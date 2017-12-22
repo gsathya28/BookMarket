@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">BookMarket</string>
+    <string name="main_prompt">Looking to:</string>
+    <string name="Sell">Sell</string>
+    <string name="Buy">Buy</string>
+</resources>
