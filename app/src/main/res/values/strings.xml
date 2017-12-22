@@ -3,4 +3,6 @@
     <string name="main_prompt">Looking to:</string>
     <string name="Sell">Sell</string>
     <string name="Buy">Buy</string>
+    <string name="your_posts">Your Posts</string>
+    <string name="Add_Post">Add Post</string>
 </resources>

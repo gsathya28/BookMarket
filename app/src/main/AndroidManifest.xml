@@ -9,7 +9,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity"></activity>
+        <activity android:name=".MainActivity" />
+        <activity android:name=".SellMainActivity" />
+        <activity android:name=".SellAddPost" />
+        <activity android:name=".SellViewPosts"></activity>
     </application>
 
 </manifest>
