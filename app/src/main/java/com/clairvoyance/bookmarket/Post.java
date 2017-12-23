@@ -14,7 +14,6 @@ class Post {
     private Calendar postDate;
     private double UID;
     private boolean isNegotiable;
-    private boolean isAvailable;
     private ArrayList<Book> books = new ArrayList<>();
     private String notes;
 
@@ -46,9 +45,5 @@ class Post {
 
     public boolean isNegotiable() {
         return isNegotiable;
-    }
-
-    public boolean isAvailable() {
-        return isAvailable;
     }
 }

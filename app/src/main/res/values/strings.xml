@@ -5,4 +5,18 @@
     <string name="Buy">Buy</string>
     <string name="your_posts">Your Posts</string>
     <string name="Add_Post">Add Post</string>
+    <string name="Add_Book">Add Book</string>
+    <string name="no_books_added">No Books Added</string>
+    <string name="post_confirm">Post!</string>
+    <string name="notes">Notes</string>
+    <string name="negotiableq">Negotiable?</string>
+    <string name="coursesubj">Course Type</string>
+    <string name="coursenumber">Course Number</string>
+    <string name="booktitle">Book Title</string>
+    <string name="author">Author</string>
+    <string name="price">Price</string>
+    <string name="vnum">Version #:</string>
+    <string name="courseinstructor">Course Instructor:</string>
+    <string name="sell_main_layout_title">People are looking for:</string>
+
 </resources>

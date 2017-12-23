@@ -13,6 +13,8 @@ public class Book {
     private String notes;
     private String courseSubj;
     private String courseNumber;
+    private String versionNumber;
+    private boolean isAvailable;
 
     static final int NAME = 0;
     static final int PRICE = 1;
@@ -20,6 +22,7 @@ public class Book {
     static final int NOTES = 3;
     static final int COURSE_SUBJECT = 4;
     static final int COURSE_NUMBER = 5;
+    static final int VERSION_NUMBER = 6;
 
     // Only courseSubj and courseNumber are required
 
@@ -64,5 +67,9 @@ public class Book {
             default:
                 throw new IllegalArgumentException("Invalid Parameter");
         }
+    }
+
+    public boolean isAvailable() {
+        return isAvailable;
     }
 }

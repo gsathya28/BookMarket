@@ -22,8 +22,8 @@ public class WebServiceHandler {
         return new User("", mainUID, "");
     }
 
-    public static ArrayList<Post> getBuyPosts(){
-        ArrayList<Post> buyPosts = new ArrayList<>();
+    public static ArrayList<BuyPost> getBuyPosts(){
+        ArrayList<BuyPost> buyPosts = new ArrayList<>();
 
         // Use AWS to generate posts and put it in an array
 
