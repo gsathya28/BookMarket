@@ -14,6 +14,7 @@ public class Book {
     private String courseSubj;
     private String courseNumber;
     private String versionNumber;
+    private String instructor;
     private boolean isAvailable;
 
     static final int NAME = 0;
@@ -23,6 +24,7 @@ public class Book {
     static final int COURSE_SUBJECT = 4;
     static final int COURSE_NUMBER = 5;
     static final int VERSION_NUMBER = 6;
+    static final int INSTRUCTOR = 7;
 
     // Only courseSubj and courseNumber are required
 
@@ -31,7 +33,11 @@ public class Book {
         this.courseNumber = courseNumber;
     }
 
-    public void set(int field, String value){
+    void set(int field, String value){
+        if (value == null){
+            return;
+        }
+
         switch (field){
             case NAME:
                 this.name = value;
@@ -45,12 +51,18 @@ public class Book {
             case NOTES:
                 this.notes = value;
                 return;
+            case VERSION_NUMBER:
+                this.versionNumber = value;
+                return;
+            case INSTRUCTOR:
+                this.instructor = value;
+                return;
             default:
                 throw new IllegalArgumentException("Invalid Parameter");
         }
     }
 
-    public String get(int field){
+    String get(int field){
         switch (field){
             case NAME:
                 return this.name;
@@ -64,6 +76,10 @@ public class Book {
                 return this.courseSubj;
             case COURSE_NUMBER:
                 return this.courseNumber;
+            case VERSION_NUMBER:
+                return this.versionNumber;
+            case INSTRUCTOR:
+                return this.instructor;
             default:
                 throw new IllegalArgumentException("Invalid Parameter");
         }
