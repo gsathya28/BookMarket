@@ -19,12 +19,13 @@ public class SellAddPost extends AppCompatActivity {
 
     ArrayList<Book> postBooks;
     View dialogLayout;
+    Button noBookButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sell_add_post);
-
+        noBookButton = findViewById(R.id.sell_default_no_book);
         postBooks = new ArrayList<>();
         setButtons();
     }
@@ -153,7 +154,7 @@ public class SellAddPost extends AppCompatActivity {
 
                 editBookDialog.setOnShowListener(new DialogInterface.OnShowListener() {
                     @Override
-                    public void onShow(DialogInterface dialogInterface) {
+                    public void onShow(DialogInterface dialo3gInterface) {
 
                         Button editButton = editBookDialog.getButton(AlertDialog.BUTTON_POSITIVE);
                         editButton.setOnClickListener(new View.OnClickListener() {
@@ -186,9 +187,9 @@ public class SellAddPost extends AppCompatActivity {
                                 newBook.set(Book.INSTRUCTOR, instructor);
 
                                 postBooks.remove(book);
-                                listLayout.removeView(bookButton);
                                 postBooks.add(newBook);
                                 addToList(newBook);
+                                deleteBookFromList(bookButton);
                                 editBookDialog.dismiss();
                             }
                         });
@@ -198,7 +199,7 @@ public class SellAddPost extends AppCompatActivity {
                             @Override
                             public void onClick(View view) {
                                 postBooks.remove(book);
-                                listLayout.removeView(bookButton);
+                                deleteBookFromList(bookButton);
                                 editBookDialog.dismiss();
                             }
                         });
@@ -223,5 +224,14 @@ public class SellAddPost extends AppCompatActivity {
         return builder.create();
     }
 
+    private void deleteBookFromList(Button button){
+        final LinearLayout listLayout = findViewById(R.id.sell_add_book_list);
 
+        if (listLayout.indexOfChild(button) != -1)
+            listLayout.removeView(button);
+
+        if (postBooks.size() == 0){
+            listLayout.addView(noBookButton, 0);
+        }
+    }
 }
