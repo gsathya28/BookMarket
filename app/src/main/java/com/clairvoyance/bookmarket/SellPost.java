@@ -9,8 +9,8 @@ import java.util.Calendar;
 
 public class SellPost extends Post {
 
-    public SellPost(double postID, Calendar postDate, double UID){
-        super(postID, postDate, UID);
+    public SellPost(Calendar postDate, double UID){
+        super(postDate, UID);
     }
 
 }

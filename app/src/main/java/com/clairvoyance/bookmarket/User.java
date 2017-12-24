@@ -1,5 +1,6 @@
 package com.clairvoyance.bookmarket;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
@@ -7,22 +8,33 @@ import java.util.ArrayList;
  *
  */
 
-public class User {
+public class User implements Serializable {
     private String name;
     private double UID;
     private String email;
     private ArrayList<Post> myPosts;
+    private boolean isAuthenticated;
 
     User(String name, double UID, String email){
         this.name = name;
         this.UID = UID;
         this.email = email;
+        myPosts = new ArrayList<>();
     }
 
     public void addPost(Post post){
         myPosts.add(post);
     }
 
+    boolean isAuthenticated() {
+        return isAuthenticated;
+    }
 
+    void setAuthenticated(boolean authenticated) {
+        isAuthenticated = authenticated;
+    }
 
+    double getUID() {
+        return UID;
+    }
 }

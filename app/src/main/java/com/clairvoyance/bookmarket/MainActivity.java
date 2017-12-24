@@ -13,6 +13,18 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setButtons();
+
+        User mainUser = LocalDataHandler.parseMainUserData(this);
+        if (mainUser == null || !WebServiceHandler.authenticateMainUser(mainUser)){
+            // Redirect to login screen
+
+            /* Test Code HERE! REMOVE LATER!!*/
+            mainUser = WebServiceHandler.generateMainUser();
+            mainUser.setAuthenticated(true);
+            LocalDataHandler.saveMainUserData(mainUser, this);
+        }
+
+
     }
 
     private void setButtons(){

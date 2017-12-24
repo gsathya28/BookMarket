@@ -14,10 +14,18 @@ import java.util.ArrayList;
 
 public class SellMainActivity extends AppCompatActivity {
 
+    User mainUser;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sell_main);
+
+        mainUser = LocalDataHandler.parseMainUserData(getApplicationContext());
+        if (!mainUser.isAuthenticated()){
+            // Redirect to Login page (Preventing corrupted files)
+        }
+
         setOptionButtons();
         setLayout();
     }
@@ -48,7 +56,7 @@ public class SellMainActivity extends AppCompatActivity {
         TextView titleText = new TextView(getApplicationContext());
         titleText.setText(R.string.sell_main_layout_title);
 
-        ArrayList<BuyPost> buyPosts = WebServiceHandler.getBuyPosts();
+        ArrayList<BuyPost> buyPosts = WebServiceHandler.getPublicBuyPosts();
 
         for (BuyPost post : buyPosts){
             Button postButton = new Button(getApplicationContext());

@@ -1,5 +1,6 @@
 package com.clairvoyance.bookmarket;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -8,17 +9,16 @@ import java.util.Calendar;
  *
  */
 
-class Post {
+class Post implements Serializable{
 
-    private double postID;
+    private double postID = -1;
     private Calendar postDate;
     private double UID;
     private boolean isNegotiable;
     private ArrayList<Book> books = new ArrayList<>();
     private String notes;
 
-    Post(double postID, Calendar postDate, double UID){
-        this.postID = postID;
+    Post(Calendar postDate, double UID){
         this.postDate = postDate;
         this.UID = UID;
     }
@@ -37,6 +37,10 @@ class Post {
 
     public void addBook(Book book){
         books.add(book);
+    }
+
+    public void addBookList(ArrayList<Book> books){
+        this.books = books;
     }
 
     public ArrayList<Book> getBooks() {

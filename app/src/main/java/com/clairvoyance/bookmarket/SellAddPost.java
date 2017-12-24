@@ -1,6 +1,7 @@
 package com.clairvoyance.bookmarket;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -14,9 +15,11 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 public class SellAddPost extends AppCompatActivity {
 
+    User mainUser;
     ArrayList<Book> postBooks;
     View dialogLayout;
     Button noBookButton;
@@ -27,12 +30,18 @@ public class SellAddPost extends AppCompatActivity {
         setContentView(R.layout.activity_sell_add_post);
         noBookButton = findViewById(R.id.sell_default_no_book);
         postBooks = new ArrayList<>();
+
+        mainUser = LocalDataHandler.parseMainUserData(getApplicationContext());
+        if (!mainUser.isAuthenticated()){
+            // Redirect to Login page (Preventing corrupted files)
+        }
+
         setButtons();
     }
 
     private void setButtons(){
 
-        Button addBook = findViewById(R.id.sell_add_book_button);
+        final Button addBook = findViewById(R.id.sell_add_book_button);
         addBook.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -81,6 +90,22 @@ public class SellAddPost extends AppCompatActivity {
                 newBookDialog.show();
             }
         });
+
+        Button postButton = findViewById(R.id.sell_post_button);
+        postButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Add a new post object, and add it to the user object
+                Post newPost = new Post(Calendar.getInstance(), mainUser.getUID());
+                newPost.addBookList(postBooks);
+                mainUser.addPost(newPost);
+                WebServiceHandler.addPublicPost(newPost);
+
+                Intent savePost = new Intent(getApplicationContext(), SellMainActivity.class);
+                startActivity(savePost);
+            }
+        });
+
     }
 
     private AlertDialog newBookDialog(){
@@ -224,11 +249,11 @@ public class SellAddPost extends AppCompatActivity {
         return builder.create();
     }
 
-    private void deleteBookFromList(Button button){
+    private void deleteBookFromList(Button bookButton){
         final LinearLayout listLayout = findViewById(R.id.sell_add_book_list);
 
-        if (listLayout.indexOfChild(button) != -1)
-            listLayout.removeView(button);
+        if (listLayout.indexOfChild(bookButton) != -1)
+            listLayout.removeView(bookButton);
 
         if (postBooks.size() == 0){
             listLayout.addView(noBookButton, 0);
