@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
 
 public class SellMainActivity extends AppCompatActivity {
@@ -82,25 +83,36 @@ public class SellMainActivity extends AppCompatActivity {
             postButton.setBackgroundColor(Color.parseColor("#267326"));
             // Set text using the post and books
             ArrayList<Book> books = post.getBooks();
+            StringBuilder builder = new StringBuilder();
+            builder.append("Books:");
             for (Book book : books){
+
                 String courseSubj = book.get(Book.COURSE_SUBJECT);
                 String courseNum = book.get(Book.COURSE_NUMBER);
                 String bookName = book.get(Book.NAME);
 
-                postButton.append(courseSubj);
-                postButton.append(" ");
-                postButton.append(courseNum);
-                postButton.append(" - ");
-                postButton.append(bookName);
-                postButton.append(System.getProperty("line.separator"));
+                builder.append(System.getProperty("line.separator"));
+                builder.append(courseSubj);
+                builder.append(" ");
+                builder.append(courseNum);
+                builder.append(" - ");
+                builder.append(bookName);
             }
+            builder.append(System.getProperty("line.separator"));
+            builder.append(System.getProperty("line.separator"));
+            builder.append("Posted: ");
+            builder.append(DateFormat.getTimeInstance(DateFormat.SHORT).format(post.getPostDate().getTime()));
+            builder.append(" - ");
+            builder.append(DateFormat.getDateInstance().format(post.getPostDate().getTime()));
 
+            postButton.setText(builder.toString());
             postButton.setTextColor(Color.parseColor("#FFFFFF"));
             mainLayout.addView(postButton);
         }
-
-
-
     }
 
+    @Override
+    public void onBackPressed(){
+
+    }
 }
