@@ -1,11 +1,13 @@
 package com.clairvoyance.bookmarket;
 
+import java.io.Serializable;
+
 /**
  * Created by Sathya on 12/22/2017.
  *
  */
 
-public class Book {
+public class Book implements Serializable {
 
     private String name;
     private String price;

@@ -37,4 +37,15 @@ public class User implements Serializable {
     double getUID() {
         return UID;
     }
+
+    public ArrayList<SellPost> getMySellPosts() {
+        ArrayList<SellPost> sellPosts = new ArrayList<>();
+        for (Post post : myPosts){
+            if (post instanceof SellPost){
+                sellPosts.add((SellPost) post);
+            }
+        }
+
+        return sellPosts;
+    }
 }

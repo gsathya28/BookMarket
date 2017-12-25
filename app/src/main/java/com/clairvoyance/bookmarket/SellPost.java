@@ -1,5 +1,6 @@
 package com.clairvoyance.bookmarket;
 
+import java.io.Serializable;
 import java.util.Calendar;
 
 /**
@@ -7,7 +8,7 @@ import java.util.Calendar;
  *
  */
 
-public class SellPost extends Post {
+public class SellPost extends Post implements Serializable {
 
     public SellPost(Calendar postDate, double UID){
         super(postDate, UID);

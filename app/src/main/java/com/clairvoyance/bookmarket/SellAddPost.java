@@ -96,10 +96,11 @@ public class SellAddPost extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 // Add a new post object, and add it to the user object
-                Post newPost = new Post(Calendar.getInstance(), mainUser.getUID());
+                SellPost newPost = new SellPost(Calendar.getInstance(), mainUser.getUID());
                 newPost.addBookList(postBooks);
                 mainUser.addPost(newPost);
                 WebServiceHandler.addPublicPost(newPost);
+                LocalDataHandler.saveMainUserData(mainUser, getApplicationContext());
 
                 Intent savePost = new Intent(getApplicationContext(), SellMainActivity.class);
                 startActivity(savePost);
