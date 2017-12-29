@@ -15,7 +15,7 @@ public class MainActivity extends AppCompatActivity {
         setButtons();
 
         User mainUser = LocalDataHandler.parseMainUserData(this);
-        if (mainUser == null || !WebServiceHandler.authenticateMainUser(mainUser)){
+        if (mainUser == null || !WebServiceHandler.authenticateMainUser(mainUser, getApplicationContext())){
             // Redirect to login screen
 
             /* Test Code HERE! REMOVE LATER!!*/
@@ -23,8 +23,6 @@ public class MainActivity extends AppCompatActivity {
             mainUser.setAuthenticated(true);
             LocalDataHandler.saveMainUserData(mainUser, this);
         }
-
-
     }
 
     private void setButtons(){
@@ -34,10 +32,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent sellMainActivity = new Intent(getApplicationContext(), SellMainActivity.class);
                 startActivity(sellMainActivity);
-
             }
         });
-
-
     }
 }

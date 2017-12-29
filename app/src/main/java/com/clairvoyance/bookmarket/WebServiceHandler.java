@@ -1,10 +1,6 @@
 package com.clairvoyance.bookmarket;
 
 import android.content.Context;
-
-import com.amazonaws.auth.CognitoCachingCredentialsProvider;
-import com.amazonaws.regions.Regions;
-
 import java.util.ArrayList;
 
 /**
@@ -23,12 +19,6 @@ class WebServiceHandler {
         // Test mainUID
 
         // Initialize the Amazon Cognito credentials provider
-        CognitoCachingCredentialsProvider credentialsProvider = new CognitoCachingCredentialsProvider(
-                context,
-                "us-east-1:08f4fe45-b937-45d2-b943-c6690c4fe3c7", // Identity pool ID
-                Regions.US_EAST_1 // Region
-        );
-
         return false;
     }
 
@@ -49,5 +39,4 @@ class WebServiceHandler {
     static void addPublicPost(Post post){
         // Use AWS to add public post
     }
-
 }
