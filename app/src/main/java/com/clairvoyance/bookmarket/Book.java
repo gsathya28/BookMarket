@@ -27,6 +27,7 @@ public class Book implements Serializable {
     static final int COURSE_NUMBER = 5;
     static final int VERSION_NUMBER = 6;
     static final int INSTRUCTOR = 7;
+    static final int AVAILABLE = 8;
 
     // Only courseSubj and courseNumber are required
 
@@ -63,7 +64,14 @@ public class Book implements Serializable {
                 throw new IllegalArgumentException("Invalid Parameter");
         }
     }
+    void set(int field, boolean value){
 
+        switch (field){
+            case AVAILABLE:
+                this.isAvailable = value;
+        }
+
+    }
     String get(int field){
         switch (field){
             case NAME:
@@ -90,4 +98,5 @@ public class Book implements Serializable {
     public boolean isAvailable() {
         return isAvailable;
     }
+
 }

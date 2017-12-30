@@ -11,6 +11,8 @@ import java.util.ArrayList;
 class WebServiceHandler {
 
     private static double mainUID;
+    final static int RC_SIGN_IN = 2899;
+    final static String WEB_CLIENT_ID = "483082602147-bmhfbbj3k1proa5r2ll3hr694d9s5mrr.apps.googleusercontent.com";
 
 
     static boolean authenticateMainUser(User localUser, Context context){

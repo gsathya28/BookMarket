@@ -8,7 +8,7 @@ import java.util.ArrayList;
  *
  */
 
-public class User implements Serializable {
+class User implements Serializable {
     private String name;
     private double UID;
     private String email;
@@ -22,7 +22,7 @@ public class User implements Serializable {
         myPosts = new ArrayList<>();
     }
 
-    public void addPost(Post post){
+    void addPost(Post post){
         myPosts.add(post);
     }
 
@@ -38,7 +38,7 @@ public class User implements Serializable {
         return UID;
     }
 
-    public ArrayList<SellPost> getMySellPosts() {
+    ArrayList<SellPost> getMySellPosts() {
         ArrayList<SellPost> sellPosts = new ArrayList<>();
         for (Post post : myPosts){
             if (post instanceof SellPost){

@@ -14,6 +14,9 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -101,6 +104,10 @@ public class SellAddPost extends AppCompatActivity {
                 mainUser.addPost(newPost);
                 WebServiceHandler.addPublicPost(newPost);
                 LocalDataHandler.saveMainUserData(mainUser, getApplicationContext());
+
+                FirebaseDatabase database = FirebaseDatabase.getInstance();
+                DatabaseReference myRef = database.getReference("myRef");
+                myRef.setValue("Hello!");
 
                 Intent savePost = new Intent(getApplicationContext(), SellMainActivity.class);
                 startActivity(savePost);

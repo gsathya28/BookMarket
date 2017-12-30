@@ -17,13 +17,14 @@ class Post implements Serializable{
     private boolean isNegotiable;
     private ArrayList<Book> books = new ArrayList<>();
     private String notes;
+    private String postType;
 
     Post(Calendar postDate, double UID){
         this.postDate = postDate;
         this.UID = UID;
     }
 
-    public Calendar getPostDate() {
+    Calendar getPostDate() {
         return postDate;
     }
 

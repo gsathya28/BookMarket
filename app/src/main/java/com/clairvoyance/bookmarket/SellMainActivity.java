@@ -4,11 +4,18 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -54,8 +61,28 @@ public class SellMainActivity extends AppCompatActivity {
     private void setLayout(){
         LinearLayout mainLayout = findViewById(R.id.buyer_post_layout);
 
-        TextView titleText = new TextView(getApplicationContext());
+        final TextView titleText = new TextView(getApplicationContext());
         titleText.setText(R.string.sell_main_layout_title);
+
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference myRef = database.getReference("myRef");
+        String str = "";
+        myRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                String value = dataSnapshot.getValue(String.class);
+                titleText.setText(value);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.w("Banana", "Failed to read value.", databaseError.toException());
+            }
+        });
+
+
+        titleText.setText(str);
+        mainLayout.addView(titleText);
 
         ArrayList<BuyPost> buyPosts = WebServiceHandler.getPublicBuyPosts();
 
