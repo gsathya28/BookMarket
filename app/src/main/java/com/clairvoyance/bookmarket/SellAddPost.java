@@ -33,11 +33,7 @@ public class SellAddPost extends AppCompatActivity {
         setContentView(R.layout.activity_sell_add_post);
         noBookButton = findViewById(R.id.sell_default_no_book);
         postBooks = new ArrayList<>();
-
         mainUser = LocalDataHandler.parseMainUserData(getApplicationContext());
-        if (!mainUser.isAuthenticated()){
-            // Redirect to Login page (Preventing corrupted files)
-        }
 
         setButtons();
     }

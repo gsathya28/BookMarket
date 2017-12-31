@@ -30,9 +30,6 @@ public class SellMainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_sell_main);
 
         mainUser = LocalDataHandler.parseMainUserData(getApplicationContext());
-        if (!mainUser.isAuthenticated()){
-            // Redirect to Login page (Preventing corrupted files)
-        }
 
         setOptionButtons();
         setLayout();

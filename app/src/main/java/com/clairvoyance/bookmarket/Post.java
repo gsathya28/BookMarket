@@ -13,13 +13,13 @@ class Post implements Serializable{
 
     private double postID = -1;
     private Calendar postDate;
-    private double UID;
+    private String UID;
     private boolean isNegotiable;
     private ArrayList<Book> books = new ArrayList<>();
     private String notes;
     private String postType;
 
-    Post(Calendar postDate, double UID){
+    Post(Calendar postDate, String UID){
         this.postDate = postDate;
         this.UID = UID;
     }
@@ -32,7 +32,7 @@ class Post implements Serializable{
         return postID;
     }
 
-    public double getUID() {
+    public String getUID() {
         return UID;
     }
 

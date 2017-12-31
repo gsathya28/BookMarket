@@ -22,9 +22,7 @@ public class SellViewPosts extends AppCompatActivity {
         setContentView(R.layout.activity_sell_view_posts);
 
         mainUser = LocalDataHandler.parseMainUserData(getApplicationContext());
-        if (!mainUser.isAuthenticated()){
-            // Redirect to Login
-        }
+
         setLayout();
     }
 

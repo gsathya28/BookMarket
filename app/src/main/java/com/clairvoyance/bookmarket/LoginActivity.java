@@ -8,6 +8,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.Toast;
+
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -39,6 +41,9 @@ public class LoginActivity extends AppCompatActivity {
                 .requestEmail()
                 .build();
 
+        // Set up Firebase Authorizer
+        mAuth = FirebaseAuth.getInstance();
+
         // Build a GoogleSignInClient with the options specified by gso.
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
         findViewById(R.id.sign_in_button).setOnClickListener(new OnClickListener() {
@@ -47,7 +52,6 @@ public class LoginActivity extends AppCompatActivity {
                 signIn();
             }
         });
-        mAuth = FirebaseAuth.getInstance();
     }
 
     private void signIn() {
@@ -66,10 +70,9 @@ public class LoginActivity extends AppCompatActivity {
             try {
                 // Google Sign In was successful, authenticate with Firebase
                 GoogleSignInAccount account = task.getResult(ApiException.class);
-
-
+                String accountEmail = account.getEmail();
+                Log.d("EmailString", accountEmail);
                 firebaseAuthWithGoogle(account);
-
                 // UI change...
             } catch (ApiException e) {
                 // Google Sign In failed, update UI appropriately
@@ -111,7 +114,15 @@ public class LoginActivity extends AppCompatActivity {
         // Check for existing Google Sign In account, if the user is already signed in
         // the GoogleSignInAccount will be non-null.
         FirebaseUser currentUser = mAuth.getCurrentUser();
-        // updateUI(account);
+        updateUI(currentUser);
     }
+
+    protected void updateUI(FirebaseUser user){
+        if (user != null){
+            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+            startActivity(intent);
+        }
+    }
+
 }
 

@@ -1,6 +1,15 @@
 package com.clairvoyance.bookmarket;
 
-import android.content.Context;
+import android.support.annotation.Nullable;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 import java.util.ArrayList;
 
 /**
@@ -10,18 +19,84 @@ import java.util.ArrayList;
 
 class WebServiceHandler {
 
-    private static double mainUID;
+
     final static int RC_SIGN_IN = 2899;
     final static String WEB_CLIENT_ID = "483082602147-bmhfbbj3k1proa5r2ll3hr694d9s5mrr.apps.googleusercontent.com";
+    private static FirebaseAuth mAuth;
+    private static FirebaseUser mUser;
+    private static User loadedUser;
 
+    private static boolean isMainUserAuthenticated(){
+        mAuth = FirebaseAuth.getInstance();
+        mUser = mAuth.getCurrentUser();
+        return mUser != null;
+    }
 
-    static boolean authenticateMainUser(User localUser, Context context){
+    @Nullable
+    static User generateMainUser(){
+        if (isMainUserAuthenticated()){
+            User user = new User(mUser.getUid(), mUser.getEmail());
+            user.setEmailVerified(mUser.isEmailVerified());
+            user = loadMainUserData(user);
+            return user;
+        }
+        else {
+            return null; // Re-authentication intent set up in onCreate
+        }
+    }
 
-        // Use AWS to get main user credentials and authenticate
-        // Test mainUID
+    private static User loadMainUserData(final User user){
 
-        // Initialize the Amazon Cognito credentials provider
-        return false;
+        if (loadedUser == null) {
+            DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
+            DatabaseReference userRef = rootRef.child("users").child(mUser.getUid());
+            userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if (!dataSnapshot.exists()) {
+                        // Create new user - with values
+                        createNewUserData(user);
+                        loadedUser = user;
+                    }
+                    else {
+                        loadedUser = dataSnapshot.getValue(User.class);
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    // Nothing special happens
+                }
+            });
+
+            // Read Data
+            userRef.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+        }
+        return loadedUser;
+    }
+
+    static void updateMainUserData(User user){
+
+    }
+
+    private static void createNewUserData(User user){
+        if (isMainUserAuthenticated()){
+            DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child("users");
+            userRef.child(mUser.getUid()).setValue(user);
+        }
+        else {
+            throw new IllegalStateException("User not authorized");
+        }
     }
 
     static ArrayList<BuyPost> getPublicBuyPosts(){
@@ -32,11 +107,6 @@ class WebServiceHandler {
         return buyPosts;
     }
 
-    static User generateMainUser(){
-        mainUID = 1;
-
-        return new User("", mainUID, "");
-    }
 
     static void addPublicPost(Post post){
         // Use AWS to add public post
