@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#66cc66"
-    tools:context="com.clairvoyance.bookmarket.SellSearchScan">
+    tools:context="com.clairvoyance.bookmarket.ActSellSearchScan">
 
     <ScrollView
         android:id="@+id/scrollView2"
@@ -70,7 +70,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="@string/negotiableq"
+        android:text="Scan?"
         android:textSize="18sp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"

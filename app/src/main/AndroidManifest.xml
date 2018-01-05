@@ -32,7 +32,8 @@
         <activity android:name=".ActSellViewPublicPost" />
         <activity android:name=".ActSellViewUserPost" />
         <activity android:name=".ActSellEditPost" />
-        <activity android:name=".SellSearchScan"></activity>
+        <activity android:name=".ActSellSearchScan" />
+        <activity android:name=".ActSellSearchResults"></activity>
     </application>
 
 </manifest>
