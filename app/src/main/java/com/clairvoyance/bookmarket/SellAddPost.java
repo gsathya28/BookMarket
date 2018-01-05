@@ -71,7 +71,7 @@ public class SellAddPost extends AppCompatActivity {
                                 String instructor = ((EditText) dialogLayout.findViewById(R.id.sell_instructor_text)).getText().toString();
                                 String notes = ((EditText) dialogLayout.findViewById(R.id.sell_book_notes_text)).getText().toString();
 
-                                newBook.set(Book.NAME, bookTitle);
+                                newBook.set(Book.TITLE, bookTitle);
                                 newBook.set(Book.AUTHOR, author);
                                 newBook.set(Book.PRICE, price);
                                 newBook.set(Book.VERSION_NUMBER, vnum);
@@ -160,7 +160,7 @@ public class SellAddPost extends AppCompatActivity {
 
         String courseSubj = book.get(Book.COURSE_SUBJECT);
         String courseNum = book.get(Book.COURSE_NUMBER);
-        String bookName = book.get(Book.NAME);
+        String bookName = book.get(Book.TITLE);
         String buttonText = courseSubj + " " + courseNum + " - " + bookName;
         bookButton.setText(buttonText);
         bookButton.setTextColor(Color.parseColor("#FFFFFF"));
@@ -174,7 +174,7 @@ public class SellAddPost extends AppCompatActivity {
 
                 ((EditText) dialogLayout.findViewById(R.id.sell_course_type_text)).setText(book.get(Book.COURSE_SUBJECT));
                 ((EditText) dialogLayout.findViewById(R.id.sell_course_number_text)).setText(book.get(Book.COURSE_NUMBER));
-                ((EditText) dialogLayout.findViewById(R.id.sell_book_title_text)).setText(book.get(Book.NAME));
+                ((EditText) dialogLayout.findViewById(R.id.sell_book_title_text)).setText(book.get(Book.TITLE));
                 ((EditText) dialogLayout.findViewById(R.id.sell_author_text)).setText(book.get(Book.AUTHOR));
                 ((EditText) dialogLayout.findViewById(R.id.sell_price_text)).setText(book.get(Book.PRICE));
                 ((EditText) dialogLayout.findViewById(R.id.sell_vnum_text)).setText(book.get(Book.VERSION_NUMBER));
@@ -208,7 +208,7 @@ public class SellAddPost extends AppCompatActivity {
                                 String instructor = ((EditText) dialogLayout.findViewById(R.id.sell_instructor_text)).getText().toString();
                                 String notes = ((EditText) dialogLayout.findViewById(R.id.sell_book_notes_text)).getText().toString();
 
-                                newBook.set(Book.NAME, bookTitle);
+                                newBook.set(Book.TITLE, bookTitle);
                                 newBook.set(Book.AUTHOR, author);
                                 newBook.set(Book.PRICE, price);
                                 newBook.set(Book.VERSION_NUMBER, vnum);

@@ -14,10 +14,14 @@ class Post implements Serializable{
     private double postID = -1;
     private Calendar postDate;
     private String UID;
-    private boolean isNegotiable;
+    private boolean isNegotiable = false;
     private ArrayList<Book> books = new ArrayList<>();
     private String notes;
     private String postType;
+
+    public Post(){
+        // For Firebase usage
+    }
 
     Post(Calendar postDate, String UID){
         this.postDate = postDate;
@@ -27,28 +31,27 @@ class Post implements Serializable{
     Calendar getPostDate() {
         return postDate;
     }
-
-    public double getPostID() {
+    double getPostID() {
         return postID;
     }
-
-    public String getUID() {
+    String getUID() {
         return UID;
     }
 
-    public void addBook(Book book){
+    void setNotes(String notes) {this.notes = notes;}
+    String getNotes() {return notes;}
+    void setNegotiable(boolean negotiable) {isNegotiable = negotiable;}
+    boolean isNegotiable() {
+        return isNegotiable;
+    }
+
+    void addBook(Book book){
         books.add(book);
     }
-
-    public void addBookList(ArrayList<Book> books){
+    void addBookList(ArrayList<Book> books){
         this.books = books;
     }
-
-    public ArrayList<Book> getBooks() {
+    ArrayList<Book> getBooks() {
         return books;
-    }
-
-    public boolean isNegotiable() {
-        return isNegotiable;
     }
 }

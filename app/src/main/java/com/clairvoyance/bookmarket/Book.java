@@ -9,7 +9,7 @@ import java.io.Serializable;
 
 public class Book implements Serializable {
 
-    private String name;
+    private String title;
     private String price;
     private String author;
     private String notes;
@@ -19,7 +19,7 @@ public class Book implements Serializable {
     private String instructor;
     private boolean isAvailable;
 
-    static final int NAME = 0;
+    static final int TITLE = 0;
     static final int PRICE = 1;
     static final int AUTHOR = 2;
     static final int NOTES = 3;
@@ -30,7 +30,6 @@ public class Book implements Serializable {
     static final int AVAILABLE = 8;
 
     // Only courseSubj and courseNumber are required
-
     public Book(String courseSubj, String courseNumber){
         this.courseSubj = courseSubj;
         this.courseNumber = courseNumber;
@@ -42,8 +41,13 @@ public class Book implements Serializable {
         }
 
         switch (field){
-            case NAME:
-                this.name = value;
+            case COURSE_NUMBER:
+                this.courseNumber = value;
+                return;
+            case COURSE_SUBJECT:
+                this.courseSubj = value;
+            case TITLE:
+                this.title = value;
                 return;
             case PRICE:
                 this.price = value;
@@ -74,8 +78,8 @@ public class Book implements Serializable {
     }
     String get(int field){
         switch (field){
-            case NAME:
-                return this.name;
+            case TITLE:
+                return this.title;
             case PRICE:
                 return this.price;
             case AUTHOR:
@@ -94,8 +98,7 @@ public class Book implements Serializable {
                 throw new IllegalArgumentException("Invalid Parameter");
         }
     }
-
-    public boolean isAvailable() {
+    boolean isAvailable() {
         return isAvailable;
     }
 

@@ -66,7 +66,7 @@ public class SellViewPosts extends AppCompatActivity {
 
                 String courseSubj = book.get(Book.COURSE_SUBJECT);
                 String courseNum = book.get(Book.COURSE_NUMBER);
-                String bookName = book.get(Book.NAME);
+                String bookName = book.get(Book.TITLE);
 
                 builder.append(System.getProperty("line.separator"));
                 builder.append(courseSubj);
