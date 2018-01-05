@@ -34,4 +34,8 @@
     </string>
     <string name="sign_in_google">Sign in with Google! </string>
     <string name="sign_in_note">Remember, only UMN email accounts (@umn.edu) can access certain features (such as posting)</string>
+    <string name="request">Request</string>
+    <string name="title_activity_sell_view_user_post">SellViewUserPost</string>
+    <string name="delete">Delete</string>
+    <string name="edit">Edit</string>
 </resources>
