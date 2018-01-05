@@ -32,5 +32,6 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
-
+    <string name="sign_in_google">Sign in with Google! </string>
+    <string name="sign_in_note">Remember, only UMN email accounts (@umn.edu) can access certain features (such as posting)</string>
 </resources>
