@@ -19,6 +19,8 @@
     <string name="courseinstructor">Course Instructor:</string>
     <string name="sell_main_layout_title">People are looking for:</string>
     <string name="title_activity_login">Sign in</string>
+    <string name="settings">Settings</string>
+    <string name="search">Search/Scan Post</string>
 
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
