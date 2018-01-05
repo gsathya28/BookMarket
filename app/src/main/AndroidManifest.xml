@@ -31,7 +31,8 @@
         </activity>
         <activity android:name=".ActSellViewPublicPost" />
         <activity android:name=".ActSellViewUserPost" />
-        <activity android:name=".ActSellEditPost"></activity>
+        <activity android:name=".ActSellEditPost" />
+        <activity android:name=".SellSearchScan"></activity>
     </application>
 
 </manifest>
