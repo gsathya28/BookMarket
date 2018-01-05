@@ -10,7 +10,7 @@ import java.io.ObjectOutputStream;
  * Created by Sathya on 12/24/2017.
  */
 
-public class Serializer {
+class Serializer {
     static byte[] serialize(Object obj) throws IOException {
         ByteArrayOutputStream b = new ByteArrayOutputStream();
         ObjectOutputStream o = new ObjectOutputStream(b);

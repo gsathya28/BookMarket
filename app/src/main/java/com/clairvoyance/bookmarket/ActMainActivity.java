@@ -6,7 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
-public class MainActivity extends AppCompatActivity {
+public class ActMainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -15,7 +15,7 @@ public class MainActivity extends AppCompatActivity {
 
         User mainUser = WebServiceHandler.generateMainUser();
         if (mainUser == null){
-            Intent intent = new Intent(this, LoginActivity.class);
+            Intent intent = new Intent(this, ActLoginActivity.class);
             startActivity(intent);
         }
 
@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
         sellMainButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent sellMainActivity = new Intent(getApplicationContext(), SellMainActivity.class);
+                Intent sellMainActivity = new Intent(getApplicationContext(), ActSellMainActivity.class);
                 startActivity(sellMainActivity);
             }
         });

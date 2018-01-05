@@ -16,12 +16,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity" />
-        <activity android:name=".SellMainActivity" />
-        <activity android:name=".SellAddPost" />
-        <activity android:name=".SellViewPosts" />
+        <activity android:name=".ActMainActivity" />
+        <activity android:name=".ActSellMainActivity" />
+        <activity android:name=".ActSellAddPost" />
+        <activity android:name=".ActSellViewPosts" />
         <activity
-            android:name=".LoginActivity"
+            android:name=".ActLoginActivity"
             android:label="BookMarket">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -29,8 +29,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".SellViewPublicPost" />
-        <activity android:name=".SellViewUserPost"></activity>
+        <activity android:name=".ActSellViewPublicPost" />
+        <activity android:name=".ActSellViewUserPost" />
+        <activity android:name=".ActSellEditPost"></activity>
     </application>
 
 </manifest>

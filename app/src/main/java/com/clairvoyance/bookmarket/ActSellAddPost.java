@@ -20,7 +20,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-public class SellAddPost extends AppCompatActivity {
+public class ActSellAddPost extends AppCompatActivity {
 
     User mainUser;
     ArrayList<Book> postBooks;
@@ -105,7 +105,7 @@ public class SellAddPost extends AppCompatActivity {
                 DatabaseReference myRef = database.getReference("myRef");
                 myRef.setValue("Hello!");
 
-                Intent savePost = new Intent(getApplicationContext(), SellMainActivity.class);
+                Intent savePost = new Intent(getApplicationContext(), ActSellMainActivity.class);
                 startActivity(savePost);
             }
         });

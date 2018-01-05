@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#66cc66"
-    tools:context="com.clairvoyance.bookmarket.SellViewPosts">
+    tools:context="com.clairvoyance.bookmarket.ActSellViewPosts">
 
     <LinearLayout
         android:id="@+id/sell_my_post_layout"

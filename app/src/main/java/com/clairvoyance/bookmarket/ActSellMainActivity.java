@@ -20,7 +20,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.text.DateFormat;
 import java.util.ArrayList;
 
-public class SellMainActivity extends AppCompatActivity {
+public class ActSellMainActivity extends AppCompatActivity {
 
     User mainUser;
 
@@ -40,7 +40,7 @@ public class SellMainActivity extends AppCompatActivity {
         addPostButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent addPostIntent = new Intent(getApplicationContext(), SellAddPost.class);
+                Intent addPostIntent = new Intent(getApplicationContext(), ActSellAddPost.class);
                 startActivity(addPostIntent);
             }
         });
@@ -49,7 +49,7 @@ public class SellMainActivity extends AppCompatActivity {
         viewPostsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent viewPostsIntent = new Intent(getApplicationContext(), SellViewPosts.class);
+                Intent viewPostsIntent = new Intent(getApplicationContext(), ActSellViewPosts.class);
                 startActivity(viewPostsIntent);
             }
         });

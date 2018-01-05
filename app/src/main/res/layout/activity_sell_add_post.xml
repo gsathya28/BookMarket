@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#66cc66"
-    tools:context="com.clairvoyance.bookmarket.SellAddPost">
+    tools:context="com.clairvoyance.bookmarket.ActSellAddPost">
 
     <ScrollView
         android:id="@+id/scrollView2"

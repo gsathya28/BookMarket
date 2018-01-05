@@ -12,7 +12,7 @@ import android.widget.TextView;
 import java.text.DateFormat;
 import java.util.ArrayList;
 
-public class SellViewPosts extends AppCompatActivity {
+public class ActSellViewPosts extends AppCompatActivity {
 
     User mainUser;
 
