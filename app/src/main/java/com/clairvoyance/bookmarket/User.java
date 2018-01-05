@@ -1,7 +1,6 @@
 package com.clairvoyance.bookmarket;
 
 import com.google.firebase.database.IgnoreExtraProperties;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -17,7 +16,6 @@ class User implements Serializable {
     private String email;
     private ArrayList<Post> myPosts;
     private boolean isEmailVerified = false;
-    private ArrayList<Long> postIDs = new ArrayList<>();
 
     public User(){
 
@@ -47,7 +45,6 @@ class User implements Serializable {
     void addPost(Post post){
         myPosts.add(post);
     }
-
     ArrayList<SellPost> getMySellPosts() {
         ArrayList<SellPost> sellPosts = new ArrayList<>();
         for (Post post : myPosts){
