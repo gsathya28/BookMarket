@@ -1,12 +1,14 @@
 package com.clairvoyance.bookmarket;
 
+import com.google.firebase.database.IgnoreExtraProperties;
+
 import java.io.Serializable;
 
 /**
  * Created by Sathya on 12/22/2017.
  *
  */
-
+@IgnoreExtraProperties
 class Book implements Serializable {
 
     private String title;
@@ -28,6 +30,11 @@ class Book implements Serializable {
     static final int VERSION_NUMBER = 6;
     static final int INSTRUCTOR = 7;
     static final int AVAILABLE = 8;
+
+
+    public Book(){
+
+    }
 
     // Only courseSubj and courseNumber are required
     public Book(String courseSubj, String courseNumber){
@@ -98,6 +105,39 @@ class Book implements Serializable {
                 throw new IllegalArgumentException("Invalid Parameter");
         }
     }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public String getCourseSubj() {
+        return courseSubj;
+    }
+
+    public String getCourseNumber() {
+        return courseNumber;
+    }
+
+    public String getPrice() {
+        return price;
+    }
+
+    public String getVersionNumber() {
+        return versionNumber;
+    }
+
+    public String getInstructor() {
+        return instructor;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+
     boolean isAvailable() {
         return isAvailable;
     }

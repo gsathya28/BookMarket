@@ -13,7 +13,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
-
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -35,11 +34,17 @@ public class ActSellAddPost extends AppCompatActivity {
         postBooks = new ArrayList<>();
         mainUser = LocalDataHandler.parseMainUserData(getApplicationContext());
 
+        setMainUser();
         setButtons();
+    }
+
+    private void setMainUser(){
+        mainUser = WebServiceHandler.generateMainUser();
     }
 
     private void setButtons(){
 
+        // Add Book Button
         final Button addBook = findViewById(R.id.sell_add_book_button);
         addBook.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -90,16 +95,20 @@ public class ActSellAddPost extends AppCompatActivity {
             }
         });
 
+        // Post Button
         Button postButton = findViewById(R.id.sell_post_button);
         postButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 // Add a new post object, and add it to the user object
-                SellPost newPost = new SellPost(Calendar.getInstance(), mainUser.getUID());
+                SellPost newPost = new SellPost(Calendar.getInstance(), mainUser.getUid());
                 newPost.addBookList(postBooks);
                 mainUser.addPost(newPost);
                 WebServiceHandler.addPublicPost(newPost);
+                WebServiceHandler.updateMainUserData(mainUser);
+
                 LocalDataHandler.saveMainUserData(mainUser, getApplicationContext());
+
 
                 FirebaseDatabase database = FirebaseDatabase.getInstance();
                 DatabaseReference myRef = database.getReference("myRef");
@@ -110,25 +119,6 @@ public class ActSellAddPost extends AppCompatActivity {
             }
         });
 
-    }
-
-    private AlertDialog newBookDialog(){
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
-        LayoutInflater inflater = getLayoutInflater();
-        dialogLayout = inflater.inflate(R.layout.add_book_dialog_layout, null);
-
-        builder.setView(dialogLayout);
-        builder.setPositiveButton("Save", null);
-
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-
-            }
-        });
-        return builder.create();
     }
 
     private void addToList(final Book book){
@@ -240,6 +230,36 @@ public class ActSellAddPost extends AppCompatActivity {
         });
     }
 
+    private void deleteBookFromList(Button bookButton){
+        final LinearLayout listLayout = findViewById(R.id.sell_add_book_list);
+
+        if (listLayout.indexOfChild(bookButton) != -1)
+            listLayout.removeView(bookButton);
+
+        if (postBooks.size() == 0){
+            listLayout.addView(noBookButton, 0);
+        }
+    }
+
+    private AlertDialog newBookDialog(){
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        LayoutInflater inflater = getLayoutInflater();
+        dialogLayout = inflater.inflate(R.layout.add_book_dialog_layout, null);
+
+        builder.setView(dialogLayout);
+        builder.setPositiveButton("Save", null);
+
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+            }
+        });
+        return builder.create();
+    }
+
     private AlertDialog editBookDialog(){
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -251,16 +271,5 @@ public class ActSellAddPost extends AppCompatActivity {
         builder.setPositiveButton("Save", null);
         builder.setNegativeButton("DELETE", null);
         return builder.create();
-    }
-
-    private void deleteBookFromList(Button bookButton){
-        final LinearLayout listLayout = findViewById(R.id.sell_add_book_list);
-
-        if (listLayout.indexOfChild(bookButton) != -1)
-            listLayout.removeView(bookButton);
-
-        if (postBooks.size() == 0){
-            listLayout.addView(noBookButton, 0);
-        }
     }
 }

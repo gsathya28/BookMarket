@@ -34,7 +34,9 @@ class WebServiceHandler {
     @Nullable
     static User generateMainUser(){
         if (isMainUserAuthenticated()){
+            // KeyLine
             User user = new User(mUser.getUid(), mUser.getEmail());
+
             user.setEmailVerified(mUser.isEmailVerified());
             user = loadMainUserData(user);
             return user;
@@ -84,14 +86,20 @@ class WebServiceHandler {
         return loadedUser;
     }
 
-    static void updateMainUserData(User user){
-
-    }
-
     private static void createNewUserData(User user){
         if (isMainUserAuthenticated()){
             DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child("users");
             userRef.child(mUser.getUid()).setValue(user);
+        }
+        else {
+            throw new IllegalStateException("User not authorized");
+        }
+    }
+
+    static void updateMainUserData(User user){
+        if (isMainUserAuthenticated()){
+            DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child("users");
+            userRef.child(user.getUid()).setValue(user);
         }
         else {
             throw new IllegalStateException("User not authorized");
@@ -108,6 +116,10 @@ class WebServiceHandler {
 
 
     static void addPublicPost(Post post){
-        // Use AWS to add public post
+
+        if (isMainUserAuthenticated()) { // Add function to only allow certain people to post
+            DatabaseReference postRef = FirebaseDatabase.getInstance().getReference().child("posts");
+            postRef.child(post.getPostID()).setValue(post);
+        }
     }
 }
