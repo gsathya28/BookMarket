@@ -1,8 +1,10 @@
 package com.clairvoyance.bookmarket;
 
+import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 /**
  * Created by Sathya on 12/22/2017.
@@ -20,6 +22,7 @@ class Book implements Serializable {
     private String versionNumber;
     private String instructor;
     private boolean isAvailable;
+    private String bookID;
 
     static final int TITLE = 0;
     static final int PRICE = 1;
@@ -40,6 +43,7 @@ class Book implements Serializable {
     public Book(String courseSubj, String courseNumber){
         this.courseSubj = courseSubj;
         this.courseNumber = courseNumber;
+        bookID = UUID.randomUUID().toString();
     }
 
     void set(int field, String value){
@@ -142,4 +146,8 @@ class Book implements Serializable {
         return isAvailable;
     }
 
+    @Exclude
+    public String getBookID() {
+        return bookID;
+    }
 }

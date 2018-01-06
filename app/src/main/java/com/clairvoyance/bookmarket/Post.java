@@ -20,6 +20,7 @@ class Post implements Serializable{
     private String uid;
     private boolean isNegotiable = false;
     private ArrayList<Book> books = new ArrayList<>();
+    private ArrayList<String> bookIDs = new ArrayList<>();
     private String notes;
     private String postType;
 
@@ -59,10 +60,19 @@ class Post implements Serializable{
 
     void addBook(Book book){
         books.add(book);
+        bookIDs.add(book.getBookID());
     }
     void addBookList(ArrayList<Book> books){
         this.books = books;
+        for (Book book: books){
+            bookIDs.add(book.getBookID());
+        }
     }
+    public ArrayList<String> getBookIDs() {
+        return bookIDs;
+    }
+
+    @Exclude
     ArrayList<Book> getBooks() {
         return books;
     }

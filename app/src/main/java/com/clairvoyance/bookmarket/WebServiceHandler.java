@@ -122,4 +122,11 @@ class WebServiceHandler {
             postRef.child(post.getPostID()).setValue(post);
         }
     }
+
+    static void addPublicBook(Book book){
+        if (isMainUserAuthenticated()) { // Add function to only allow certain people to post
+            DatabaseReference postRef = FirebaseDatabase.getInstance().getReference().child("books");
+            postRef.child(book.getBookID()).setValue(book);
+        }
+    }
 }

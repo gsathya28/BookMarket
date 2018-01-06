@@ -35,6 +35,7 @@ class User implements Serializable {
     String getName() {
         return name;
     }
+    // Todo: @Exclude getUid
     String getUid() {
         return uid;
     }

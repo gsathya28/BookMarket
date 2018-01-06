@@ -106,19 +106,16 @@ public class ActSellAddPost extends AppCompatActivity {
                 mainUser.addPost(newPost);
                 WebServiceHandler.addPublicPost(newPost);
                 WebServiceHandler.updateMainUserData(mainUser);
+                for(Book book: newPost.getBooks()){
+                    WebServiceHandler.addPublicBook(book);
+                }
 
                 LocalDataHandler.saveMainUserData(mainUser, getApplicationContext());
-
-
-                FirebaseDatabase database = FirebaseDatabase.getInstance();
-                DatabaseReference myRef = database.getReference("myRef");
-                myRef.setValue("Hello!");
 
                 Intent savePost = new Intent(getApplicationContext(), ActSellMainActivity.class);
                 startActivity(savePost);
             }
         });
-
     }
 
     private void addToList(final Book book){
