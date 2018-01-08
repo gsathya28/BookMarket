@@ -5,6 +5,7 @@ import android.provider.ContactsContract;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Exclude;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.IgnoreExtraProperties;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -34,8 +35,8 @@ class Post implements Serializable{
     }
 
     Post(String uid){
-        this.postDate = Calendar.getInstance();
-        postDateInSecs = postDate.getTimeInMillis();
+        postDateInSecs = Calendar.getInstance().getTimeInMillis();
+        setPostDate(postDateInSecs);
         this.uid = uid;
         postID = UUID.randomUUID().toString();
 
@@ -63,13 +64,11 @@ class Post implements Serializable{
     boolean isNegotiable() {
         return isNegotiable;
     }
-
     public void setPostDate(long postDateInSecs) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(postDateInSecs);
         this.postDate = calendar;
     }
-
     void addBook(Book book){
         books.add(book);
         bookIDs.add(book.getBookID());
@@ -89,6 +88,7 @@ class Post implements Serializable{
         return postDate;
     }
 
+    @Exclude
     ArrayList<Book> getBooks() {
         if (books.isEmpty() && !bookIDs.isEmpty()){
             DatabaseReference bookListRef = FirebaseDatabase.getInstance().getReference().child("books");

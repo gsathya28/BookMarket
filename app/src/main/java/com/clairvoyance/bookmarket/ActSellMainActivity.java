@@ -105,9 +105,23 @@ public class ActSellMainActivity extends AppCompatActivity {
                 if (dataSnapshot.exists()){
                     for(DataSnapshot d: dataSnapshot.getChildren()){
                         Post post = d.getValue(Post.class);
+                        post.setPostDate(post.getPostDateInSecs());
+
                         Button button = new Button(getApplicationContext());
                         setButtonLayout(button);
+
+                        StringBuilder builder = new StringBuilder();
+                        builder.append("Posted: ");
+                        builder.append(DateFormat.getTimeInstance(DateFormat.SHORT).format(post.getPostDate().getTime()));
+                        builder.append(" - ");
+                        builder.append(DateFormat.getDateInstance().format(post.getPostDate().getTime()));
+                        builder.append(System.getProperty("line.separator"));
+                        String buttonText = button.getText().toString();
+                        buttonText = buttonText + builder.toString();
+                        button.setText(buttonText);
+
                         setButtonText(button, post);
+
                         mainLayout.addView(button);
                     }
                 }
@@ -140,32 +154,49 @@ public class ActSellMainActivity extends AppCompatActivity {
 
     }
 
-    public void setButtonText(Button button, Post post){
-        ArrayList<Book> books = post.getBooks();
+    public void setButtonText(final Button button, final Post post){
+        // ArrayList<Book> books = post.getBooks();
+        ArrayList<String> bookIds = post.getBookIDs();
         StringBuilder builder = new StringBuilder();
         builder.append("Books:");
-        for (Book book : books){
-
-            String courseSubj = book.get(Book.COURSE_SUBJECT);
-            String courseNum = book.get(Book.COURSE_NUMBER);
-            String bookName = book.get(Book.TITLE);
-
-            builder.append(System.getProperty("line.separator"));
-            builder.append(courseSubj);
-            builder.append(" ");
-            builder.append(courseNum);
-            builder.append(" - ");
-            builder.append(bookName);
-        }
         builder.append(System.getProperty("line.separator"));
-        builder.append(System.getProperty("line.separator"));
-        builder.append("Posted: ");
-        // builder.append(DateFormat.getTimeInstance(DateFormat.SHORT).format(post.getPostDate().getTime()));
-        builder.append(" - ");
-        // builder.append(DateFormat.getDateInstance().format(post.getPostDate().getTime()));
-
-        button.setText(builder.toString());
+        String text = button.getText() + builder.toString();
+        button.setText(text);
         button.setTextColor(Color.parseColor("#FFFFFF"));
+
+        // Book ID Code
+        DatabaseReference bookList = FirebaseDatabase.getInstance().getReference().child("books");
+        for (String id: bookIds){
+            DatabaseReference bookRef = bookList.child(id);
+            ValueEventListener getBookById = new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    Book book = dataSnapshot.getValue(Book.class);
+                    post.addBook(book);
+                    StringBuilder stringBuilder = new StringBuilder();
+                    String courseSubj = book.get(Book.COURSE_SUBJECT);
+                    String courseNum = book.get(Book.COURSE_NUMBER);
+                    String bookName = book.get(Book.TITLE);
+
+                    stringBuilder.append(courseSubj);
+                    stringBuilder.append(" ");
+                    stringBuilder.append(courseNum);
+                    stringBuilder.append(" - ");
+                    stringBuilder.append(bookName);
+                    stringBuilder.append(System.getProperty("line.separator"));
+                    String buttonText = button.getText().toString();
+                    buttonText = buttonText + stringBuilder.toString();
+                    button.setText(buttonText);
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            };
+
+            bookRef.addListenerForSingleValueEvent(getBookById);
+        }
     }
 
     @Override
