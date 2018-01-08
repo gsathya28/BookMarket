@@ -10,8 +10,8 @@ import java.util.Calendar;
 
 class SellPost extends Post implements Serializable {
 
-    SellPost(Calendar postDate, String UID){
-        super(postDate, UID);
+    SellPost(String UID){
+        super(UID);
     }
 
 }

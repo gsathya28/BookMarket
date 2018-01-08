@@ -1,6 +1,10 @@
 package com.clairvoyance.bookmarket;
 
+import android.provider.ContactsContract;
+
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Exclude;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -17,6 +21,7 @@ class Post implements Serializable{
 
     private String postID;
     private Calendar postDate;
+    private long postDateInSecs;
     private String uid;
     private boolean isNegotiable = false;
     private ArrayList<Book> books = new ArrayList<>();
@@ -28,8 +33,9 @@ class Post implements Serializable{
         // For Firebase usage
     }
 
-    Post(Calendar postDate, String uid){
-        this.postDate = postDate;
+    Post(String uid){
+        this.postDate = Calendar.getInstance();
+        postDateInSecs = postDate.getTimeInMillis();
         this.uid = uid;
         postID = UUID.randomUUID().toString();
 
@@ -41,21 +47,27 @@ class Post implements Serializable{
         }
     }
 
-    Calendar getPostDate() {
-        return postDate;
-    }
+
     String getPostID() {
         return postID;
     }
     String getUid() {
         return uid;
     }
-
+    public long getPostDateInSecs() {
+        return postDateInSecs;
+    }
     void setNotes(String notes) {this.notes = notes;}
     String getNotes() {return notes;}
     void setNegotiable(boolean negotiable) {isNegotiable = negotiable;}
     boolean isNegotiable() {
         return isNegotiable;
+    }
+
+    public void setPostDate(long postDateInSecs) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(postDateInSecs);
+        this.postDate = calendar;
     }
 
     void addBook(Book book){
@@ -73,7 +85,19 @@ class Post implements Serializable{
     }
 
     @Exclude
+    Calendar getPostDate() {
+        return postDate;
+    }
+
     ArrayList<Book> getBooks() {
+        if (books.isEmpty() && !bookIDs.isEmpty()){
+            DatabaseReference bookListRef = FirebaseDatabase.getInstance().getReference().child("books");
+            for (String id: bookIDs){
+
+                DatabaseReference bookRef = bookListRef.child(id);
+            }
+        }
+
         return books;
     }
 

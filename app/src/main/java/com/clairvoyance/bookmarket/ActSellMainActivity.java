@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,6 +19,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.text.DateFormat;
@@ -26,6 +28,7 @@ import java.util.ArrayList;
 public class ActSellMainActivity extends AppCompatActivity {
 
     User mainUser;
+    ArrayList<Post> posts;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,83 +92,80 @@ public class ActSellMainActivity extends AppCompatActivity {
     }
 
     private void setLayout(){
-        LinearLayout mainLayout = findViewById(R.id.buyer_post_layout);
+        final LinearLayout mainLayout = findViewById(R.id.buyer_post_layout);
+        TextView titleText = new TextView(getApplicationContext());
 
-        final TextView titleText = new TextView(getApplicationContext());
         titleText.setText(R.string.sell_main_layout_title);
+        mainLayout.addView(titleText);
 
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference("myRef");
-        String str = "";
-        myRef.addValueEventListener(new ValueEventListener() {
+        Query postListRef = WebServiceHandler.mPublicPosts;
+        ValueEventListener publicPostListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                String value = dataSnapshot.getValue(String.class);
-                titleText.setText(value);
+                if (dataSnapshot.exists()){
+                    for(DataSnapshot d: dataSnapshot.getChildren()){
+                        Post post = d.getValue(Post.class);
+                        Button button = new Button(getApplicationContext());
+                        setButtonLayout(button);
+                        setButtonText(button, post);
+                        mainLayout.addView(button);
+                    }
+                }
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                Log.w("Banana", "Failed to read value.", databaseError.toException());
+
             }
-        });
+        };
+        postListRef.addListenerForSingleValueEvent(publicPostListener);
+    }
 
+    public void setButtonLayout(Button button){
 
-        titleText.setText(str);
-        mainLayout.addView(titleText);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+        );
 
-        ArrayList<BuyPost> buyPosts = WebServiceHandler.getPublicBuyPosts();
+        int topValueInPx = (int) getApplicationContext().getResources().getDimension(R.dimen.activity_vertical_margin);
+        int bottomValueInPx = (int) getApplicationContext().getResources().getDimension(R.dimen.activity_vertical_margin);
+        bottomValueInPx = bottomValueInPx / 2;
+        int leftValueInPx = (int) getApplicationContext().getResources().getDimension(R.dimen.activity_horizontal_margin);
 
-        for (BuyPost post : buyPosts){
-            Button postButton = new Button(getApplicationContext());
+        params.setMargins(leftValueInPx, topValueInPx, leftValueInPx, bottomValueInPx);
+        button.setLayoutParams(params);
+        button.setGravity(Gravity.START);
+        button.setBackgroundColor(Color.parseColor("#267326"));
 
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-            );
+    }
 
-            int topValueInPx = (int) getApplicationContext().getResources().getDimension(R.dimen.activity_vertical_margin);
-            int bottomValueInPx = (int) getApplicationContext().getResources().getDimension(R.dimen.activity_vertical_margin);
-            bottomValueInPx = bottomValueInPx / 2;
-            int leftValueInPx = (int) getApplicationContext().getResources().getDimension(R.dimen.activity_horizontal_margin);
-            /*
-            if (i != 0)
-            {
-                topValueInPx = topValueInPx / 2;
-            }
-            */
-            params.setMargins(leftValueInPx, topValueInPx, leftValueInPx, bottomValueInPx);
-            postButton.setLayoutParams(params);
+    public void setButtonText(Button button, Post post){
+        ArrayList<Book> books = post.getBooks();
+        StringBuilder builder = new StringBuilder();
+        builder.append("Books:");
+        for (Book book : books){
 
-            postButton.setBackgroundColor(Color.parseColor("#267326"));
-            // Set text using the post and books
-            ArrayList<Book> books = post.getBooks();
-            StringBuilder builder = new StringBuilder();
-            builder.append("Books:");
-            for (Book book : books){
+            String courseSubj = book.get(Book.COURSE_SUBJECT);
+            String courseNum = book.get(Book.COURSE_NUMBER);
+            String bookName = book.get(Book.TITLE);
 
-                String courseSubj = book.get(Book.COURSE_SUBJECT);
-                String courseNum = book.get(Book.COURSE_NUMBER);
-                String bookName = book.get(Book.TITLE);
-
-                builder.append(System.getProperty("line.separator"));
-                builder.append(courseSubj);
-                builder.append(" ");
-                builder.append(courseNum);
-                builder.append(" - ");
-                builder.append(bookName);
-            }
             builder.append(System.getProperty("line.separator"));
-            builder.append(System.getProperty("line.separator"));
-            builder.append("Posted: ");
-            builder.append(DateFormat.getTimeInstance(DateFormat.SHORT).format(post.getPostDate().getTime()));
+            builder.append(courseSubj);
+            builder.append(" ");
+            builder.append(courseNum);
             builder.append(" - ");
-            builder.append(DateFormat.getDateInstance().format(post.getPostDate().getTime()));
-
-            postButton.setText(builder.toString());
-            postButton.setTextColor(Color.parseColor("#FFFFFF"));
-            mainLayout.addView(postButton);
+            builder.append(bookName);
         }
+        builder.append(System.getProperty("line.separator"));
+        builder.append(System.getProperty("line.separator"));
+        builder.append("Posted: ");
+        // builder.append(DateFormat.getTimeInstance(DateFormat.SHORT).format(post.getPostDate().getTime()));
+        builder.append(" - ");
+        // builder.append(DateFormat.getDateInstance().format(post.getPostDate().getTime()));
+
+        button.setText(builder.toString());
+        button.setTextColor(Color.parseColor("#FFFFFF"));
     }
 
     @Override

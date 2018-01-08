@@ -9,8 +9,8 @@ import java.util.Calendar;
 
 class BuyPost extends Post implements Serializable{
 
-    public BuyPost(Calendar postDate, String UID){
-        super(postDate, UID);
+    public BuyPost(String UID){
+        super(UID);
     }
 
 }

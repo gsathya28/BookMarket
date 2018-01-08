@@ -101,7 +101,7 @@ public class ActSellAddPost extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 // Add a new post object, and add it to the user object
-                SellPost newPost = new SellPost(Calendar.getInstance(), mainUser.getUid());
+                SellPost newPost = new SellPost(mainUser.getUid());
                 newPost.addBookList(postBooks);
                 mainUser.addPost(newPost);
                 WebServiceHandler.addPublicPost(newPost);

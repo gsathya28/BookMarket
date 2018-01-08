@@ -7,6 +7,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -24,6 +25,13 @@ class WebServiceHandler {
     private static FirebaseAuth mAuth;
     private static FirebaseUser mUser;
     private static User loadedUser;
+    final static ArrayList<Post> publicPosts = new ArrayList<>();
+
+    // Value Event Listeners
+
+    static DatabaseReference mPosts = FirebaseDatabase.getInstance().getReference().child("posts");
+    static DatabaseReference mBooks = FirebaseDatabase.getInstance().getReference().child("books");
+    static Query mPublicPosts = FirebaseDatabase.getInstance().getReference().child("posts").limitToFirst(10);
 
     private static boolean isMainUserAuthenticated(){
         mAuth = FirebaseAuth.getInstance();
@@ -51,7 +59,9 @@ class WebServiceHandler {
         if (loadedUser == null) {
             DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
             DatabaseReference userRef = rootRef.child("users").child(mUser.getUid());
-            userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+
+            // Read Data
+            userRef.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     if (!dataSnapshot.exists()) {
@@ -62,19 +72,6 @@ class WebServiceHandler {
                     else {
                         loadedUser = dataSnapshot.getValue(User.class);
                     }
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-                    // Nothing special happens
-                }
-            });
-
-            // Read Data
-            userRef.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-
                 }
 
                 @Override
@@ -106,17 +103,55 @@ class WebServiceHandler {
         }
     }
 
-    static ArrayList<BuyPost> getPublicBuyPosts(){
-        ArrayList<BuyPost> buyPosts = new ArrayList<>();
+    static ArrayList<Post> getPosts(ArrayList<String> postIDs){
+        final ArrayList<Post> posts = new ArrayList<>();
+        DatabaseReference postListRef = FirebaseDatabase.getInstance().getReference().child("posts");
+        for (String id: postIDs){
+            DatabaseReference postRef = postListRef.child(id);
+            postRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.exists()){
+                        posts.add(dataSnapshot.getValue(Post.class));
+                    }
+                }
 
-        // Use AWS to generate posts and put it in an array
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
 
-        return buyPosts;
+                }
+            });
+        }
+        return posts;
     }
 
+    static ArrayList<Post> getPublicPosts(){
+        loadPublicPosts();
+        return publicPosts;
+    }
+
+    static void loadPublicPosts(){
+
+        Query postListRef = FirebaseDatabase.getInstance().getReference().child("posts").limitToFirst(10);
+        postListRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot d: dataSnapshot.getChildren()){
+                    Post post = d.getValue(Post.class);
+                    post.setPostDate(post.getPostDateInSecs());
+                    publicPosts.add(post);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+    }
 
     static void addPublicPost(Post post){
-
         if (isMainUserAuthenticated()) { // Add function to only allow certain people to post
             DatabaseReference postRef = FirebaseDatabase.getInstance().getReference().child("posts");
             postRef.child(post.getPostID()).setValue(post);
@@ -129,4 +164,5 @@ class WebServiceHandler {
             postRef.child(book.getBookID()).setValue(book);
         }
     }
+
 }

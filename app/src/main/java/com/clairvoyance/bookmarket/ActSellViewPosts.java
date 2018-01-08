@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 public class ActSellViewPosts extends AppCompatActivity {
 
@@ -75,6 +76,8 @@ public class ActSellViewPosts extends AppCompatActivity {
                 builder.append(" - ");
                 builder.append(bookName);
             }
+
+
             builder.append(System.getProperty("line.separator"));
             builder.append(System.getProperty("line.separator"));
             builder.append("Posted: ");
