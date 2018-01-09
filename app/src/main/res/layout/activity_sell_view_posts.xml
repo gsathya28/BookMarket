@@ -7,16 +7,38 @@
     android:background="#66cc66"
     tools:context="com.clairvoyance.bookmarket.ActSellViewPosts">
 
-    <LinearLayout
-        android:id="@+id/sell_my_post_layout"
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/view_posts_toolbar"
         android:layout_width="match_parent"
-        android:layout_height="425dp"
-        android:orientation="vertical"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimary"
+        android:minHeight="?attr/actionBarSize"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
-    </LinearLayout>
+    <ScrollView
+        android:id="@+id/scrollView4"
+        android:layout_width="match_parent"
+        android:layout_height="429dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/view_posts_toolbar">
+
+        <LinearLayout
+            android:id="@+id/sell_my_post_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+        </LinearLayout>
+
+    </ScrollView>
 
     <Button
         android:id="@+id/sell_add_post"
@@ -33,6 +55,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sell_my_post_layout" />
+        app:layout_constraintTop_toBottomOf="@+id/scrollView4" />
 
 </android.support.constraint.ConstraintLayout>

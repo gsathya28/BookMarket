@@ -2,6 +2,7 @@ package com.clairvoyance.bookmarket;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -28,7 +29,6 @@ import java.util.ArrayList;
 public class ActSellMainActivity extends AppCompatActivity {
 
     User mainUser;
-    ArrayList<Post> posts;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +44,14 @@ public class ActSellMainActivity extends AppCompatActivity {
     private void setToolbar(){
         Toolbar myToolbar = findViewById(R.id.my_toolbar);
         myToolbar.setTitleTextColor(Color.parseColor("#FFFFFF"));
+        myToolbar.setTitle(R.string.sell_main_layout_title);
         setSupportActionBar(myToolbar);
+        // Get a support ActionBar corresponding to this toolbar
+        ActionBar ab = getSupportActionBar();
+
+        // Enable the Up button
+        ab.setDisplayHomeAsUpEnabled(true);
+
     }
 
     @Override
@@ -93,10 +100,6 @@ public class ActSellMainActivity extends AppCompatActivity {
 
     private void setLayout(){
         final LinearLayout mainLayout = findViewById(R.id.buyer_post_layout);
-        TextView titleText = new TextView(getApplicationContext());
-
-        titleText.setText(R.string.sell_main_layout_title);
-        mainLayout.addView(titleText);
 
         Query postListRef = WebServiceHandler.mPublicPosts;
         ValueEventListener publicPostListener = new ValueEventListener() {
@@ -135,7 +138,7 @@ public class ActSellMainActivity extends AppCompatActivity {
         postListRef.addListenerForSingleValueEvent(publicPostListener);
     }
 
-    public void setButtonLayout(Button button){
+    private void setButtonLayout(Button button){
 
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
@@ -154,14 +157,16 @@ public class ActSellMainActivity extends AppCompatActivity {
 
     }
 
-    public void setButtonText(final Button button, final Post post){
-        // ArrayList<Book> books = post.getBooks();
+    private void setButtonText(final Button button, final Post post){
+
         ArrayList<String> bookIds = post.getBookIDs();
+
         StringBuilder builder = new StringBuilder();
         builder.append("Books:");
         builder.append(System.getProperty("line.separator"));
         String text = button.getText() + builder.toString();
         button.setText(text);
+
         button.setTextColor(Color.parseColor("#FFFFFF"));
 
         // Book ID Code

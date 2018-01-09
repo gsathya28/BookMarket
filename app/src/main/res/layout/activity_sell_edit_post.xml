@@ -7,10 +7,21 @@
     android:background="#66cc66"
     tools:context="com.clairvoyance.bookmarket.ActSellEditPost">
 
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/edit_post_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimary"
+        android:minHeight="?attr/actionBarSize"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+
     <ScrollView
         android:id="@+id/scrollView2"
         android:layout_width="match_parent"
-        android:layout_height="284dp">
+        android:layout_height="215dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@+id/edit_post_toolbar">
 
         <LinearLayout
             android:id="@+id/sell_edit_book_list"

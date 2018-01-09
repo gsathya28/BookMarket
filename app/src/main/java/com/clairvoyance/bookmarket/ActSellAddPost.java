@@ -3,9 +3,11 @@ package com.clairvoyance.bookmarket;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,10 +34,23 @@ public class ActSellAddPost extends AppCompatActivity {
         setContentView(R.layout.activity_sell_add_post);
         noBookButton = findViewById(R.id.sell_default_no_book);
         postBooks = new ArrayList<>();
-        mainUser = LocalDataHandler.parseMainUserData(getApplicationContext());
+        mainUser = WebServiceHandler.generateMainUser();
 
+        setToolbar();
         setMainUser();
         setButtons();
+    }
+
+    private void setToolbar(){
+        Toolbar myToolbar = findViewById(R.id.add_post_toolbar);
+        myToolbar.setTitleTextColor(Color.parseColor("#FFFFFF"));
+        myToolbar.setTitle(R.string.Add_Post);
+        setSupportActionBar(myToolbar);
+        // Get a support ActionBar corresponding to this toolbar
+        ActionBar ab = getSupportActionBar();
+
+        // Enable the Up button
+        ab.setDisplayHomeAsUpEnabled(true);
     }
 
     private void setMainUser(){

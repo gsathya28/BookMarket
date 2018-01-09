@@ -1,8 +1,10 @@
 package com.clairvoyance.bookmarket;
 
 import android.graphics.Color;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -23,8 +25,20 @@ public class ActSellViewPosts extends AppCompatActivity {
         setContentView(R.layout.activity_sell_view_posts);
 
         mainUser = LocalDataHandler.parseMainUserData(getApplicationContext());
-
+        setToolbar();
         setLayout();
+    }
+
+    private void setToolbar(){
+        Toolbar myToolbar = findViewById(R.id.view_posts_toolbar);
+        myToolbar.setTitleTextColor(Color.parseColor("#FFFFFF"));
+        myToolbar.setTitle("Your Posts");
+        setSupportActionBar(myToolbar);
+        // Get a support ActionBar corresponding to this toolbar
+        ActionBar ab = getSupportActionBar();
+
+        // Enable the Up button
+        ab.setDisplayHomeAsUpEnabled(true);
     }
 
     private void setLayout(){

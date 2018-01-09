@@ -16,10 +16,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ActMainActivity" />
-        <activity android:name=".ActSellMainActivity" />
-        <activity android:name=".ActSellAddPost" />
-        <activity android:name=".ActSellViewPosts" />
         <activity
             android:name=".ActLoginActivity"
             android:label="BookMarket">
@@ -29,11 +25,80 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ActSellViewPublicPost" />
-        <activity android:name=".ActSellViewUserPost" />
-        <activity android:name=".ActSellEditPost" />
-        <activity android:name=".ActSellSearchScan" />
-        <activity android:name=".ActSellSearchResults"></activity>
+        <activity android:name=".ActMainActivity" />
+        <activity android:name=".ActSellMainActivity"
+            android:parentActivityName="com.clairvoyance.bookmarket.ActMainActivity" >
+
+            <!-- Parent activity meta-data to support 4.0 and lower -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.clairvoyance.bookmarket.ActMainActivity" />
+
+
+        </activity>
+        <activity android:name=".ActSellAddPost"
+            android:parentActivityName="com.clairvoyance.bookmarket.ActSellMainActivity" >
+
+            <!-- Parent activity meta-data to support 4.0 and lower -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.clairvoyance.bookmarket.ActSellMainActivity" />
+
+        </activity>
+        <activity android:name=".ActSellViewPosts"
+            android:parentActivityName="com.clairvoyance.bookmarket.ActSellMainActivity" >
+
+            <!-- Parent activity meta-data to support 4.0 and lower -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.clairvoyance.bookmarket.ActSellMainActivity" />
+
+        </activity>
+        <activity android:name=".ActSellViewPublicPost"
+            android:parentActivityName="com.clairvoyance.bookmarket.ActSellMainActivity" >
+
+            <!-- Parent activity meta-data to support 4.0 and lower -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.clairvoyance.bookmarket.ActSellMainActivity" />
+
+        </activity>
+        <activity android:name=".ActSellViewUserPost"
+            android:parentActivityName="com.clairvoyance.bookmarket.ActSellViewPosts" >
+
+            <!-- Parent activity meta-data to support 4.0 and lower -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.clairvoyance.bookmarket.ActSellViewPosts" />
+
+        </activity>
+        <activity android:name=".ActSellEditPost"
+            android:parentActivityName="com.clairvoyance.bookmarket.ActSellViewUserPost" >
+
+            <!-- Parent activity meta-data to support 4.0 and lower -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.clairvoyance.bookmarket.ActSellViewUserPost" />
+
+        </activity>
+        <activity android:name=".ActSellSearchScan"
+            android:parentActivityName="com.clairvoyance.bookmarket.ActSellMainActivity" >
+
+            <!-- Parent activity meta-data to support 4.0 and lower -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.clairvoyance.bookmarket.ActSellMainActivity" />
+
+        </activity>
+        <activity android:name=".ActSellSearchResults"
+            android:parentActivityName="com.clairvoyance.bookmarket.ActSellSearchResults" >
+
+            <!-- Parent activity meta-data to support 4.0 and lower -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.clairvoyance.bookmarket.ActSellSearchResults" />
+
+        </activity>
     </application>
 
 </manifest>
