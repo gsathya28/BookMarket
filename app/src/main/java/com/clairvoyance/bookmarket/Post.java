@@ -21,8 +21,7 @@ import java.util.UUID;
 class Post implements Serializable{
 
     private String postID;
-    private Calendar postDate;
-    private long postDateInSecs;
+    private long postDateInSecs = 0;
     private String uid;
     private boolean isNegotiable = false;
     private ArrayList<Book> books = new ArrayList<>();
@@ -36,7 +35,6 @@ class Post implements Serializable{
 
     Post(String uid){
         postDateInSecs = Calendar.getInstance().getTimeInMillis();
-        setPostDate(postDateInSecs);
         this.uid = uid;
         postID = UUID.randomUUID().toString();
 
@@ -58,17 +56,18 @@ class Post implements Serializable{
     public long getPostDateInSecs() {
         return postDateInSecs;
     }
+    Calendar getPostDate(){
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(postDateInSecs);
+        return calendar;
+    }
     void setNotes(String notes) {this.notes = notes;}
     String getNotes() {return notes;}
     void setNegotiable(boolean negotiable) {isNegotiable = negotiable;}
     boolean isNegotiable() {
         return isNegotiable;
     }
-    public void setPostDate(long postDateInSecs) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(postDateInSecs);
-        this.postDate = calendar;
-    }
+
     void addBook(Book book){
         books.add(book);
         bookIDs.add(book.getBookID());
@@ -83,21 +82,9 @@ class Post implements Serializable{
         return bookIDs;
     }
 
-    @Exclude
-    Calendar getPostDate() {
-        return postDate;
-    }
 
     @Exclude
     ArrayList<Book> getBooks() {
-        if (books.isEmpty() && !bookIDs.isEmpty()){
-            DatabaseReference bookListRef = FirebaseDatabase.getInstance().getReference().child("books");
-            for (String id: bookIDs){
-
-                DatabaseReference bookRef = bookListRef.child(id);
-            }
-        }
-
         return books;
     }
 
@@ -106,12 +93,11 @@ class Post implements Serializable{
         HashMap<String, Object> result = new HashMap<>();
         result.put("postID", postID);
         result.put("uid", uid);
-        result.put("postDate", postDate);
         result.put("negotiable", isNegotiable);
         result.put("books", books);
         result.put("notes", notes);
         result.put("postType", postType);
-
+        result.put("postDateInSecs", postDateInSecs);
         return result;
     }
 }

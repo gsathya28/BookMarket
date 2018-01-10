@@ -13,7 +13,6 @@ import android.widget.TextView;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 
 public class ActSellViewPosts extends AppCompatActivity {
 
@@ -24,7 +23,7 @@ public class ActSellViewPosts extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sell_view_posts);
 
-        mainUser = LocalDataHandler.parseMainUserData(getApplicationContext());
+        mainUser = DataHandler.parseMainUserData(getApplicationContext());
         setToolbar();
         setLayout();
     }

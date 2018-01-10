@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -25,6 +26,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 public class ActSellMainActivity extends AppCompatActivity {
 
@@ -35,7 +37,12 @@ public class ActSellMainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sell_main);
 
-        mainUser = LocalDataHandler.parseMainUserData(getApplicationContext());
+        mainUser = WebServiceHandler.generateMainUser();
+        if (mainUser == null){
+            Intent intent = new Intent(this, ActLoginActivity.class);
+            startActivity(intent);
+        }
+
         setToolbar();
         setOptionButtons();
         setLayout();
@@ -107,8 +114,11 @@ public class ActSellMainActivity extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()){
                     for(DataSnapshot d: dataSnapshot.getChildren()){
-                        Post post = d.getValue(Post.class);
-                        post.setPostDate(post.getPostDateInSecs());
+
+                        final Post post = d.getValue(Post.class);
+                        if (post == null){
+                            continue;
+                        }
 
                         Button button = new Button(getApplicationContext());
                         setButtonLayout(button);
@@ -124,6 +134,15 @@ public class ActSellMainActivity extends AppCompatActivity {
                         button.setText(buttonText);
 
                         setButtonText(button, post);
+
+                        button.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                Intent intent = new Intent(getApplicationContext(), ActSellViewPublicPost.class);
+                                intent.putExtra("post", post);
+                                startActivity(intent);
+                            }
+                        });
 
                         mainLayout.addView(button);
                     }

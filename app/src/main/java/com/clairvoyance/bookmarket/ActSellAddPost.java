@@ -15,11 +15,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 
 public class ActSellAddPost extends AppCompatActivity {
 
@@ -125,7 +122,7 @@ public class ActSellAddPost extends AppCompatActivity {
                     WebServiceHandler.addPublicBook(book);
                 }
 
-                LocalDataHandler.saveMainUserData(mainUser, getApplicationContext());
+                DataHandler.saveMainUserData(mainUser, getApplicationContext());
 
                 Intent savePost = new Intent(getApplicationContext(), ActSellMainActivity.class);
                 startActivity(savePost);

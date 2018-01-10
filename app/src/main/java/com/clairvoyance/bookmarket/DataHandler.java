@@ -6,13 +6,18 @@ import android.util.Log;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * Created by Sathya on 12/24/2017.
- * LocalDataHandler
+ * DataHandler
  */
 
-class LocalDataHandler {
+class DataHandler {
+
+    static ArrayList<Post> publicPosts;
+    static ArrayList<Post> myPosts;
+
 
     static User parseMainUserData(Context context){
 
