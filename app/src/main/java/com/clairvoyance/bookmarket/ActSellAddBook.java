@@ -18,7 +18,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
-public class ActSellAddPost extends AppCompatActivity {
+public class ActSellAddBook extends AppCompatActivity {
 
     User mainUser;
     ArrayList<Book> postBooks;
@@ -102,7 +102,6 @@ public class ActSellAddPost extends AppCompatActivity {
                         });
                     }
                 });
-
                 newBookDialog.show();
             }
         });
@@ -113,12 +112,10 @@ public class ActSellAddPost extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 // Add a new post object, and add it to the user object
-                SellPost newPost = new SellPost(mainUser.getUid());
-                newPost.addBookList(postBooks);
-                mainUser.addPost(newPost);
-                WebServiceHandler.addPublicPost(newPost);
+                mainUser.addBookList(postBooks);
+
                 WebServiceHandler.updateMainUserData(mainUser);
-                for(Book book: newPost.getBooks()){
+                for(Book book: mainUser.getBooks()){
                     WebServiceHandler.addPublicBook(book);
                 }
 

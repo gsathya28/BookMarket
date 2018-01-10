@@ -6,7 +6,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -14,8 +13,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -26,11 +23,12 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 
 public class ActSellMainActivity extends AppCompatActivity {
 
     User mainUser;
+    ArrayList<Book> books;
+    LinearLayout mainLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +40,7 @@ public class ActSellMainActivity extends AppCompatActivity {
             Intent intent = new Intent(this, ActLoginActivity.class);
             startActivity(intent);
         }
-
+        mainLayout = findViewById(R.id.buyer_post_layout);
         setToolbar();
         setOptionButtons();
         setLayout();
@@ -90,7 +88,7 @@ public class ActSellMainActivity extends AppCompatActivity {
         addPostButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent addPostIntent = new Intent(getApplicationContext(), ActSellAddPost.class);
+                Intent addPostIntent = new Intent(getApplicationContext(), ActSellAddBook.class);
                 startActivity(addPostIntent);
             }
         });
@@ -106,47 +104,16 @@ public class ActSellMainActivity extends AppCompatActivity {
     }
 
     private void setLayout(){
-        final LinearLayout mainLayout = findViewById(R.id.buyer_post_layout);
 
-        Query postListRef = WebServiceHandler.mPublicPosts;
-        ValueEventListener publicPostListener = new ValueEventListener() {
+        Query bookListRef = WebServiceHandler.mBooks;
+        ValueEventListener bookDataListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()){
-                    for(DataSnapshot d: dataSnapshot.getChildren()){
-
-                        final Post post = d.getValue(Post.class);
-                        if (post == null){
-                            continue;
-                        }
-
-                        Button button = new Button(getApplicationContext());
-                        setButtonLayout(button);
-
-                        StringBuilder builder = new StringBuilder();
-                        builder.append("Posted: ");
-                        builder.append(DateFormat.getTimeInstance(DateFormat.SHORT).format(post.getPostDate().getTime()));
-                        builder.append(" - ");
-                        builder.append(DateFormat.getDateInstance().format(post.getPostDate().getTime()));
-                        builder.append(System.getProperty("line.separator"));
-                        String buttonText = button.getText().toString();
-                        buttonText = buttonText + builder.toString();
-                        button.setText(buttonText);
-
-                        setButtonText(button, post);
-
-                        button.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                Intent intent = new Intent(getApplicationContext(), ActSellViewPublicPost.class);
-                                intent.putExtra("post", post);
-                                startActivity(intent);
-                            }
-                        });
-
-                        mainLayout.addView(button);
-                    }
+                books = new ArrayList<>();
+                for (DataSnapshot d: dataSnapshot.getChildren()){
+                    books.add(d.getValue(Book.class));
                 }
+                updateUI();
             }
 
             @Override
@@ -154,7 +121,7 @@ public class ActSellMainActivity extends AppCompatActivity {
 
             }
         };
-        postListRef.addListenerForSingleValueEvent(publicPostListener);
+        bookListRef.addValueEventListener(bookDataListener);
     }
 
     private void setButtonLayout(Button button){
@@ -176,50 +143,13 @@ public class ActSellMainActivity extends AppCompatActivity {
 
     }
 
-    private void setButtonText(final Button button, final Post post){
+    private void updateUI(){
+        for (Book book: books){
+            Button button = new Button(getApplicationContext());
+            setButtonLayout(button);
 
-        ArrayList<String> bookIds = post.getBookIDs();
-
-        StringBuilder builder = new StringBuilder();
-        builder.append("Books:");
-        builder.append(System.getProperty("line.separator"));
-        String text = button.getText() + builder.toString();
-        button.setText(text);
-
-        button.setTextColor(Color.parseColor("#FFFFFF"));
-
-        // Book ID Code
-        DatabaseReference bookList = FirebaseDatabase.getInstance().getReference().child("books");
-        for (String id: bookIds){
-            DatabaseReference bookRef = bookList.child(id);
-            ValueEventListener getBookById = new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    Book book = dataSnapshot.getValue(Book.class);
-                    post.addBook(book);
-                    StringBuilder stringBuilder = new StringBuilder();
-                    String courseSubj = book.get(Book.COURSE_SUBJECT);
-                    String courseNum = book.get(Book.COURSE_NUMBER);
-                    String bookName = book.get(Book.TITLE);
-
-                    stringBuilder.append(courseSubj);
-                    stringBuilder.append(" ");
-                    stringBuilder.append(courseNum);
-                    stringBuilder.append(" - ");
-                    stringBuilder.append(bookName);
-                    stringBuilder.append(System.getProperty("line.separator"));
-                    String buttonText = button.getText().toString();
-                    buttonText = buttonText + stringBuilder.toString();
-                    button.setText(buttonText);
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-            };
-
-            bookRef.addListenerForSingleValueEvent(getBookById);
+            button.setText(book.getTitle());
+            mainLayout.addView(button);
         }
     }
 

@@ -14,7 +14,7 @@ import java.util.ArrayList;
 
 /**
  * Created by Sathya on 12/21/2017.
- * Amazon Web Service Handler
+ * Firebase Authentication and Database Handler
  */
 
 class WebServiceHandler {
@@ -25,13 +25,11 @@ class WebServiceHandler {
     private static FirebaseAuth mAuth;
     private static FirebaseUser mUser;
     private static User loadedUser;
-    final static ArrayList<Post> publicPosts = new ArrayList<>();
 
     // Value Event Listeners
 
-    static DatabaseReference mPosts = FirebaseDatabase.getInstance().getReference().child("posts");
-    static DatabaseReference mBooks = FirebaseDatabase.getInstance().getReference().child("books");
-    static Query mPublicPosts = FirebaseDatabase.getInstance().getReference().child("posts").orderByChild("postDateInSecs").limitToFirst(10);
+    static Query mBooks = FirebaseDatabase.getInstance().getReference().child("books").orderByChild("postDateInSecs").limitToFirst(100);
+    static Query mPublicPosts = FirebaseDatabase.getInstance().getReference().child("posts");
 
     private static boolean isMainUserAuthenticated(){
         mAuth = FirebaseAuth.getInstance();
@@ -95,18 +93,12 @@ class WebServiceHandler {
 
     static void updateMainUserData(User user){
         if (isMainUserAuthenticated()){
-            DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child("users");
-            userRef.child(user.getUid()).setValue(user);
+            DatabaseReference userRefList = FirebaseDatabase.getInstance().getReference().child("users");
+            DatabaseReference userRef = userRefList.child(mUser.getUid());
+            userRef.setValue(user);
         }
         else {
             throw new IllegalStateException("User not authorized");
-        }
-    }
-
-    static void addPublicPost(Post post){
-        if (isMainUserAuthenticated()) { // Add function to only allow certain people to post
-            DatabaseReference postRef = FirebaseDatabase.getInstance().getReference().child("posts");
-            postRef.child(post.getPostID()).setValue(post);
         }
     }
 

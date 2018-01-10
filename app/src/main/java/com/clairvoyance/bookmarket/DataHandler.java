@@ -15,8 +15,8 @@ import java.util.ArrayList;
 
 class DataHandler {
 
-    static ArrayList<Post> publicPosts;
-    static ArrayList<Post> myPosts;
+    static ArrayList<Book> publicBooks;
+    static ArrayList<Book> myBooks;
 
 
     static User parseMainUserData(Context context){

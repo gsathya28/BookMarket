@@ -4,6 +4,7 @@ import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
 
 import java.io.Serializable;
+import java.util.Calendar;
 import java.util.UUID;
 
 /**
@@ -23,6 +24,8 @@ class Book implements Serializable {
     private String instructor;
     private boolean isAvailable;
     private String bookID;
+    private String uid;
+    private long negPostDateInSecs;
 
     static final int TITLE = 0;
     static final int PRICE = 1;
@@ -44,6 +47,7 @@ class Book implements Serializable {
         this.courseSubj = courseSubj;
         this.courseNumber = courseNumber;
         bookID = UUID.randomUUID().toString();
+        negPostDateInSecs = Calendar.getInstance().getTimeInMillis() * -1;
     }
 
     void set(int field, String value){
@@ -145,6 +149,8 @@ class Book implements Serializable {
     boolean isAvailable() {
         return isAvailable;
     }
+
+    long getPostDateInSecs() {return negPostDateInSecs * -1;}
 
     @Exclude
     public String getBookID() {

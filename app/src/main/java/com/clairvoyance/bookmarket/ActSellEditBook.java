@@ -6,7 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 
-public class ActSellEditPost extends AppCompatActivity {
+public class ActSellEditBook extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

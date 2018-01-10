@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#66cc66"
-    tools:context="com.clairvoyance.bookmarket.ActSellAddPost">
+    tools:context="com.clairvoyance.bookmarket.ActSellAddBook">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/add_post_toolbar"

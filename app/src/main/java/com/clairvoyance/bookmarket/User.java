@@ -4,6 +4,7 @@ import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by Sathya on 12/21/2017.
@@ -15,8 +16,8 @@ class User implements Serializable {
     private String name;
     private String uid;
     private String email;
-    private ArrayList<Post> myPosts = new ArrayList<>();
-    private ArrayList<String> postIDs = new ArrayList<>();
+    private ArrayList<Book> books = new ArrayList<>();
+    private HashMap<String, Object> bookIDs = new HashMap<>();
     private boolean isEmailVerified = false;
 
     public User(){
@@ -26,7 +27,6 @@ class User implements Serializable {
     User(String uid, String email){
         this.uid = uid;
         this.email = email;
-        myPosts = new ArrayList<>();
     }
 
     void setName(String name) {
@@ -35,36 +35,36 @@ class User implements Serializable {
     String getName() {
         return name;
     }
-    // Todo: @Exclude getUid
+
+    @Exclude
     String getUid() {
         return uid;
     }
+
     String getEmail() {
         return email;
     }
     void setEmailVerified(boolean emailVerified) { isEmailVerified = emailVerified; }
     boolean isEmailVerified() { return isEmailVerified;  }
 
-    void addPost(Post post){
-        myPosts.add(post);
-        postIDs.add(post.getPostID());
+    void addBook(Book book){
+        books.add(book);
+        bookIDs.put(book.getBookID(), true);
     }
-    public ArrayList<String> getPostIDs() {
-        return postIDs;
+    void addBookList(ArrayList<Book> books){
+        this.books = books;
+        for (Book book: books){
+            bookIDs.put(book.getBookID(), true);
+        }
+    }
+    public HashMap<String, Object> getBookIDs() {
+        return bookIDs;
     }
 
     @Exclude
-    ArrayList<SellPost> getMySellPosts() {
-        ArrayList<SellPost> sellPosts = new ArrayList<>();
-        for (Post post : myPosts){
-            if (post instanceof SellPost){
-                sellPosts.add((SellPost) post);
-            }
-        }
-
-        return sellPosts;
+    ArrayList<Book> getBooks() {
+        return books;
     }
-
 
     @Override
     public boolean equals(Object obj) {
