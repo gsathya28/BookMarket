@@ -31,7 +31,7 @@ class WebServiceHandler {
 
     static DatabaseReference mPosts = FirebaseDatabase.getInstance().getReference().child("posts");
     static DatabaseReference mBooks = FirebaseDatabase.getInstance().getReference().child("books");
-    static Query mPublicPosts = FirebaseDatabase.getInstance().getReference().child("posts").limitToFirst(10);
+    static Query mPublicPosts = FirebaseDatabase.getInstance().getReference().child("posts").orderByChild("postDateInSecs").limitToFirst(10);
 
     private static boolean isMainUserAuthenticated(){
         mAuth = FirebaseAuth.getInstance();
@@ -101,54 +101,6 @@ class WebServiceHandler {
         else {
             throw new IllegalStateException("User not authorized");
         }
-    }
-
-    static ArrayList<Post> getPosts(ArrayList<String> postIDs){
-        final ArrayList<Post> posts = new ArrayList<>();
-        DatabaseReference postListRef = FirebaseDatabase.getInstance().getReference().child("posts");
-        for (String id: postIDs){
-            DatabaseReference postRef = postListRef.child(id);
-            postRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    if (dataSnapshot.exists()){
-                        posts.add(dataSnapshot.getValue(Post.class));
-                    }
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-            });
-        }
-        return posts;
-    }
-
-    static ArrayList<Post> getPublicPosts(){
-        loadPublicPosts();
-        return publicPosts;
-    }
-
-    static void loadPublicPosts(){
-
-        Query postListRef = FirebaseDatabase.getInstance().getReference().child("posts").limitToFirst(10);
-        postListRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot d: dataSnapshot.getChildren()){
-                    Post post = d.getValue(Post.class);
-                    post.setPostDate(post.getPostDateInSecs());
-                    publicPosts.add(post);
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
     }
 
     static void addPublicPost(Post post){
