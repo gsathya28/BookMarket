@@ -1,17 +1,24 @@
 package com.clairvoyance.bookmarket;
 
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.text.Layout;
+import android.util.AttributeSet;
+import android.view.ContextThemeWrapper;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.LinearLayout;
 
 import com.google.firebase.database.DataSnapshot;
@@ -144,17 +151,90 @@ public class ActSellMainActivity extends AppCompatActivity {
     }
 
     private void updateUI(){
-        for (Book book: books){
+        for (final Book book: books){
+            LinearLayout bookLayout = new LinearLayout(getApplicationContext());
+
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+            );
+
+            bookLayout.setOrientation(LinearLayout.HORIZONTAL);
+            bookLayout.setLayoutParams(params);
+
+            final CheckBox checkBox = new CheckBox(getApplicationContext());
+            bookLayout.addView(checkBox);
+            checkBox.setButtonDrawable(Resources.getSystem().getIdentifier("btn_check_holo_light", "drawable", "android"));
+
+            LinearLayout.LayoutParams checkParams = new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT
+            );
+            int leftValueInPx = (int) getApplicationContext().getResources().getDimension(R.dimen.activity_horizontal_margin);
+            checkParams.setMargins(leftValueInPx, checkParams.topMargin, checkParams.rightMargin, checkParams.bottomMargin);
+            checkBox.setLayoutParams(checkParams);
+
             Button button = new Button(getApplicationContext());
             setButtonLayout(button);
-
             button.setText(book.getTitle());
-            mainLayout.addView(button);
+            button.setPadding(leftValueInPx, button.getPaddingTop(), button.getPaddingRight(), button.getPaddingBottom());
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    // Set Dialog!
+                    viewBookDialog(book, checkBox).show();
+                }
+            });
+
+
+            bookLayout.addView(button);
+            mainLayout.addView(bookLayout);
         }
+    }
+
+    private AlertDialog viewBookDialog(Book book, final CheckBox box){
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(ActSellMainActivity.this);
+        builder.setTitle(book.getTitle());
+
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("Book Title");
+        stringBuilder.append(System.getProperty("line.separator"));
+        stringBuilder.append(book.getTitle());
+        stringBuilder.append(System.getProperty("line.separator"));
+        stringBuilder.append(System.getProperty("line.separator"));
+
+        stringBuilder.append("Course: ");
+        stringBuilder.append(System.getProperty("line.separator"));
+        stringBuilder.append(book.getCourseSubj());
+        stringBuilder.append(" ");
+        stringBuilder.append(book.getCourseNumber());
+        stringBuilder.append(System.getProperty("line.separator"));
+        stringBuilder.append(System.getProperty("line.separator"));
+
+        stringBuilder.append("Price: ");
+        stringBuilder.append(System.getProperty("line.separator"));
+        stringBuilder.append(book.getPrice());
+
+        builder.setMessage(stringBuilder.toString());
+        builder.setPositiveButton("Add to Request List", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                // Todo: check the checkbox!
+                box.setChecked(true);
+            }
+        });
+
+        builder.setNegativeButton("Cancel", null);
+
+        return builder.create();
     }
 
     @Override
     public void onBackPressed(){
 
     }
+
+
+
 }
