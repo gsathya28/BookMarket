@@ -152,7 +152,6 @@ class Book implements Serializable {
 
     long getPostDateInSecs() {return negPostDateInSecs * -1;}
 
-    @Exclude
     public String getBookID() {
         return bookID;
     }

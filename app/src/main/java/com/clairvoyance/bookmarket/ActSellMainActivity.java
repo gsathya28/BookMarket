@@ -2,33 +2,26 @@ package com.clairvoyance.bookmarket;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.graphics.Color;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.text.Layout;
-import android.util.AttributeSet;
-import android.view.ContextThemeWrapper;
+import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.LinearLayout;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-import java.text.DateFormat;
 import java.util.ArrayList;
 
 public class ActSellMainActivity extends AppCompatActivity {
@@ -56,7 +49,7 @@ public class ActSellMainActivity extends AppCompatActivity {
     private void setToolbar(){
         Toolbar myToolbar = findViewById(R.id.my_toolbar);
         myToolbar.setTitleTextColor(Color.parseColor("#FFFFFF"));
-        myToolbar.setTitle(R.string.sell_main_layout_title);
+        myToolbar.setTitle("Books People Want: ");
         setSupportActionBar(myToolbar);
         // Get a support ActionBar corresponding to this toolbar
         ActionBar ab = getSupportActionBar();
@@ -131,8 +124,20 @@ public class ActSellMainActivity extends AppCompatActivity {
         bookListRef.addValueEventListener(bookDataListener);
     }
 
-    private void setButtonLayout(Button button){
+    private void setInfoButtonLayout(Button button){
 
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+        );
+
+        button.setLayoutParams(params);
+        button.setGravity(Gravity.START);
+        button.setGravity(Gravity.CENTER_VERTICAL);
+
+    }
+
+    private void setBookLayout(LinearLayout bookLayout){
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
@@ -141,58 +146,61 @@ public class ActSellMainActivity extends AppCompatActivity {
         int topValueInPx = (int) getApplicationContext().getResources().getDimension(R.dimen.activity_vertical_margin);
         int bottomValueInPx = (int) getApplicationContext().getResources().getDimension(R.dimen.activity_vertical_margin);
         bottomValueInPx = bottomValueInPx / 2;
-        int leftValueInPx = (int) getApplicationContext().getResources().getDimension(R.dimen.activity_horizontal_margin);
+        int valueInPx = (int) getApplicationContext().getResources().getDimension(R.dimen.activity_horizontal_margin);
 
-        params.setMargins(leftValueInPx, topValueInPx, leftValueInPx, bottomValueInPx);
-        button.setLayoutParams(params);
-        button.setGravity(Gravity.START);
-        button.setBackgroundColor(Color.parseColor("#267326"));
+        params.setMargins(params.leftMargin, topValueInPx, valueInPx/2, bottomValueInPx);
 
+        bookLayout.setGravity(Gravity.CENTER_VERTICAL);
+        bookLayout.setOrientation(LinearLayout.HORIZONTAL);
+        bookLayout.setLayoutParams(params);
     }
 
+    private void setReqButtonLayout(Button reqButton){
+        LinearLayout.LayoutParams checkParams = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+        );
+
+        reqButton.setLayoutParams(checkParams);
+        reqButton.setText("Request");
+    }
+
+
     private void updateUI(){
+        mainLayout.removeAllViews();
         for (final Book book: books){
             LinearLayout bookLayout = new LinearLayout(getApplicationContext());
+            setBookLayout(bookLayout);
 
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-            );
+            int valueInPx = (int) getApplicationContext().getResources().getDimension(R.dimen.activity_horizontal_margin);
 
-            bookLayout.setOrientation(LinearLayout.HORIZONTAL);
-            bookLayout.setLayoutParams(params);
+            Button reqButton = new Button(getApplicationContext());
+            bookLayout.addView(reqButton);
+            Button infoButton = new Button(getApplicationContext());
+            bookLayout.addView(infoButton);
 
-            final CheckBox checkBox = new CheckBox(getApplicationContext());
-            bookLayout.addView(checkBox);
-            checkBox.setButtonDrawable(Resources.getSystem().getIdentifier("btn_check_holo_light", "drawable", "android"));
+            setInfoButtonLayout(infoButton);
+            setReqButtonLayout(reqButton);
 
-            LinearLayout.LayoutParams checkParams = new LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.MATCH_PARENT
-            );
-            int leftValueInPx = (int) getApplicationContext().getResources().getDimension(R.dimen.activity_horizontal_margin);
-            checkParams.setMargins(leftValueInPx, checkParams.topMargin, checkParams.rightMargin, checkParams.bottomMargin);
-            checkBox.setLayoutParams(checkParams);
-
-            Button button = new Button(getApplicationContext());
-            setButtonLayout(button);
-            button.setText(book.getTitle());
-            button.setPadding(leftValueInPx, button.getPaddingTop(), button.getPaddingRight(), button.getPaddingBottom());
-            button.setOnClickListener(new View.OnClickListener() {
+            String buttonText = book.getCourseSubj() + " " + book.getCourseNumber() + " - " + book.getTitle();
+            infoButton.setText(buttonText);
+            infoButton.setBackgroundColor(Color.parseColor("#267326"));
+            infoButton.setSingleLine();
+            infoButton.setEllipsize(TextUtils.TruncateAt.END);
+            infoButton.setPadding(valueInPx, infoButton.getPaddingTop(), valueInPx, infoButton.getPaddingBottom());
+            infoButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     // Set Dialog!
-                    viewBookDialog(book, checkBox).show();
+                    viewBookDialog(book).show();
                 }
             });
 
-
-            bookLayout.addView(button);
             mainLayout.addView(bookLayout);
         }
     }
 
-    private AlertDialog viewBookDialog(Book book, final CheckBox box){
+    private AlertDialog viewBookDialog(Book book){
 
         AlertDialog.Builder builder = new AlertDialog.Builder(ActSellMainActivity.this);
         builder.setTitle(book.getTitle());
@@ -214,6 +222,7 @@ public class ActSellMainActivity extends AppCompatActivity {
 
         stringBuilder.append("Price: ");
         stringBuilder.append(System.getProperty("line.separator"));
+        stringBuilder.append("$");
         stringBuilder.append(book.getPrice());
 
         builder.setMessage(stringBuilder.toString());
@@ -221,7 +230,7 @@ public class ActSellMainActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 // Todo: check the checkbox!
-                box.setChecked(true);
+
             }
         });
 
@@ -234,7 +243,5 @@ public class ActSellMainActivity extends AppCompatActivity {
     public void onBackPressed(){
 
     }
-
-
 
 }
