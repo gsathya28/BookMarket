@@ -1,6 +1,7 @@
 package com.clairvoyance.bookmarket;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
@@ -9,10 +10,13 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -31,6 +35,7 @@ public class ActSellViewPosts extends AppCompatActivity {
     ArrayList<String> bookIDs = new ArrayList<>();
     ArrayList<String> displayedBooks = new ArrayList<>();
     LinearLayout mainLayout;
+    View dialogLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +44,7 @@ public class ActSellViewPosts extends AppCompatActivity {
 
         mainUser = WebServiceHandler.generateMainUser();
         mainLayout = findViewById(R.id.sell_my_post_layout);
+
         setToolbar();
         setLayout();
     }
@@ -186,7 +192,75 @@ public class ActSellViewPosts extends AppCompatActivity {
         builder.setPositiveButton("Edit", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                // Todo: Edit Post
+
+                final AlertDialog editBookDialog = editBookDialog();
+
+                ((EditText) dialogLayout.findViewById(R.id.sell_course_type_text)).setText(book.get(Book.COURSE_SUBJECT));
+                ((EditText) dialogLayout.findViewById(R.id.sell_course_number_text)).setText(book.get(Book.COURSE_NUMBER));
+                ((EditText) dialogLayout.findViewById(R.id.sell_book_title_text)).setText(book.get(Book.TITLE));
+                ((EditText) dialogLayout.findViewById(R.id.sell_author_text)).setText(book.get(Book.AUTHOR));
+                ((EditText) dialogLayout.findViewById(R.id.sell_price_text)).setText(book.get(Book.PRICE));
+                ((EditText) dialogLayout.findViewById(R.id.sell_vnum_text)).setText(book.get(Book.VERSION_NUMBER));
+                ((EditText) dialogLayout.findViewById(R.id.sell_instructor_text)).setText(book.get(Book.INSTRUCTOR));
+                ((EditText) dialogLayout.findViewById(R.id.sell_book_notes_text)).setText(book.get(Book.NOTES));
+
+                editBookDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+                    @Override
+                    public void onShow(DialogInterface dialo3gInterface) {
+
+                        Button editButton = editBookDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                        editButton.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+
+                                String courseType = ((EditText) dialogLayout.findViewById(R.id.sell_course_type_text)).getText().toString();
+                                String courseNumber = ((EditText) dialogLayout.findViewById(R.id.sell_course_number_text)).getText().toString();
+
+
+
+                                if (courseType.equals("") && courseNumber.equals("")){
+                                    Toast.makeText(getApplicationContext(), "Both Course Subject and Number required", Toast.LENGTH_LONG).show();
+                                    return;
+                                }
+
+                                book.set(Book.COURSE_SUBJECT, courseType);
+                                book.set(Book.COURSE_NUMBER, courseNumber);
+
+                                String bookTitle = ((EditText) dialogLayout.findViewById(R.id.sell_book_title_text)).getText().toString();
+                                String author = ((EditText) dialogLayout.findViewById(R.id.sell_author_text)).getText().toString();
+                                String price = ((EditText) dialogLayout.findViewById(R.id.sell_price_text)).getText().toString();
+                                String vnum = ((EditText) dialogLayout.findViewById(R.id.sell_vnum_text)).getText().toString();
+                                String instructor = ((EditText) dialogLayout.findViewById(R.id.sell_instructor_text)).getText().toString();
+                                String notes = ((EditText) dialogLayout.findViewById(R.id.sell_book_notes_text)).getText().toString();
+
+                                book.set(Book.TITLE, bookTitle);
+                                book.set(Book.AUTHOR, author);
+                                book.set(Book.PRICE, price);
+                                book.set(Book.VERSION_NUMBER, vnum);
+                                book.set(Book.NOTES, notes);
+                                book.set(Book.INSTRUCTOR, instructor);
+
+                                // Save Data -
+                                DatabaseReference bookRef = FirebaseDatabase.getInstance().getReference().child("books").child(book.getBookID());
+                                bookRef.setValue(book);
+
+                                editBookDialog.dismiss();
+                                viewBookDialog(book).show();
+                            }
+                        });
+
+                        Button deleteButton = editBookDialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+                        deleteButton.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                editBookDialog.dismiss();
+                                viewBookDialog(book).show();
+                            }
+                        });
+                    }
+                });
+
+                editBookDialog.show();
 
             }
         });
@@ -241,5 +315,17 @@ public class ActSellViewPosts extends AppCompatActivity {
         return builder.create();
     }
 
+    private AlertDialog editBookDialog(){
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        LayoutInflater inflater = getLayoutInflater();
+        dialogLayout = inflater.inflate(R.layout.add_book_dialog_layout, null);
+
+        builder.setView(dialogLayout);
+        builder.setPositiveButton("Save", null);
+        builder.setNegativeButton("Cancel", null);
+        return builder.create();
+    }
 
 }
