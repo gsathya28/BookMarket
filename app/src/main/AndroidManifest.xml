@@ -54,33 +54,6 @@
                 android:value="com.clairvoyance.bookmarket.ActSellMainActivity" />
 
         </activity>
-        <activity android:name=".ActSellViewPublicPost"
-            android:parentActivityName="com.clairvoyance.bookmarket.ActSellMainActivity" >
-
-            <!-- Parent activity meta-data to support 4.0 and lower -->
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.clairvoyance.bookmarket.ActSellMainActivity" />
-
-        </activity>
-        <activity android:name=".ActSellViewUserPost"
-            android:parentActivityName="com.clairvoyance.bookmarket.ActSellViewPosts" >
-
-            <!-- Parent activity meta-data to support 4.0 and lower -->
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.clairvoyance.bookmarket.ActSellViewPosts" />
-
-        </activity>
-        <activity android:name=".ActSellEditBook"
-            android:parentActivityName="com.clairvoyance.bookmarket.ActSellViewUserPost" >
-
-            <!-- Parent activity meta-data to support 4.0 and lower -->
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.clairvoyance.bookmarket.ActSellViewUserPost" />
-
-        </activity>
         <activity android:name=".ActSellSearchScan"
             android:parentActivityName="com.clairvoyance.bookmarket.ActSellMainActivity" >
 
