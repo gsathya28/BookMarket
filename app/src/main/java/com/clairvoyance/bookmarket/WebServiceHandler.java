@@ -29,7 +29,6 @@ class WebServiceHandler {
     // Value Event Listeners
 
     static Query mBooks = FirebaseDatabase.getInstance().getReference().child("books").orderByChild("postDateInSecs").limitToFirst(100);
-    static Query mPublicPosts = FirebaseDatabase.getInstance().getReference().child("posts");
 
     private static boolean isMainUserAuthenticated(){
         mAuth = FirebaseAuth.getInstance();

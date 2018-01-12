@@ -13,7 +13,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -21,7 +20,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -137,6 +135,10 @@ public class ActSellViewPosts extends AppCompatActivity {
         mainLayout.addView(infoButton, index);
     }
 
+    private void deleteBookInUI(int index, final Book book){
+        mainLayout.removeViewAt(index);
+    }
+
     private void setButtonLayout(Button button){
 
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
@@ -155,7 +157,7 @@ public class ActSellViewPosts extends AppCompatActivity {
         button.setBackgroundColor(Color.parseColor("#267326"));
     }
 
-    private AlertDialog viewBookDialog(Book book){
+    private AlertDialog viewBookDialog(final Book book){
 
         AlertDialog.Builder builder = new AlertDialog.Builder(ActSellViewPosts.this);
         builder.setTitle(book.getTitle());
@@ -181,17 +183,63 @@ public class ActSellViewPosts extends AppCompatActivity {
         stringBuilder.append(book.getPrice());
 
         builder.setMessage(stringBuilder.toString());
-        builder.setPositiveButton("Add to Request List", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton("Edit", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                // Todo: check the checkbox!
+                // Todo: Edit Post
 
             }
         });
 
-        builder.setNegativeButton("Cancel", null);
+        builder.setNegativeButton("Delete", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                // Load Delete Post Dialog!
+                deleteCheckDialog(book).show();
+            }
+        });
+
+        builder.setNeutralButton("Cancel", null);
 
         return builder.create();
     }
+
+    private AlertDialog deleteCheckDialog(final Book book){
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(ActSellViewPosts.this);
+        builder.setMessage("Are you sure do you want to delete this post?");
+        builder.setTitle("Delete?");
+
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                // Todo: Delete Code - and exit out
+                // In Books!
+                String id = book.getBookID();
+                DatabaseReference bookRef = FirebaseDatabase.getInstance().getReference().child("books").child(id);
+                bookRef.removeValue();
+
+                // In User Book Ids
+                HashMap<String, Object> UserBookIds = mainUser.getBookIDs();
+                UserBookIds.remove(id);
+                WebServiceHandler.updateMainUserData(mainUser);
+
+                // Update UI
+                int index = displayedBooks.indexOf(book.getBookID());
+                displayedBooks.remove(index);
+                deleteBookInUI(index, book);
+
+            }
+        });
+        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                viewBookDialog(book).show();
+            }
+        });
+
+        return builder.create();
+    }
+
 
 }
