@@ -206,7 +206,6 @@ public class ActSellMainActivity extends AppCompatActivity {
         reqButton.setTextOn("Unrequest");
     }
 
-
     private void updateUI(){
         mainLayout.removeAllViews();
         for (final Book book: books){
@@ -256,7 +255,7 @@ public class ActSellMainActivity extends AppCompatActivity {
                         if (GUIRequestID == null || GUIRequestID.equals("")){
                             throw new IllegalStateException("Invalid GUI Request ID Values!!!!");
                         }
-                        AlertDialog dialog = removeRequest(book, book.getGUIRequestID(), reqButton);
+                        AlertDialog dialog = removeRequestDialog(book, book.getGUIRequestID(), reqButton);
                         dialog.show();
                     }
                 }
@@ -323,7 +322,7 @@ public class ActSellMainActivity extends AppCompatActivity {
                     if (GUIRequestID == null || GUIRequestID.equals("")){
                         throw new IllegalStateException("Invalid GUI Request ID Values!!!!");
                     }
-                    AlertDialog dialog = removeRequest(book, book.getGUIRequestID(), reqButton);
+                    AlertDialog dialog = removeRequestDialog(book, book.getGUIRequestID(), reqButton);
                     dialog.show();
                 }
             });
@@ -333,7 +332,7 @@ public class ActSellMainActivity extends AppCompatActivity {
         return builder.create();
     }
 
-    private AlertDialog removeRequest(final Book book, final String requestID, final ToggleButton button){
+    private AlertDialog removeRequestDialog(final Book book, final String requestID, final ToggleButton button){
         AlertDialog.Builder builder = new AlertDialog.Builder(ActSellMainActivity.this);
         builder.setTitle("Remove Request?");
         builder.setMessage("Are you sure you want to remove your request for this book?");
