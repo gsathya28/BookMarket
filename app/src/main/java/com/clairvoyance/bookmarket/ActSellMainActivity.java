@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -37,7 +38,8 @@ public class ActSellMainActivity extends AppCompatActivity {
     LinearLayout mainLayout;
     ArrayList<String> requestIDs = new ArrayList<>();
     ArrayList<Request> requests = new ArrayList<>();
-    boolean deletionProcess = false;
+    boolean deletionCanceled = false;
+    boolean dialogDeletion = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -235,8 +237,13 @@ public class ActSellMainActivity extends AppCompatActivity {
             reqButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
-                    if (deletionProcess){
-                        deletionProcess = false;
+                    if (deletionCanceled){
+                        deletionCanceled = false;
+                        return;
+                    }
+
+                    if (dialogDeletion){
+                        dialogDeletion = false;
                         return;
                     }
 
@@ -255,7 +262,7 @@ public class ActSellMainActivity extends AppCompatActivity {
                         if (GUIRequestID == null || GUIRequestID.equals("")){
                             throw new IllegalStateException("Invalid GUI Request ID Values!!!!");
                         }
-                        AlertDialog dialog = removeRequestDialog(book, book.getGUIRequestID(), reqButton);
+                        AlertDialog dialog = removeRequestDialogFromToggle(book, book.getGUIRequestID(), reqButton);
                         dialog.show();
                     }
                 }
@@ -309,8 +316,7 @@ public class ActSellMainActivity extends AppCompatActivity {
             builder.setPositiveButton("Add to Request List", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
-                    Request request = new Request(mainUser.getUid(), book.getBookID());
-                    WebServiceHandler.addRequest(request);
+                    reqButton.setChecked(true);
                 }
             });
         }else {
@@ -322,7 +328,8 @@ public class ActSellMainActivity extends AppCompatActivity {
                     if (GUIRequestID == null || GUIRequestID.equals("")){
                         throw new IllegalStateException("Invalid GUI Request ID Values!!!!");
                     }
-                    AlertDialog dialog = removeRequestDialog(book, book.getGUIRequestID(), reqButton);
+
+                    AlertDialog dialog = removeRequestDialogFromDialog(book, book.getGUIRequestID(), reqButton);
                     dialog.show();
                 }
             });
@@ -332,7 +339,7 @@ public class ActSellMainActivity extends AppCompatActivity {
         return builder.create();
     }
 
-    private AlertDialog removeRequestDialog(final Book book, final String requestID, final ToggleButton button){
+    private AlertDialog removeRequestDialogFromToggle(final Book book, final String requestID, final ToggleButton button){
         AlertDialog.Builder builder = new AlertDialog.Builder(ActSellMainActivity.this);
         builder.setTitle("Remove Request?");
         builder.setMessage("Are you sure you want to remove your request for this book?");
@@ -342,8 +349,8 @@ public class ActSellMainActivity extends AppCompatActivity {
                 FirebaseDatabase.getInstance().getReference().child("requests").child(requestID).removeValue();
                 mainUser.getRequestIDs().remove(requestID);
                 WebServiceHandler.updateMainUserData(mainUser);
-                deletionProcess = true;
-                button.setChecked(false);
+                Log.d("DialogDeletion", String.valueOf(dialogDeletion));
+                Log.d("DeletionCanceled", String.valueOf(deletionCanceled));
             }
         });
         builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -351,13 +358,41 @@ public class ActSellMainActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialogInterface, int i) {
                 if (book != null){
                     viewBookDialog(book, button);
-                    deletionProcess = true;
+                    deletionCanceled = true;
                     button.setChecked(true);
                 }
             }
         });
         return builder.create();
     }
+
+    private AlertDialog removeRequestDialogFromDialog(final Book book, final String requestID, final ToggleButton button){
+        AlertDialog.Builder builder = new AlertDialog.Builder(ActSellMainActivity.this);
+        builder.setTitle("Remove Request?");
+        builder.setMessage("Are you sure you want to remove your request for this book?");
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                FirebaseDatabase.getInstance().getReference().child("requests").child(requestID).removeValue();
+                mainUser.getRequestIDs().remove(requestID);
+                WebServiceHandler.updateMainUserData(mainUser);
+                dialogDeletion = true;
+                button.setChecked(false);
+                Log.d("DialogDeletion", String.valueOf(dialogDeletion));
+                Log.d("DeletionCanceled", String.valueOf(deletionCanceled));
+            }
+        });
+        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                if (book != null){
+                    viewBookDialog(book, button);
+                }
+            }
+        });
+        return builder.create();
+    }
+
 
     @Override
     public void onBackPressed(){
