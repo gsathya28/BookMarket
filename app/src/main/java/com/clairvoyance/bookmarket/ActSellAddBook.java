@@ -111,14 +111,15 @@ public class ActSellAddBook extends AppCompatActivity {
         postButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // Add a new post object, and add it to the user object
-                mainUser.addBookList(postBooks);
+                // Add books to database
 
-                WebServiceHandler.updateMainUserData(mainUser);
-                for(Book book: mainUser.getBooks()){
+                for(Book book: postBooks){
+                    mainUser.addBook(book);
                     WebServiceHandler.addPublicBook(book);
                 }
+                WebServiceHandler.updateMainUserData(mainUser);
 
+                // Local Save
                 DataHandler.saveMainUserData(mainUser, getApplicationContext());
 
                 Intent savePost = new Intent(getApplicationContext(), ActSellMainActivity.class);

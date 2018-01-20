@@ -108,4 +108,12 @@ class WebServiceHandler {
         }
     }
 
+    static void addRequest(Request request){
+        if (isMainUserAuthenticated()) { // Add function to only allow certain people to post
+            DatabaseReference requestRef = FirebaseDatabase.getInstance().getReference().child("requests");
+            requestRef.child(request.getRequestID()).setValue(request);
+
+        }
+    }
+
 }

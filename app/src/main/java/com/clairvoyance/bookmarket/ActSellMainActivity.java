@@ -15,20 +15,29 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.LinearLayout;
+import android.widget.ToggleButton;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Set;
 
 public class ActSellMainActivity extends AppCompatActivity {
 
     User mainUser;
     ArrayList<Book> books;
     LinearLayout mainLayout;
+    ArrayList<String> requestIDs = new ArrayList<>();
+    ArrayList<Request> requests = new ArrayList<>();
+    boolean deletionProcess = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,6 +114,36 @@ public class ActSellMainActivity extends AppCompatActivity {
 
     private void setLayout(){
 
+        // Prelim data work - may put in separate function
+        Set keys = mainUser.getRequestIDs().keySet();
+        Iterator iterator = keys.iterator();
+        while (iterator.hasNext()){
+            Object object = iterator.next();
+            if (object instanceof String){
+                requestIDs.add((String) object);
+            }
+        }
+
+        for (String requestID: requestIDs){
+            DatabaseReference requestRef = FirebaseDatabase.getInstance().getReference().child("requests").child(requestID);
+            ValueEventListener requestDataListener = new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    Request request = dataSnapshot.getValue(Request.class);
+                    if (request != null){
+                        requests.add(request);
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            };
+            requestRef.addValueEventListener(requestDataListener);
+        }
+
+
         Query bookListRef = WebServiceHandler.mBooks;
         ValueEventListener bookDataListener = new ValueEventListener() {
             @Override
@@ -155,7 +194,7 @@ public class ActSellMainActivity extends AppCompatActivity {
         bookLayout.setLayoutParams(params);
     }
 
-    private void setReqButtonLayout(Button reqButton){
+    private void setReqButtonLayout(ToggleButton reqButton){
         LinearLayout.LayoutParams checkParams = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
@@ -163,6 +202,8 @@ public class ActSellMainActivity extends AppCompatActivity {
 
         reqButton.setLayoutParams(checkParams);
         reqButton.setText("Request");
+        reqButton.setTextOff("Request");
+        reqButton.setTextOn("Unrequest");
     }
 
 
@@ -174,13 +215,52 @@ public class ActSellMainActivity extends AppCompatActivity {
 
             int valueInPx = (int) getApplicationContext().getResources().getDimension(R.dimen.activity_horizontal_margin);
 
-            Button reqButton = new Button(getApplicationContext());
+            final ToggleButton reqButton = new ToggleButton(getApplicationContext());
             bookLayout.addView(reqButton);
             Button infoButton = new Button(getApplicationContext());
             bookLayout.addView(infoButton);
 
             setInfoButtonLayout(infoButton);
             setReqButtonLayout(reqButton);
+
+
+            // Check if there's a pending request on the book by the user.
+            for (Request request: requests){
+                if (book.getBookID().equals(request.getBookID())){
+                    reqButton.setChecked(true);
+                    book.setGUIRequestID(request.getRequestID());
+                    break;
+                }
+            }
+
+            reqButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                    if (deletionProcess){
+                        deletionProcess = false;
+                        return;
+                    }
+
+                    if (isChecked){
+                        Request request = new Request(mainUser.getUid(), book.getBookID());
+                        mainUser.addRequest(request);
+                        WebServiceHandler.updateMainUserData(mainUser);
+                        book.setGUIRequestID(request.getRequestID());
+                        WebServiceHandler.addRequest(request);
+                    }
+                    else {
+                        // Toggle is disabled
+                        // Add Dialog - to prevent accidental request removal -
+                        // Todo: Get Request ID. We need to load these IDS somehow
+                        String GUIRequestID = book.getGUIRequestID();
+                        if (GUIRequestID == null || GUIRequestID.equals("")){
+                            throw new IllegalStateException("Invalid GUI Request ID Values!!!!");
+                        }
+                        AlertDialog dialog = removeRequest(book, book.getGUIRequestID(), reqButton);
+                        dialog.show();
+                    }
+                }
+            });
 
             String buttonText = book.getCourseSubj() + " " + book.getCourseNumber() + " - " + book.getTitle();
             infoButton.setText(buttonText);
@@ -192,7 +272,7 @@ public class ActSellMainActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View view) {
                     // Set Dialog!
-                    viewBookDialog(book).show();
+                    viewBookDialog(book, reqButton).show();
                 }
             });
 
@@ -200,7 +280,7 @@ public class ActSellMainActivity extends AppCompatActivity {
         }
     }
 
-    private AlertDialog viewBookDialog(Book book){
+    private AlertDialog viewBookDialog(final Book book, final ToggleButton reqButton){
 
         AlertDialog.Builder builder = new AlertDialog.Builder(ActSellMainActivity.this);
         builder.setTitle(book.getTitle());
@@ -226,16 +306,57 @@ public class ActSellMainActivity extends AppCompatActivity {
         stringBuilder.append(book.getPrice());
 
         builder.setMessage(stringBuilder.toString());
-        builder.setPositiveButton("Add to Request List", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                // Todo: check the checkbox!
-
-            }
-        });
-
+        if (!reqButton.isChecked()) {
+            builder.setPositiveButton("Add to Request List", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    Request request = new Request(mainUser.getUid(), book.getBookID());
+                    WebServiceHandler.addRequest(request);
+                }
+            });
+        }else {
+            builder.setPositiveButton("Un-request", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    // Todo: Un-request Dialog
+                    String GUIRequestID = book.getGUIRequestID();
+                    if (GUIRequestID == null || GUIRequestID.equals("")){
+                        throw new IllegalStateException("Invalid GUI Request ID Values!!!!");
+                    }
+                    AlertDialog dialog = removeRequest(book, book.getGUIRequestID(), reqButton);
+                    dialog.show();
+                }
+            });
+        }
         builder.setNegativeButton("Cancel", null);
 
+        return builder.create();
+    }
+
+    private AlertDialog removeRequest(final Book book, final String requestID, final ToggleButton button){
+        AlertDialog.Builder builder = new AlertDialog.Builder(ActSellMainActivity.this);
+        builder.setTitle("Remove Request?");
+        builder.setMessage("Are you sure you want to remove your request for this book?");
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                FirebaseDatabase.getInstance().getReference().child("requests").child(requestID).removeValue();
+                mainUser.getRequestIDs().remove(requestID);
+                WebServiceHandler.updateMainUserData(mainUser);
+                deletionProcess = true;
+                button.setChecked(false);
+            }
+        });
+        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                if (book != null){
+                    viewBookDialog(book, button);
+                    deletionProcess = true;
+                    button.setChecked(true);
+                }
+            }
+        });
         return builder.create();
     }
 

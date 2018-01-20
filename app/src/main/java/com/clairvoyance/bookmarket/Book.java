@@ -27,6 +27,9 @@ class Book implements Serializable {
     private String uid;
     private long negPostDateInSecs;
 
+    // GUI Variables
+    private String GUIRequestID;
+
     static final int TITLE = 0;
     static final int PRICE = 1;
     static final int AUTHOR = 2;
@@ -154,5 +157,14 @@ class Book implements Serializable {
 
     public String getBookID() {
         return bookID;
+    }
+
+    public void setGUIRequestID(String GUIRequestID) {
+        this.GUIRequestID = GUIRequestID;
+    }
+
+    @Exclude
+    public String getGUIRequestID() {
+        return GUIRequestID;
     }
 }

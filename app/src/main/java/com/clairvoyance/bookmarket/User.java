@@ -3,7 +3,6 @@ package com.clairvoyance.bookmarket;
 import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -16,13 +15,11 @@ class User implements Serializable {
     private String name;
     private String uid;
     private String email;
-    private ArrayList<Book> books = new ArrayList<>();
     private HashMap<String, Object> bookIDs = new HashMap<>();
+    private HashMap<String, Object> requestIDs = new HashMap<>();
     private boolean isEmailVerified = false;
 
-    public User(){
-
-    }
+    public User(){ }
 
     User(String uid, String email){
         this.uid = uid;
@@ -32,39 +29,30 @@ class User implements Serializable {
     void setName(String name) {
         this.name = name;
     }
-    String getName() {
-        return name;
+    void setEmailVerified(boolean emailVerified) { isEmailVerified = emailVerified; }
+    void addBook(Book book){
+        bookIDs.put(book.getBookID(), true);
     }
+    void addBook(String bookID) {bookIDs.put(bookID, true);}
+    void addRequest(Request request){requestIDs.put(request.getRequestID(), true);}
+    void addRequest(String requestID){requestIDs.put(requestID, true);}
 
     @Exclude
     String getUid() {
         return uid;
     }
 
+    String getName() {
+        return name;
+    }
     String getEmail() {
         return email;
     }
-    void setEmailVerified(boolean emailVerified) { isEmailVerified = emailVerified; }
     boolean isEmailVerified() { return isEmailVerified;  }
-
-    void addBook(Book book){
-        books.add(book);
-        bookIDs.put(book.getBookID(), true);
-    }
-    void addBookList(ArrayList<Book> books){
-        this.books = books;
-        for (Book book: books){
-            bookIDs.put(book.getBookID(), true);
-        }
-    }
-    public HashMap<String, Object> getBookIDs() {
+    HashMap<String, Object> getBookIDs() {
         return bookIDs;
     }
-
-    @Exclude
-    ArrayList<Book> getBooks() {
-        return books;
-    }
+    HashMap<String, Object> getRequestIDs() {return requestIDs;}
 
     @Override
     public boolean equals(Object obj) {
