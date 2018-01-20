@@ -1,8 +1,5 @@
 package com.clairvoyance.bookmarket;
 
-
-import com.google.firebase.database.Exclude;
-
 import java.util.UUID;
 
 /**
@@ -29,18 +26,14 @@ class Request {
     public boolean isAccepted() {
         return accepted;
     }
-
     String getUid() {
         return uid;
     }
+    String getBookID() {return bookID;}
 
-    public String getBookID() {
-        return bookID;
-    }
-
-    // Actual Book Data will be loaded and displayed in the listener in the listener.
-
+    // Actual Book Data will be loaded and displayed in the listener.
     String getRequestID() {
         return requestID;
     }
+
 }

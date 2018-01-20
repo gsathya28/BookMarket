@@ -6,7 +6,6 @@ import android.util.Log;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 
 /**
  * Created by Sathya on 12/24/2017.
@@ -15,9 +14,7 @@ import java.util.ArrayList;
 
 class DataHandler {
 
-    static ArrayList<Book> publicBooks;
-    static ArrayList<Book> myBooks;
-
+    // May add myBooks / publicBooks ArrayLists later if necessary
 
     static User parseMainUserData(Context context){
 

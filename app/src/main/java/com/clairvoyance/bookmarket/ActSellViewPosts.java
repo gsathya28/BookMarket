@@ -1,7 +1,6 @@
 package com.clairvoyance.bookmarket;
 
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.graphics.Color;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
@@ -26,7 +25,6 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Set;
 
 public class ActSellViewPosts extends AppCompatActivity {
@@ -63,10 +61,9 @@ public class ActSellViewPosts extends AppCompatActivity {
 
     private void setLayout(){
 
-        Set keys = mainUser.getBookIDs().keySet();
-        Iterator iterator = keys.iterator();
-        while (iterator.hasNext()){
-            Object object = iterator.next();
+        Set keys = mainUser.getRequestIDs().keySet();
+
+        for (Object object: keys){
             if (object instanceof String){
                 bookIDs.add((String) object);
             }
@@ -141,7 +138,7 @@ public class ActSellViewPosts extends AppCompatActivity {
         mainLayout.addView(infoButton, index);
     }
 
-    private void deleteBookInUI(int index, final Book book){
+    private void deleteBookInUI(int index){
         mainLayout.removeViewAt(index);
     }
 
@@ -301,7 +298,7 @@ public class ActSellViewPosts extends AppCompatActivity {
                 // Update UI
                 int index = displayedBooks.indexOf(book.getBookID());
                 displayedBooks.remove(index);
-                deleteBookInUI(index, book);
+                deleteBookInUI(index);
 
             }
         });

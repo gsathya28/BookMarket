@@ -117,54 +117,45 @@ class Book implements Serializable {
         }
     }
 
+    // Firebase-Required Getters
     public String getTitle() {
         return title;
     }
-
     public String getAuthor() {
         return author;
     }
-
-    public String getCourseSubj() {
+    String getCourseSubj() {
         return courseSubj;
     }
-
-    public String getCourseNumber() {
+    String getCourseNumber() {
         return courseNumber;
     }
-
-    public String getPrice() {
+    String getPrice() {
         return price;
     }
-
     public String getVersionNumber() {
         return versionNumber;
     }
-
     public String getInstructor() {
         return instructor;
     }
-
     public String getNotes() {
         return notes;
     }
-
     boolean isAvailable() {
         return isAvailable;
     }
-
     long getPostDateInSecs() {return negPostDateInSecs * -1;}
-
-    public String getBookID() {
+    String getBookID() {
         return bookID;
     }
 
-    public void setGUIRequestID(String GUIRequestID) {
+    // GUI - Control Variables
+    void setGUIRequestID(String GUIRequestID) {
         this.GUIRequestID = GUIRequestID;
     }
-
     @Exclude
-    public String getGUIRequestID() {
+    String getGUIRequestID() {
         return GUIRequestID;
     }
 }

@@ -28,7 +28,6 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Set;
 
 public class ActSellMainActivity extends AppCompatActivity {
@@ -118,9 +117,8 @@ public class ActSellMainActivity extends AppCompatActivity {
 
         // Prelim data work - may put in separate function
         Set keys = mainUser.getRequestIDs().keySet();
-        Iterator iterator = keys.iterator();
-        while (iterator.hasNext()){
-            Object object = iterator.next();
+
+        for (Object object: keys){
             if (object instanceof String){
                 requestIDs.add((String) object);
             }
@@ -203,7 +201,7 @@ public class ActSellMainActivity extends AppCompatActivity {
         );
 
         reqButton.setLayoutParams(checkParams);
-        reqButton.setText("Request");
+        reqButton.setText(R.string.request);
         reqButton.setTextOff("Request");
         reqButton.setTextOn("Unrequest");
     }
@@ -392,7 +390,6 @@ public class ActSellMainActivity extends AppCompatActivity {
         });
         return builder.create();
     }
-
 
     @Override
     public void onBackPressed(){

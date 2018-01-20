@@ -10,7 +10,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.ArrayList;
 
 /**
  * Created by Sathya on 12/21/2017.
@@ -25,8 +24,6 @@ class WebServiceHandler {
     private static FirebaseAuth mAuth;
     private static FirebaseUser mUser;
     private static User loadedUser;
-
-    // Value Event Listeners
 
     static Query mBooks = FirebaseDatabase.getInstance().getReference().child("books").orderByChild("postDateInSecs").limitToFirst(100);
 

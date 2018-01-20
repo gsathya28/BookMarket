@@ -54,6 +54,7 @@ class User implements Serializable {
     }
     HashMap<String, Object> getRequestIDs() {return requestIDs;}
 
+    // Todo: Still need to implement correctly - currently no usages in com.clairvoyance.bookmarket
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof User){
