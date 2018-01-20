@@ -54,6 +54,7 @@ public class ActLoginActivity extends AppCompatActivity {
     }
 
     private void signIn() {
+        // Start Sign in Activity (launched by Google)
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, WebServiceHandler.RC_SIGN_IN);
     }
@@ -72,11 +73,11 @@ public class ActLoginActivity extends AppCompatActivity {
                 String accountEmail = account.getEmail();
                 Log.d("EmailString", accountEmail);
                 firebaseAuthWithGoogle(account);
-                // UI change...
+
             } catch (ApiException e) {
                 // Google Sign In failed, update UI appropriately
                 Log.w("AuthError", "Google sign in failed", e);
-                // ...
+                // Update UI
             }
         }
     }
@@ -91,18 +92,19 @@ public class ActLoginActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
+                            // The user data will now be handled in WebServiceHandler.class
+
                             Log.d("AuthExchangeSuccess", "signInWithCredential:success");
-                            // FirebaseUser user = mAuth.getCurrentUser();
                             Intent intent = new Intent(getApplicationContext(), ActMainActivity.class);
                             startActivity(intent);
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w("AuthExchangeFailure", "signInWithCredential:failure", task.getException());
                             Snackbar.make(findViewById(R.id.main_layout), "Authentication Failed.", Snackbar.LENGTH_SHORT).show();
-                            // updateUI(null);
+
                         }
 
-                        // ...
+
                     }
                 });
     }
@@ -122,6 +124,5 @@ public class ActLoginActivity extends AppCompatActivity {
             startActivity(intent);
         }
     }
-
 }
 

@@ -17,7 +17,6 @@ class DataHandler {
     // May add myBooks / publicBooks ArrayLists later if necessary
 
     static User parseMainUserData(Context context){
-
         User mainUser = null;
         try {
             FileInputStream fIn = context.openFileInput("localUser");
@@ -33,6 +32,7 @@ class DataHandler {
         return mainUser;
     }
 
+    // Currently one usage in ActSellAddBook.java
     static void saveMainUserData(User mainUser, Context context){
 
         try {

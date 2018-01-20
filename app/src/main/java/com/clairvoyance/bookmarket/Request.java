@@ -30,8 +30,6 @@ class Request {
         return uid;
     }
     String getBookID() {return bookID;}
-
-    // Actual Book Data will be loaded and displayed in the listener.
     String getRequestID() {
         return requestID;
     }

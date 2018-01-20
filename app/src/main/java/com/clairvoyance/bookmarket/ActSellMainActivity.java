@@ -29,7 +29,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Set;
-
+// Todo: Restructure Request Loading!
 public class ActSellMainActivity extends AppCompatActivity {
 
     User mainUser;
@@ -37,25 +37,57 @@ public class ActSellMainActivity extends AppCompatActivity {
     LinearLayout mainLayout;
     ArrayList<String> requestIDs = new ArrayList<>();
     ArrayList<Request> requests = new ArrayList<>();
+    ArrayList<DatabaseReference> requestRefs = new ArrayList<>();
     boolean deletionCanceled = false;
     boolean dialogDeletion = false;
+    Query bookListRef = WebServiceHandler.mBooks;
+    ValueEventListener bookDataListener = new ValueEventListener() {
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+            // Add Book Objects in to arrayList
+            books = new ArrayList<>();
+            for (DataSnapshot d: dataSnapshot.getChildren()){
+                books.add(d.getValue(Book.class));
+            }
+            // Layout is loaded only after all the data is loaded from the database
+            updateUI();
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+
+        }
+    };
+    ValueEventListener requestDataListener = new ValueEventListener() {
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+            Request request = dataSnapshot.getValue(Request.class);
+            if (request != null){
+                requests.add(request);
+            }
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+
+        }
+    };
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sell_main);
 
-        mainUser = WebServiceHandler.generateMainUser();
-        if (mainUser == null){
-            Intent intent = new Intent(this, ActLoginActivity.class);
-            startActivity(intent);
-        }
+
         mainLayout = findViewById(R.id.buyer_post_layout);
         setToolbar();
+        setMainUser();
         setOptionButtons();
         setLayout();
     }
 
+    // Toolbar Methods - setToolbar, onCreateOptionsMenu, onOptionsItemSelected
     private void setToolbar(){
         Toolbar myToolbar = findViewById(R.id.my_toolbar);
         myToolbar.setTitleTextColor(Color.parseColor("#FFFFFF"));
@@ -93,6 +125,15 @@ public class ActSellMainActivity extends AppCompatActivity {
         }
     }
 
+    private void setMainUser(){
+        mainUser = WebServiceHandler.generateMainUser();
+        if (mainUser == null){
+            Intent intent = new Intent(this, ActLoginActivity.class);
+            startActivity(intent);
+        }
+    }
+
+    // Set Listeners for Option Buttons generated at the Bottom of the layout
     private void setOptionButtons(){
         Button addPostButton = findViewById(R.id.sell_add_post);
         addPostButton.setOnClickListener(new View.OnClickListener() {
@@ -114,8 +155,9 @@ public class ActSellMainActivity extends AppCompatActivity {
     }
 
     private void setLayout(){
+        // Get Request Data - note Listeners are triggered for sure once, but only after all the code has run in OnCreate
 
-        // Prelim data work - may put in separate function
+        // Get Keys for Request IDs - to see what the user has requested already
         Set keys = mainUser.getRequestIDs().keySet();
 
         for (Object object: keys){
@@ -124,42 +166,14 @@ public class ActSellMainActivity extends AppCompatActivity {
             }
         }
 
+        // Set Database Listeners for Request Objects - so Request Data is ready when updateGUI() is called.
         for (String requestID: requestIDs){
             DatabaseReference requestRef = FirebaseDatabase.getInstance().getReference().child("requests").child(requestID);
-            ValueEventListener requestDataListener = new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    Request request = dataSnapshot.getValue(Request.class);
-                    if (request != null){
-                        requests.add(request);
-                    }
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-            };
             requestRef.addValueEventListener(requestDataListener);
+            requestRefs.add(requestRef);
         }
 
-
-        Query bookListRef = WebServiceHandler.mBooks;
-        ValueEventListener bookDataListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                books = new ArrayList<>();
-                for (DataSnapshot d: dataSnapshot.getChildren()){
-                    books.add(d.getValue(Book.class));
-                }
-                updateUI();
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        };
+        // Set Database Listener for Public Book List
         bookListRef.addValueEventListener(bookDataListener);
     }
 
@@ -207,18 +221,21 @@ public class ActSellMainActivity extends AppCompatActivity {
     }
 
     private void updateUI(){
+        // Remove all View since there is a new Book ArrayList in place
         mainLayout.removeAllViews();
+
+        // Funnel through the data placing new Horizontal LinearLayout (to hold info and request buttons) for each book
         for (final Book book: books){
             LinearLayout bookLayout = new LinearLayout(getApplicationContext());
             setBookLayout(bookLayout);
 
             int valueInPx = (int) getApplicationContext().getResources().getDimension(R.dimen.activity_horizontal_margin);
 
+            // Set layout for Buttons in BookLayout
             final ToggleButton reqButton = new ToggleButton(getApplicationContext());
             bookLayout.addView(reqButton);
             Button infoButton = new Button(getApplicationContext());
             bookLayout.addView(infoButton);
-
             setInfoButtonLayout(infoButton);
             setReqButtonLayout(reqButton);
 
@@ -232,14 +249,17 @@ public class ActSellMainActivity extends AppCompatActivity {
                 }
             }
 
+            // This is really important - adds and deletes request data when checked/unchecked
             reqButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                    // No Code should run if the deletion is canceled and the toggle button isChecked back to true
                     if (deletionCanceled){
                         deletionCanceled = false;
                         return;
                     }
 
+                    // No Code should run if the deletion comes from the info dialog of the book and the toggle button isChecked to false
                     if (dialogDeletion){
                         dialogDeletion = false;
                         return;
@@ -253,19 +273,21 @@ public class ActSellMainActivity extends AppCompatActivity {
                         WebServiceHandler.addRequest(request);
                     }
                     else {
-                        // Toggle is disabled
-                        // Add Dialog - to prevent accidental request removal -
-                        // Todo: Get Request ID. We need to load these IDS somehow
+
+                        // Check if requestID exists Todo: Need to check if requestID is valid
                         String GUIRequestID = book.getGUIRequestID();
                         if (GUIRequestID == null || GUIRequestID.equals("")){
                             throw new IllegalStateException("Invalid GUI Request ID Values!!!!");
                         }
+
+                        // Add Delete? Dialog - to prevent accidental request removal -
                         AlertDialog dialog = removeRequestDialogFromToggle(book, book.getGUIRequestID(), reqButton);
                         dialog.show();
                     }
                 }
             });
 
+            // Set Button Text
             String buttonText = book.getCourseSubj() + " " + book.getCourseNumber() + " - " + book.getTitle();
             infoButton.setText(buttonText);
             infoButton.setBackgroundColor(Color.parseColor("#267326"));
@@ -275,7 +297,7 @@ public class ActSellMainActivity extends AppCompatActivity {
             infoButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    // Set Dialog!
+                    // Set Info Dialog (different from Delete? Dialog)
                     viewBookDialog(book, reqButton).show();
                 }
             });
@@ -310,6 +332,9 @@ public class ActSellMainActivity extends AppCompatActivity {
         stringBuilder.append(book.getPrice());
 
         builder.setMessage(stringBuilder.toString());
+
+        // If a request is not made for this book - button will prompt to make request
+        // and the listener will set the toggleButton to isChecked which will run code to add request to database
         if (!reqButton.isChecked()) {
             builder.setPositiveButton("Add to Request List", new DialogInterface.OnClickListener() {
                 @Override
@@ -317,11 +342,12 @@ public class ActSellMainActivity extends AppCompatActivity {
                     reqButton.setChecked(true);
                 }
             });
-        }else {
+        }
+        // Else, the button will prompt to un-request, and the listener will load a dialog to make sure the un-request is intended.
+        else {
             builder.setPositiveButton("Un-request", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
-                    // Todo: Un-request Dialog
                     String GUIRequestID = book.getGUIRequestID();
                     if (GUIRequestID == null || GUIRequestID.equals("")){
                         throw new IllegalStateException("Invalid GUI Request ID Values!!!!");
@@ -344,7 +370,7 @@ public class ActSellMainActivity extends AppCompatActivity {
         builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                FirebaseDatabase.getInstance().getReference().child("requests").child(requestID).removeValue();
+                WebServiceHandler.rootRef.child("requests").child(requestID).removeValue();
                 mainUser.getRequestIDs().remove(requestID);
                 WebServiceHandler.updateMainUserData(mainUser);
                 Log.d("DialogDeletion", String.valueOf(dialogDeletion));
@@ -371,7 +397,7 @@ public class ActSellMainActivity extends AppCompatActivity {
         builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                FirebaseDatabase.getInstance().getReference().child("requests").child(requestID).removeValue();
+                WebServiceHandler.rootRef.child("requests").child(requestID).removeValue();
                 mainUser.getRequestIDs().remove(requestID);
                 WebServiceHandler.updateMainUserData(mainUser);
                 dialogDeletion = true;
@@ -391,9 +417,19 @@ public class ActSellMainActivity extends AppCompatActivity {
         return builder.create();
     }
 
+    // Disable Back Button
     @Override
     public void onBackPressed(){
 
     }
 
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        bookListRef.removeEventListener(bookDataListener);
+        // For loop to remove every ValueEventListener for requests
+        for (DatabaseReference requestRef: requestRefs){
+            requestRef.removeEventListener(requestDataListener);
+        }
+    }
 }

@@ -1,6 +1,7 @@
 package com.clairvoyance.bookmarket;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
@@ -39,11 +40,10 @@ public class ActSellViewPosts extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sell_view_posts);
-
-        mainUser = WebServiceHandler.generateMainUser();
         mainLayout = findViewById(R.id.sell_my_post_layout);
 
         setToolbar();
+        setMainUser();
         setLayout();
     }
 
@@ -59,9 +59,17 @@ public class ActSellViewPosts extends AppCompatActivity {
         ab.setDisplayHomeAsUpEnabled(true);
     }
 
+    private void setMainUser(){
+        mainUser = WebServiceHandler.generateMainUser();
+        if (mainUser == null){
+            Intent intent = new Intent(this, ActLoginActivity.class);
+            startActivity(intent);
+        }
+    }
+
     private void setLayout(){
 
-        Set keys = mainUser.getRequestIDs().keySet();
+        Set keys = mainUser.getBookIDs().keySet();
 
         for (Object object: keys){
             if (object instanceof String){

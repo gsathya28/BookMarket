@@ -1,4 +1,4 @@
-package com.clairvoyance.bookmarket; // has been delivered.. bitch!
+package com.clairvoyance.bookmarket;
 
 import android.support.annotation.Nullable;
 import com.google.firebase.auth.FirebaseAuth;
@@ -25,7 +25,8 @@ class WebServiceHandler {
     private static FirebaseUser mUser;
     private static User loadedUser;
 
-    static Query mBooks = FirebaseDatabase.getInstance().getReference().child("books").orderByChild("postDateInSecs").limitToFirst(100);
+    static DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
+    static Query mBooks = rootRef.child("books").orderByChild("postDateInSecs").limitToFirst(100);
 
     private static boolean isMainUserAuthenticated(){
         mAuth = FirebaseAuth.getInstance();
@@ -36,22 +37,22 @@ class WebServiceHandler {
     @Nullable
     static User generateMainUser(){
         if (isMainUserAuthenticated()){
-            // KeyLine
             User user = new User(mUser.getUid(), mUser.getEmail());
-
             user.setEmailVerified(mUser.isEmailVerified());
+
+            // Key-line
             user = loadMainUserData(user);
             return user;
         }
         else {
-            return null; // Re-authentication intent set up in onCreate
+            return null; // Re-authentication intent set up in onCreate of most Activities. Todo: Make sure re-authentication intent is setup for null case in every activity
         }
     }
 
     private static User loadMainUserData(final User user){
-
+        // Load main data (and set listener) from database - if not already loaded
         if (loadedUser == null) {
-            DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
+
             DatabaseReference userRef = rootRef.child("users").child(mUser.getUid());
 
             // Read Data
@@ -59,11 +60,13 @@ class WebServiceHandler {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     if (!dataSnapshot.exists()) {
-                        // Create new user - with values
+                        // Create new user in database
                         createNewUserData(user);
+                        // Loaded User is whatever it is now since there is no previous data to load
                         loadedUser = user;
                     }
                     else {
+                        // This works even after the initial data read since loadedUser's pointer is returned at the end of the method.
                         loadedUser = dataSnapshot.getValue(User.class);
                     }
                 }
@@ -74,7 +77,7 @@ class WebServiceHandler {
                 }
             });
         }
-        return loadedUser;
+        return loadedUser; // This will be null at first since the ValueEventListener only puts the data in this pointer after all the code (onCreate) has run
     }
 
     private static void createNewUserData(User user){
@@ -89,27 +92,32 @@ class WebServiceHandler {
 
     static void updateMainUserData(User user){
         if (isMainUserAuthenticated()){
-            DatabaseReference userRefList = FirebaseDatabase.getInstance().getReference().child("users");
-            DatabaseReference userRef = userRefList.child(mUser.getUid());
+            DatabaseReference userRef = rootRef.child("users").child(mUser.getUid());
             userRef.setValue(user);
+        }
+        else {
+            throw new IllegalStateException("User not authorized");
+            // Todo: Implement Try-catch to send activities back to the Login Activity
+        }
+    }
+
+    static void addPublicBook(Book book){
+        if (isMainUserAuthenticated()) { // Add function to only allow certain people to post
+            DatabaseReference postRef = WebServiceHandler.rootRef.child("books").child(book.getBookID());
+            postRef.setValue(book);
         }
         else {
             throw new IllegalStateException("User not authorized");
         }
     }
 
-    static void addPublicBook(Book book){
-        if (isMainUserAuthenticated()) { // Add function to only allow certain people to post
-            DatabaseReference postRef = FirebaseDatabase.getInstance().getReference().child("books");
-            postRef.child(book.getBookID()).setValue(book);
-        }
-    }
-
     static void addRequest(Request request){
         if (isMainUserAuthenticated()) { // Add function to only allow certain people to post
-            DatabaseReference requestRef = FirebaseDatabase.getInstance().getReference().child("requests");
-            requestRef.child(request.getRequestID()).setValue(request);
-
+            DatabaseReference requestRef = rootRef.child("requests").child(request.getRequestID());
+            requestRef.setValue(request);
+        }
+        else {
+            throw new IllegalStateException("User not authorized");
         }
     }
 

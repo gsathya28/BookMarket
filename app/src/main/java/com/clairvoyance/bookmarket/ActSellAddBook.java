@@ -21,17 +21,16 @@ import java.util.ArrayList;
 public class ActSellAddBook extends AppCompatActivity {
 
     User mainUser;
-    ArrayList<Book> postBooks;
+    ArrayList<Book> postBooks = new ArrayList<>();
     View dialogLayout;
     Button noBookButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_sell_add_post);
         noBookButton = findViewById(R.id.sell_default_no_book);
-        postBooks = new ArrayList<>();
-        mainUser = WebServiceHandler.generateMainUser();
 
         setToolbar();
         setMainUser();
@@ -52,6 +51,10 @@ public class ActSellAddBook extends AppCompatActivity {
 
     private void setMainUser(){
         mainUser = WebServiceHandler.generateMainUser();
+        if (mainUser == null){
+            Intent intent = new Intent(this, ActLoginActivity.class);
+            startActivity(intent);
+        }
     }
 
     private void setButtons(){
@@ -61,11 +64,17 @@ public class ActSellAddBook extends AppCompatActivity {
         addBook.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                // New Dialog allowing you to enter Book Details
                 final AlertDialog newBookDialog = newBookDialog();
+
+                // OnShowListener - that will set OnClickListeners for Buttons in Dialog
                 newBookDialog.setOnShowListener(new DialogInterface.OnShowListener() {
                     @Override
                     public void onShow(DialogInterface dialogInterface) {
                         Button button = newBookDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+
+                        // Listener for Dialog Positive Button to create Book Object and stored temporarily in Activity (postBooks)
                         button.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
@@ -111,17 +120,17 @@ public class ActSellAddBook extends AppCompatActivity {
         postButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // Add books to database
 
+                // Add books to database that are in temporary store (postBooks)
                 for(Book book: postBooks){
                     mainUser.addBook(book);
                     WebServiceHandler.addPublicBook(book);
                 }
                 WebServiceHandler.updateMainUserData(mainUser);
-
-                // Local Save
+                // Local Save - may remove later
                 DataHandler.saveMainUserData(mainUser, getApplicationContext());
 
+                // Go back to the Sell-MainActivity
                 Intent savePost = new Intent(getApplicationContext(), ActSellMainActivity.class);
                 startActivity(savePost);
             }
@@ -131,30 +140,17 @@ public class ActSellAddBook extends AppCompatActivity {
     private void addToList(final Book book){
         final LinearLayout listLayout = findViewById(R.id.sell_add_book_list);
 
+        // Remove "No Books" View
         if (listLayout.getChildAt(0).equals(findViewById(R.id.sell_default_no_book))){
             listLayout.removeViewAt(0);
         }
 
+        // Load a button to GUI
         final Button bookButton = new Button(this);
         listLayout.addView(bookButton, 0);
+        setButtonLayout(bookButton);
 
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-        );
-
-        int topValueInPx = (int) getApplicationContext().getResources().getDimension(R.dimen.activity_vertical_margin);
-        int bottomValueInPx = (int) getApplicationContext().getResources().getDimension(R.dimen.activity_vertical_margin);
-        bottomValueInPx = bottomValueInPx / 2;
-        int leftValueInPx = (int) getApplicationContext().getResources().getDimension(R.dimen.activity_horizontal_margin);
-
-
-        params.setMargins(leftValueInPx, topValueInPx, leftValueInPx, bottomValueInPx);
-        bookButton.setLayoutParams(params);
-
-        bookButton.setBackgroundColor(Color.parseColor("#267326"));
-        // Set text using the post and books
-
+        // Set text using the Book object
         String courseSubj = book.get(Book.COURSE_SUBJECT);
         String courseNum = book.get(Book.COURSE_NUMBER);
         String bookName = book.get(Book.TITLE);
@@ -162,13 +158,13 @@ public class ActSellAddBook extends AppCompatActivity {
         bookButton.setText(buttonText);
         bookButton.setTextColor(Color.parseColor("#FFFFFF"));
 
-        // Set onClickListener to update Book!
-
+        // Set Listener to load Dialog to update/change book data.
         bookButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 final AlertDialog editBookDialog = editBookDialog();
 
+                // Load current data into dialog
                 ((EditText) dialogLayout.findViewById(R.id.sell_course_type_text)).setText(book.get(Book.COURSE_SUBJECT));
                 ((EditText) dialogLayout.findViewById(R.id.sell_course_number_text)).setText(book.get(Book.COURSE_NUMBER));
                 ((EditText) dialogLayout.findViewById(R.id.sell_book_title_text)).setText(book.get(Book.TITLE));
@@ -178,11 +174,13 @@ public class ActSellAddBook extends AppCompatActivity {
                 ((EditText) dialogLayout.findViewById(R.id.sell_instructor_text)).setText(book.get(Book.INSTRUCTOR));
                 ((EditText) dialogLayout.findViewById(R.id.sell_book_notes_text)).setText(book.get(Book.NOTES));
 
+                // Handle Buttons (w/ Listeners) in dialog
                 editBookDialog.setOnShowListener(new DialogInterface.OnShowListener() {
                     @Override
                     public void onShow(DialogInterface dialo3gInterface) {
-
                         Button editButton = editBookDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+
+                        // Save Book Data back into postBooks - (Temporary Activity Store)
                         editButton.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
@@ -196,6 +194,7 @@ public class ActSellAddBook extends AppCompatActivity {
                                     Toast.makeText(getApplicationContext(), "Both Course Subject and Number required", Toast.LENGTH_LONG).show();
                                     return;
                                 }
+
                                 newBook = new Book(courseType, courseNumber);
 
                                 String bookTitle = ((EditText) dialogLayout.findViewById(R.id.sell_book_title_text)).getText().toString();
@@ -220,6 +219,7 @@ public class ActSellAddBook extends AppCompatActivity {
                             }
                         });
 
+                        // Delete Book from Temporary Store
                         Button deleteButton = editBookDialog.getButton(AlertDialog.BUTTON_NEGATIVE);
                         deleteButton.setOnClickListener(new View.OnClickListener() {
                             @Override
@@ -231,33 +231,51 @@ public class ActSellAddBook extends AppCompatActivity {
                         });
                     }
                 });
-
                 editBookDialog.show();
             }
         });
     }
 
+    private void setButtonLayout(Button bookButton){
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+        );
+
+        int topValueInPx = (int) getApplicationContext().getResources().getDimension(R.dimen.activity_vertical_margin);
+        int bottomValueInPx = (int) getApplicationContext().getResources().getDimension(R.dimen.activity_vertical_margin);
+        bottomValueInPx = bottomValueInPx / 2;
+        int leftValueInPx = (int) getApplicationContext().getResources().getDimension(R.dimen.activity_horizontal_margin);
+
+
+        params.setMargins(leftValueInPx, topValueInPx, leftValueInPx, bottomValueInPx);
+        bookButton.setLayoutParams(params);
+
+        bookButton.setBackgroundColor(Color.parseColor("#267326"));
+    }
+
     private void deleteBookFromList(Button bookButton){
         final LinearLayout listLayout = findViewById(R.id.sell_add_book_list);
 
+        // Check if button is part of layout before deleting
         if (listLayout.indexOfChild(bookButton) != -1)
             listLayout.removeView(bookButton);
 
+        // Add the "No Books" text if there are no books left.
         if (postBooks.size() == 0){
             listLayout.addView(noBookButton, 0);
         }
     }
 
     private AlertDialog newBookDialog(){
-
+        // Set Dialog Layout
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
         LayoutInflater inflater = getLayoutInflater();
         dialogLayout = inflater.inflate(R.layout.add_book_dialog_layout, null);
-
         builder.setView(dialogLayout);
-        builder.setPositiveButton("Save", null);
 
+        // Add Buttons (onClickListeners added when onShowListener is added to AlertDialog after it is returned)
+        builder.setPositiveButton("Save", null);
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
@@ -268,13 +286,13 @@ public class ActSellAddBook extends AppCompatActivity {
     }
 
     private AlertDialog editBookDialog(){
-
+        // Set Dialog Layout
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
         LayoutInflater inflater = getLayoutInflater();
         dialogLayout = inflater.inflate(R.layout.add_book_dialog_layout, null);
-
         builder.setView(dialogLayout);
+
+        // Add Buttons (onClickListeners added when onShowListener is added to AlertDialog after it is returned)
         builder.setPositiveButton("Save", null);
         builder.setNegativeButton("DELETE", null);
         return builder.create();
