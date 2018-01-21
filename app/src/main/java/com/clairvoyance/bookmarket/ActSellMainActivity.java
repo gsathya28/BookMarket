@@ -9,7 +9,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -29,7 +28,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Set;
-// Todo: Restructure Request Loading!
+
 public class ActSellMainActivity extends AppCompatActivity {
 
     User mainUser;
@@ -38,8 +37,6 @@ public class ActSellMainActivity extends AppCompatActivity {
     ArrayList<String> requestIDs = new ArrayList<>();
     ArrayList<Request> requests = new ArrayList<>();
     ArrayList<DatabaseReference> requestRefs = new ArrayList<>();
-    boolean deletionCanceled = false;
-    boolean dialogDeletion = false;
     Query bookListRef = WebServiceHandler.mBooks;
     ValueEventListener bookDataListener = new ValueEventListener() {
         @Override
@@ -78,7 +75,6 @@ public class ActSellMainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sell_main);
-
 
         mainLayout = findViewById(R.id.buyer_post_layout);
         setToolbar();
@@ -253,37 +249,7 @@ public class ActSellMainActivity extends AppCompatActivity {
             reqButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
-                    // No Code should run if the deletion is canceled and the toggle button isChecked back to true
-                    if (deletionCanceled){
-                        deletionCanceled = false;
-                        return;
-                    }
-
-                    // No Code should run if the deletion comes from the info dialog of the book and the toggle button isChecked to false
-                    if (dialogDeletion){
-                        dialogDeletion = false;
-                        return;
-                    }
-
-                    if (isChecked){
-                        Request request = new Request(mainUser.getUid(), book.getBookID());
-                        mainUser.addRequest(request);
-                        WebServiceHandler.updateMainUserData(mainUser);
-                        book.setGUIRequestID(request.getRequestID());
-                        WebServiceHandler.addRequest(request);
-                    }
-                    else {
-
-                        // Check if requestID exists Todo: Need to check if requestID is valid
-                        String GUIRequestID = book.getGUIRequestID();
-                        if (GUIRequestID == null || GUIRequestID.equals("")){
-                            throw new IllegalStateException("Invalid GUI Request ID Values!!!!");
-                        }
-
-                        // Add Delete? Dialog - to prevent accidental request removal -
-                        AlertDialog dialog = removeRequestDialogFromToggle(book, book.getGUIRequestID(), reqButton);
-                        dialog.show();
-                    }
+                    checkedConditional(reqButton, isChecked, book);
                 }
             });
 
@@ -353,7 +319,7 @@ public class ActSellMainActivity extends AppCompatActivity {
                         throw new IllegalStateException("Invalid GUI Request ID Values!!!!");
                     }
 
-                    AlertDialog dialog = removeRequestDialogFromDialog(book, book.getGUIRequestID(), reqButton);
+                    AlertDialog dialog = removeRequestDialog(book, book.getGUIRequestID(), reqButton);
                     dialog.show();
                 }
             });
@@ -363,58 +329,69 @@ public class ActSellMainActivity extends AppCompatActivity {
         return builder.create();
     }
 
-    private AlertDialog removeRequestDialogFromToggle(final Book book, final String requestID, final ToggleButton button){
+    private AlertDialog removeRequestDialog(final Book book, final String requestID, final ToggleButton button){
         AlertDialog.Builder builder = new AlertDialog.Builder(ActSellMainActivity.this);
         builder.setTitle("Remove Request?");
         builder.setMessage("Are you sure you want to remove your request for this book?");
         builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                WebServiceHandler.rootRef.child("requests").child(requestID).removeValue();
-                mainUser.getRequestIDs().remove(requestID);
-                WebServiceHandler.updateMainUserData(mainUser);
-                Log.d("DialogDeletion", String.valueOf(dialogDeletion));
-                Log.d("DeletionCanceled", String.valueOf(deletionCanceled));
+                deleteRequest(requestID);
+                button.setOnCheckedChangeListener(null);
+                button.setChecked(false);
+                button.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                        checkedConditional(button, button.isChecked(), book);
+                    }
+                });
             }
         });
         builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 if (book != null){
-                    viewBookDialog(book, button);
-                    deletionCanceled = true;
+                    // To prevent the triggering of code in the OnCheckedChangeListener
+                    button.setOnCheckedChangeListener(null);
                     button.setChecked(true);
+                    button.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                        @Override
+                        public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                            checkedConditional(button, button.isChecked(), book);
+                        }
+                    });
                 }
             }
         });
         return builder.create();
     }
 
-    private AlertDialog removeRequestDialogFromDialog(final Book book, final String requestID, final ToggleButton button){
-        AlertDialog.Builder builder = new AlertDialog.Builder(ActSellMainActivity.this);
-        builder.setTitle("Remove Request?");
-        builder.setMessage("Are you sure you want to remove your request for this book?");
-        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                WebServiceHandler.rootRef.child("requests").child(requestID).removeValue();
-                mainUser.getRequestIDs().remove(requestID);
-                WebServiceHandler.updateMainUserData(mainUser);
-                dialogDeletion = true;
-                button.setChecked(false);
-                Log.d("DialogDeletion", String.valueOf(dialogDeletion));
-                Log.d("DeletionCanceled", String.valueOf(deletionCanceled));
+    private void deleteRequest(String requestID){
+        WebServiceHandler.rootRef.child("requests").child(requestID).removeValue();
+        mainUser.getRequestIDs().remove(requestID);
+        WebServiceHandler.updateMainUserData(mainUser);
+    }
+
+    private void checkedConditional(ToggleButton reqButton, boolean isChecked, Book book){
+        if (isChecked){
+            Request request = new Request(mainUser.getUid(), book.getBookID());
+            mainUser.addRequest(request);
+            WebServiceHandler.updateMainUserData(mainUser);
+            book.setGUIRequestID(request.getRequestID());
+            WebServiceHandler.addRequest(request);
+        }
+        else {
+
+            // Check if requestID exists Todo: Need to check if requestID is valid
+            String GUIRequestID = book.getGUIRequestID();
+            if (GUIRequestID == null || GUIRequestID.equals("")){
+                throw new IllegalStateException("Invalid GUI Request ID Values!!!!");
             }
-        });
-        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                if (book != null){
-                    viewBookDialog(book, button);
-                }
-            }
-        });
-        return builder.create();
+
+            // Add Delete? Dialog - to prevent accidental request removal -
+            AlertDialog dialog = removeRequestDialog(book, book.getGUIRequestID(), reqButton);
+            dialog.show();
+        }
     }
 
     // Disable Back Button
@@ -432,4 +409,5 @@ public class ActSellMainActivity extends AppCompatActivity {
             requestRef.removeEventListener(requestDataListener);
         }
     }
+
 }
