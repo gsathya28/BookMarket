@@ -3,9 +3,10 @@
     <string name="main_prompt">Looking to:</string>
     <string name="Sell">Sell</string>
     <string name="Buy">Buy</string>
-    <string name="your_posts">Your Posts</string>
+    <string name="your_books">Your Books</string>
     <string name="Add_Post">Add Post</string>
     <string name="Add_Book">Add Book</string>
+    <string name="Add_Books">Add Books</string>
     <string name="no_books_added">No Books Added</string>
     <string name="post_confirm">Post!</string>
     <string name="notes">Notes</string>
@@ -37,6 +38,7 @@
     <string name="sign_in_google">Sign in with Google! </string>
     <string name="sign_in_note">Remember, only UMN email accounts (@umn.edu) can access certain features (such as posting)</string>
     <string name="request">Request</string>
+    <string name="requests">Requests</string>
     <string name="title_activity_sell_view_user_post">SellViewUserPost</string>
     <string name="delete">Delete</string>
     <string name="edit">Edit</string>

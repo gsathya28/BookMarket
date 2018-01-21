@@ -31,12 +31,8 @@ import java.util.Set;
 
 public class ActSellMainActivity extends AppCompatActivity {
 
+    // Firebase Data Transfer Variables
     User mainUser;
-    ArrayList<Book> books;
-    LinearLayout mainLayout;
-    ArrayList<String> requestIDs = new ArrayList<>();
-    ArrayList<Request> requests = new ArrayList<>();
-    ArrayList<DatabaseReference> requestRefs = new ArrayList<>();
     Query bookListRef = WebServiceHandler.mBooks;
     ValueEventListener bookDataListener = new ValueEventListener() {
         @Override
@@ -70,6 +66,14 @@ public class ActSellMainActivity extends AppCompatActivity {
         }
     };
 
+    // Local Machine Data
+    ArrayList<Book> books;
+    ArrayList<String> requestIDs = new ArrayList<>();
+    ArrayList<Request> requests = new ArrayList<>();
+    ArrayList<DatabaseReference> requestRefs = new ArrayList<>();
+
+    // GUI Variables
+    LinearLayout mainLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,9 +82,9 @@ public class ActSellMainActivity extends AppCompatActivity {
 
         mainLayout = findViewById(R.id.buyer_post_layout);
         setToolbar();
-        setMainUser();
         setOptionButtons();
-        setLayout();
+        setMainUser();
+        loadData();
     }
 
     // Toolbar Methods - setToolbar, onCreateOptionsMenu, onOptionsItemSelected
@@ -131,8 +135,8 @@ public class ActSellMainActivity extends AppCompatActivity {
 
     // Set Listeners for Option Buttons generated at the Bottom of the layout
     private void setOptionButtons(){
-        Button addPostButton = findViewById(R.id.sell_add_post);
-        addPostButton.setOnClickListener(new View.OnClickListener() {
+        Button addBookButton = findViewById(R.id.sell_add_post);
+        addBookButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent addPostIntent = new Intent(getApplicationContext(), ActSellAddBook.class);
@@ -140,19 +144,28 @@ public class ActSellMainActivity extends AppCompatActivity {
             }
         });
 
-        Button viewPostsButton = findViewById(R.id.sell_view_posts);
-        viewPostsButton.setOnClickListener(new View.OnClickListener() {
+        Button viewBooksButton = findViewById(R.id.sell_view_posts);
+        viewBooksButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent viewPostsIntent = new Intent(getApplicationContext(), ActSellViewPosts.class);
                 startActivity(viewPostsIntent);
             }
         });
+
+        Button viewRequestsButton = findViewById(R.id.sell_view_requests);
+        viewRequestsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent viewRequestsIntent = new Intent(getApplicationContext(), ActSellViewRequests.class);
+                startActivity(viewRequestsIntent);
+            }
+        });
     }
 
-    private void setLayout(){
+    // Main Data Load from Database
+    private void loadData(){
         // Get Request Data - note Listeners are triggered for sure once, but only after all the code has run in OnCreate
-
         // Get Keys for Request IDs - to see what the user has requested already
         Set keys = mainUser.getRequestIDs().keySet();
 
@@ -216,6 +229,7 @@ public class ActSellMainActivity extends AppCompatActivity {
         reqButton.setTextOn("Unrequest");
     }
 
+    // Actual Data Incorporation - all of it runs after onCreate!
     private void updateUI(){
         // Remove all View since there is a new Book ArrayList in place
         mainLayout.removeAllViews();
@@ -400,6 +414,7 @@ public class ActSellMainActivity extends AppCompatActivity {
 
     }
 
+    // Remove ValueEventListeners when Activity is destroyed - to prevent memory leaks.
     @Override
     public void onDestroy(){
         super.onDestroy();
@@ -409,5 +424,4 @@ public class ActSellMainActivity extends AppCompatActivity {
             requestRef.removeEventListener(requestDataListener);
         }
     }
-
 }

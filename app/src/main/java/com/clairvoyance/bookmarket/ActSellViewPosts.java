@@ -36,6 +36,8 @@ public class ActSellViewPosts extends AppCompatActivity {
     LinearLayout mainLayout;
     View dialogLayout;
 
+    // Todo: Query sort!! Currently sorted using keys
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
