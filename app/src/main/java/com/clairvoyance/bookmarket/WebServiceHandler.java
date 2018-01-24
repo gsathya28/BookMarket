@@ -1,6 +1,7 @@
 package com.clairvoyance.bookmarket;
 
 import android.support.annotation.Nullable;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -21,15 +22,18 @@ class WebServiceHandler {
 
     final static int RC_SIGN_IN = 2899;
     final static String WEB_CLIENT_ID = "483082602147-bmhfbbj3k1proa5r2ll3hr694d9s5mrr.apps.googleusercontent.com";
-    private static FirebaseAuth mAuth;
     private static FirebaseUser mUser;
     private static User loadedUser;
 
-    static DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
+    private static DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
     static Query mBooks = rootRef.child("books").orderByChild("postDateInSecs").limitToFirst(100);
 
+    static DatabaseReference getRootRef() {
+        return rootRef;
+    }
+
     private static boolean isMainUserAuthenticated(){
-        mAuth = FirebaseAuth.getInstance();
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
         return mUser != null;
     }
@@ -39,7 +43,7 @@ class WebServiceHandler {
         if (isMainUserAuthenticated()){
             User user = new User(mUser.getUid(), mUser.getEmail());
             user.setEmailVerified(mUser.isEmailVerified());
-
+            user.setName(mUser.getDisplayName());
             // Key-line
             user = loadMainUserData(user);
             return user;
@@ -101,6 +105,15 @@ class WebServiceHandler {
         }
     }
 
+    static String getUID(){
+        if(isMainUserAuthenticated()){
+            return mUser.getUid();
+        }
+        else{
+            throw new IllegalStateException("User not authorized!");
+        }
+    }
+
     static void addPublicBook(Book book){
         if (isMainUserAuthenticated()) { // Add function to only allow certain people to post
             DatabaseReference postRef = WebServiceHandler.rootRef.child("books").child(book.getBookID());
@@ -113,12 +126,44 @@ class WebServiceHandler {
 
     static void addRequest(Request request){
         if (isMainUserAuthenticated()) { // Add function to only allow certain people to post
-            DatabaseReference requestRef = rootRef.child("requests").child(request.getRequestID());
-            requestRef.setValue(request);
+            DatabaseReference myRequestRef = rootRef.child("requests").child(request.getRequestID());
+            myRequestRef.setValue(request);
+
+            sendRequest(request);
+
         }
         else {
             throw new IllegalStateException("User not authorized");
         }
     }
 
+    private static void sendRequest(final Request request){
+
+        if (isMainUserAuthenticated()) {
+            String receiverUID = request.getRequesteeID();
+            final DatabaseReference receiverUserRef = rootRef.child("users").child(receiverUID);
+            ValueEventListener receiverUserListener = new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    User receiver = dataSnapshot.getValue(User.class);
+                    if (receiver == null){
+                        onCancelled(DatabaseError.fromException(new IllegalStateException("Not a valid USER - Send no request")));
+                    }
+                    else{
+                        // Update data in listener
+                        receiver.addPublicRequest(request);
+                        receiverUserRef.setValue(receiver);
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    // Do something here, I guess...
+                }
+            };
+
+
+            receiverUserRef.addListenerForSingleValueEvent(receiverUserListener);
+        }
+    }
 }

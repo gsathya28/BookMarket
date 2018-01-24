@@ -36,7 +36,7 @@ public class ActSellViewPosts extends AppCompatActivity {
     LinearLayout mainLayout;
     View dialogLayout;
 
-    // Todo: Query sort!! Currently sorted using keys
+    // Todo: Query sort!! Currently sorted using keys alphanumerically
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -174,7 +174,7 @@ public class ActSellViewPosts extends AppCompatActivity {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(ActSellViewPosts.this);
         builder.setTitle(book.getTitle());
-        // Todo: Fix Dialog Options
+
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Book Title");
         stringBuilder.append(System.getProperty("line.separator"));
@@ -222,8 +222,6 @@ public class ActSellViewPosts extends AppCompatActivity {
 
                                 String courseType = ((EditText) dialogLayout.findViewById(R.id.sell_course_type_text)).getText().toString();
                                 String courseNumber = ((EditText) dialogLayout.findViewById(R.id.sell_course_number_text)).getText().toString();
-
-
 
                                 if (courseType.equals("") && courseNumber.equals("")){
                                     Toast.makeText(getApplicationContext(), "Both Course Subject and Number required", Toast.LENGTH_LONG).show();
@@ -334,5 +332,4 @@ public class ActSellViewPosts extends AppCompatActivity {
         builder.setNegativeButton("Cancel", null);
         return builder.create();
     }
-
 }

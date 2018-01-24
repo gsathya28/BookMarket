@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.google.firebase.database.DataSnapshot;
@@ -85,6 +86,8 @@ public class ActSellMainActivity extends AppCompatActivity {
         setOptionButtons();
         setMainUser();
         loadData();
+
+        Toast.makeText(getApplicationContext(), "Hello", Toast.LENGTH_LONG).show();
     }
 
     // Toolbar Methods - setToolbar, onCreateOptionsMenu, onOptionsItemSelected
@@ -167,7 +170,7 @@ public class ActSellMainActivity extends AppCompatActivity {
     private void loadData(){
         // Get Request Data - note Listeners are triggered for sure once, but only after all the code has run in OnCreate
         // Get Keys for Request IDs - to see what the user has requested already
-        Set keys = mainUser.getRequestIDs().keySet();
+        Set keys = mainUser.getMyRequestIDs().keySet();
 
         for (Object object: keys){
             if (object instanceof String){
@@ -177,7 +180,7 @@ public class ActSellMainActivity extends AppCompatActivity {
 
         // Set Database Listeners for Request Objects - so Request Data is ready when updateGUI() is called.
         for (String requestID: requestIDs){
-            DatabaseReference requestRef = FirebaseDatabase.getInstance().getReference().child("requests").child(requestID);
+            DatabaseReference requestRef = WebServiceHandler.getRootRef().child("requests").child(requestID);
             requestRef.addValueEventListener(requestDataListener);
             requestRefs.add(requestRef);
         }
@@ -380,19 +383,23 @@ public class ActSellMainActivity extends AppCompatActivity {
         return builder.create();
     }
 
+    private void addRequest(Book bookRequested){
+        Request request = new Request(mainUser, bookRequested);
+        mainUser.addMyRequest(request);
+        WebServiceHandler.updateMainUserData(mainUser);
+        bookRequested.setGUIRequestID(request.getRequestID());
+        WebServiceHandler.addRequest(request);
+    }
+
     private void deleteRequest(String requestID){
-        WebServiceHandler.rootRef.child("requests").child(requestID).removeValue();
-        mainUser.getRequestIDs().remove(requestID);
+        WebServiceHandler.getRootRef().child("requests").child(requestID).removeValue();
+        mainUser.getMyRequestIDs().remove(requestID);
         WebServiceHandler.updateMainUserData(mainUser);
     }
 
     private void checkedConditional(ToggleButton reqButton, boolean isChecked, Book book){
         if (isChecked){
-            Request request = new Request(mainUser.getUid(), book.getBookID());
-            mainUser.addRequest(request);
-            WebServiceHandler.updateMainUserData(mainUser);
-            book.setGUIRequestID(request.getRequestID());
-            WebServiceHandler.addRequest(request);
+            addRequest(book);
         }
         else {
 
