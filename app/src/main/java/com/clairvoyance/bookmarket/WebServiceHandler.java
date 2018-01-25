@@ -49,7 +49,8 @@ class WebServiceHandler {
             return user;
         }
         else {
-            return null; // Re-authentication intent set up in onCreate of most Activities. Todo: Make sure re-authentication intent is setup for null case in every activity
+            throw new IllegalStateException("Main User not Authenticated");
+            // Todo: Throw Exception to send back to Login Activity
         }
     }
 

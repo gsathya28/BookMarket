@@ -292,7 +292,6 @@ public class ActSellViewPosts extends AppCompatActivity {
         builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                // Todo: Delete Code - and exit out
                 // In Books!
                 String id = book.getBookID();
                 DatabaseReference bookRef = FirebaseDatabase.getInstance().getReference().child("books").child(id);

@@ -8,7 +8,8 @@ import java.io.ObjectOutputStream;
 
 /**
  * Created by Sathya on 12/24/2017.
- * Serializer - Todo: Need to cite source.
+ * Serializer class was posted by Henrik Gustafsson
+ * https://stackoverflow.com/questions/5837698/converting-any-object-to-a-byte-array-in-java
  */
 
 class Serializer {
