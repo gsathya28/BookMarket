@@ -103,8 +103,6 @@ public class ActLoginActivity extends AppCompatActivity {
                             Snackbar.make(findViewById(R.id.main_layout), "Authentication Failed.", Snackbar.LENGTH_SHORT).show();
 
                         }
-
-
                     }
                 });
     }

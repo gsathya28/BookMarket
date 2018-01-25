@@ -63,7 +63,23 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.clairvoyance.bookmarket.ActSellSearchResults" />
         </activity>
-        <activity android:name=".ActSellViewRequests"></activity>
+        <activity android:name=".ActSellViewRequests" />
+        <activity android:name=".ActSellViewRequest"/>
+
+        <service
+            android:name=".MyFirebaseMessagingService">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+            </intent-filter>
+        </service>
+
+        <service
+            android:name=".MyFirebaseInstanceIDService">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
+            </intent-filter>
+        </service>
+
     </application>
 
 </manifest>
