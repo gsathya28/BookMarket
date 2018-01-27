@@ -2,13 +2,16 @@ package com.clairvoyance.bookmarket;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
+
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -64,10 +67,6 @@ public class ActSellViewRequests extends AppCompatActivity {
 
     }
 
-    private void setRequestLayout(LinearLayout layout){
-
-    }
-
     private void loadData(){
 
         mainUser = WebServiceHandler.generateMainUser();
@@ -91,11 +90,22 @@ public class ActSellViewRequests extends AppCompatActivity {
     }
 
     private void updateRequestUI(Request request){
-        addRequest(request);
+        if (!requestIDs.contains(request.getRequestID()))
+        {
+            addRequest(request);
+        }
+        else {
+            updateRequest(request);
+        }
+
     }
 
     private void updateRequest(Request request){
+        // Add one to the index because
+        int displayIndex = requestIDs.indexOf(request.getRequestID()) + 1;
+        Button button = (Button) mainLayout.getChildAt(displayIndex);
 
+        button.setText(request.getRequestorName());
     }
 
     private void addRequest(final Request request){
@@ -110,13 +120,18 @@ public class ActSellViewRequests extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent =  new Intent(getApplicationContext(), ActSellViewRequest.class);
                 intent.putExtra("requestID", request.getRequestID());
+                startActivity(intent);
             }
         });
         mainLayout.addView(button);
     }
 
     private void removeRequestUI(String key){
-
+        if (displayRequestIDs.contains(key)){
+            int displayIndex = requestIDs.indexOf(key) + 1;
+            requestIDs.remove(displayIndex);
+            mainLayout.removeViewAt(displayIndex);
+        }
     }
 
     private void setButtonLayout(Button button){
@@ -129,6 +144,5 @@ public class ActSellViewRequests extends AppCompatActivity {
         button.setLayoutParams(params);
         button.setGravity(Gravity.START);
         button.setGravity(Gravity.CENTER_VERTICAL);
-
     }
 }

@@ -313,6 +313,32 @@ public class ActSellMainActivity extends AppCompatActivity {
         stringBuilder.append(System.getProperty("line.separator"));
         stringBuilder.append("$");
         stringBuilder.append(book.getPrice());
+        stringBuilder.append(System.getProperty("line.separator"));
+        stringBuilder.append(System.getProperty("line.separator"));
+
+        stringBuilder.append("Author: ");
+        stringBuilder.append(System.getProperty("line.separator"));
+        stringBuilder.append(book.getAuthor());
+        stringBuilder.append(System.getProperty("line.separator"));
+        stringBuilder.append(System.getProperty("line.separator"));
+
+        stringBuilder.append("Version Number: ");
+        stringBuilder.append(System.getProperty("line.separator"));
+        stringBuilder.append(book.getVersionNumber());
+        stringBuilder.append(System.getProperty("line.separator"));
+        stringBuilder.append(System.getProperty("line.separator"));
+
+        stringBuilder.append("Instructor: ");
+        stringBuilder.append(System.getProperty("line.separator"));
+        stringBuilder.append(book.getInstructor());
+        stringBuilder.append(System.getProperty("line.separator"));
+        stringBuilder.append(System.getProperty("line.separator"));
+
+        stringBuilder.append("Notes: ");
+        stringBuilder.append(System.getProperty("line.separator"));
+        stringBuilder.append(book.getNotes());
+        stringBuilder.append(System.getProperty("line.separator"));
+        stringBuilder.append(System.getProperty("line.separator"));
 
         builder.setMessage(stringBuilder.toString());
 
