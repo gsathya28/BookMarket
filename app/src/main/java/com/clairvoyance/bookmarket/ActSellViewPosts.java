@@ -37,6 +37,7 @@ public class ActSellViewPosts extends AppCompatActivity {
     View dialogLayout;
 
     // Todo: Query sort!! Currently sorted using keys alphanumerically
+    // Todo: When Books are deleted, the requests on the books need to be deleted as well.
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

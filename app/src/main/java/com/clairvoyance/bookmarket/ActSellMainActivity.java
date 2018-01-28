@@ -23,7 +23,6 @@ import android.widget.ToggleButton;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
@@ -32,6 +31,7 @@ import java.util.Set;
 
 public class ActSellMainActivity extends AppCompatActivity {
 
+    // Todo: Need to make sure same user can't request their own book (maybe not even see it).
     // Firebase Data Transfer Variables
     User mainUser;
     Query bookListRef = WebServiceHandler.mBooks;

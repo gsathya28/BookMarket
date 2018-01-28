@@ -36,7 +36,6 @@ public class ActSellViewRequests extends AppCompatActivity {
             String key = dataSnapshot.getKey();
             Request request = dataSnapshot.getValue(Request.class);
             if (request != null){
-                requests.add(request);
                 updateRequestUI(request);
             }
             else{
@@ -90,8 +89,8 @@ public class ActSellViewRequests extends AppCompatActivity {
     }
 
     private void updateRequestUI(Request request){
-        if (!requestIDs.contains(request.getRequestID()))
-        {
+        if ((displayRequestIDs.indexOf(request.getRequestID()) == -1)){
+            requests.add(request);
             addRequest(request);
         }
         else {
@@ -129,7 +128,8 @@ public class ActSellViewRequests extends AppCompatActivity {
     private void removeRequestUI(String key){
         if (displayRequestIDs.contains(key)){
             int displayIndex = requestIDs.indexOf(key) + 1;
-            requestIDs.remove(displayIndex);
+            requestIDs.remove(displayIndex - 1);
+            displayRequestIDs.remove(displayIndex - 1);
             mainLayout.removeViewAt(displayIndex);
         }
     }
