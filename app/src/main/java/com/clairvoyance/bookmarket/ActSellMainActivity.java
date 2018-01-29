@@ -31,7 +31,8 @@ import java.util.Set;
 
 public class ActSellMainActivity extends AppCompatActivity {
 
-    // Todo: Need to make sure same user can't request their own book (maybe not even see it).
+
+    // Todo: Fix discrepancy between back button and back-toolbar button
     // Firebase Data Transfer Variables
     User mainUser;
     Query bookListRef = WebServiceHandler.mBooks;
@@ -239,6 +240,11 @@ public class ActSellMainActivity extends AppCompatActivity {
 
         // Funnel through the data placing new Horizontal LinearLayout (to hold info and request buttons) for each book
         for (final Book book: books){
+
+            if(book.getUid().equals(WebServiceHandler.getUID())){
+                continue;
+            }
+
             LinearLayout bookLayout = new LinearLayout(getApplicationContext());
             setBookLayout(bookLayout);
 
@@ -251,7 +257,6 @@ public class ActSellMainActivity extends AppCompatActivity {
             bookLayout.addView(infoButton);
             setInfoButtonLayout(infoButton);
             setReqButtonLayout(reqButton);
-
 
             // Check if there's a pending request on the book by the user.
             for (Request request: requests){
