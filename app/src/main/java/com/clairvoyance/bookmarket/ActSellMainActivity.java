@@ -31,7 +31,6 @@ import java.util.Set;
 
 public class ActSellMainActivity extends AppCompatActivity {
 
-
     // Todo: Fix discrepancy between back button and back-toolbar button
     // Firebase Data Transfer Variables
     User mainUser;
@@ -42,7 +41,10 @@ public class ActSellMainActivity extends AppCompatActivity {
             // Add Book Objects in to arrayList
             books = new ArrayList<>();
             for (DataSnapshot d: dataSnapshot.getChildren()){
-                books.add(d.getValue(Book.class));
+                Book book = d.getValue(Book.class);
+                if (book != null){
+                    books.add(book);
+                }
             }
             // Layout is loaded only after all the data is loaded from the database
             updateUI();
@@ -444,12 +446,6 @@ public class ActSellMainActivity extends AppCompatActivity {
             AlertDialog dialog = removeRequestDialog(book, book.getGUIRequestID(), reqButton);
             dialog.show();
         }
-    }
-
-    // Disable Back Button
-    @Override
-    public void onBackPressed(){
-
     }
 
     // Remove ValueEventListeners when Activity is destroyed - to prevent memory leaks.

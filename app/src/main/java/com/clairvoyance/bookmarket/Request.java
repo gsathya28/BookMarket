@@ -15,6 +15,7 @@ class Request {
     private String requesteeID;
     private boolean accepted = false;
     private String requestID;
+    private String bookName;
 
     Request(){}
 
@@ -25,6 +26,7 @@ class Request {
         this.bookID = book.getBookID();
         this.requesteeID = book.getUid();
         this.requestorName = user.getName();
+        this.bookName = book.getTitle();
     }
 
     public boolean isAccepted() {
@@ -44,5 +46,9 @@ class Request {
     }
     public String getRequestorName() {
         return requestorName;
+    }
+
+    public String getBookName() {
+        return bookName;
     }
 }

@@ -26,7 +26,14 @@
             </intent-filter>
         </activity>
         <activity android:name=".ActMainActivity" />
-        <activity android:name=".ActSellMainActivity" />
+        <activity
+            android:name=".ActSellMainActivity"
+            android:parentActivityName=".ActMainActivity">
+
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.clairvoyance.bookmarket.ActMainActivity" />
+        </activity>
         <activity
             android:name=".ActSellAddBook"
             android:parentActivityName=".ActSellMainActivity">

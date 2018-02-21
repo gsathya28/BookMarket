@@ -42,4 +42,6 @@
     <string name="title_activity_sell_view_user_post">SellViewUserPost</string>
     <string name="delete">Delete</string>
     <string name="edit">Edit</string>
+    <string name="sold_query">Sold?</string>
+    <string name="sold_conf">Sold!</string>
 </resources>

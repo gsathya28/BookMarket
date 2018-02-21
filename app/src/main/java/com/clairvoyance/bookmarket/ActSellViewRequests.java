@@ -6,6 +6,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -63,7 +64,15 @@ public class ActSellViewRequests extends AppCompatActivity {
     }
 
     private void setToolbar(){
+        Toolbar myToolbar = findViewById(R.id.sell_view_requests_toolbar);
+        myToolbar.setTitleTextColor(Color.parseColor("#FFFFFF"));
+        myToolbar.setTitle("Requests: ");
+        setSupportActionBar(myToolbar);
+        // Get a support ActionBar corresponding to this toolbar
+        ActionBar ab = getSupportActionBar();
 
+        // Enable the Up button
+        ab.setDisplayHomeAsUpEnabled(true);
     }
 
     private void loadData(){
@@ -112,8 +121,9 @@ public class ActSellViewRequests extends AppCompatActivity {
 
         final Button button =  new Button(getApplicationContext());
         setButtonLayout(button);
-        button.setText(request.getRequestorName());
-        button.setBackgroundColor(Color.parseColor("#267326"));
+        String buttonText = request.getRequestorName() + " requests your book: " + request.getBookName();
+        button.setText(buttonText);
+
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -141,8 +151,17 @@ public class ActSellViewRequests extends AppCompatActivity {
                 ViewGroup.LayoutParams.WRAP_CONTENT
         );
 
+
+
         button.setLayoutParams(params);
         button.setGravity(Gravity.START);
         button.setGravity(Gravity.CENTER_VERTICAL);
+
+        int valueInPx = (int) getApplicationContext().getResources().getDimension(R.dimen.activity_horizontal_margin);
+
+        button.setSingleLine();
+        button.setEllipsize(TextUtils.TruncateAt.END);
+        button.setPadding(valueInPx, button.getPaddingTop(), valueInPx, button.getPaddingBottom());
+        button.setBackgroundColor(Color.parseColor("#267326"));
     }
 }
