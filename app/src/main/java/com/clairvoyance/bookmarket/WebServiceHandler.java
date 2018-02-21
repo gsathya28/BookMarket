@@ -11,7 +11,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-
 /**
  * Created by Sathya on 12/21/2017.
  * Firebase Authentication and Database Handler
@@ -95,6 +94,10 @@ class WebServiceHandler {
         }
     }
 
+    // Add/Update Data down below!
+    // Todo: Some sort of trigger needs to run when a book is added - so correct notifications are given. (Either here, database backend (lambda), or when data is read in (background))
+    // For above task-to-do: We can try to use some sort of state counter/dataset with each state showing what DB edits were made in a certain time frame
+
     static void updateMainUserData(User user){
         if (isMainUserAuthenticated()){
             DatabaseReference userRef = rootRef.child("users").child(mUser.getUid());
@@ -163,8 +166,8 @@ class WebServiceHandler {
                 }
             };
 
-
             receiverUserRef.addListenerForSingleValueEvent(receiverUserListener);
+
         }
     }
 }

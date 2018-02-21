@@ -77,7 +77,6 @@
             android:name="android.support.PARENT_ACTIVITY"
             android:value="com.clairvoyance.bookmarket.ActSellMainActivity" />
         </activity>
-        <activity android:name=".ActSellViewRequest"/>
 
         <service
             android:name=".MyFirebaseMessagingService">

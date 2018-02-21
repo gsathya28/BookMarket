@@ -24,6 +24,7 @@ import com.google.firebase.auth.GoogleAuthProvider;
 
 /**
  * A login screen that offers login via Google.
+ * Todo: Add Terms of Agreement stuff
  */
 public class ActLoginActivity extends AppCompatActivity {
 

@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <!--Todo: Remove focus from the EditTexts at the start and after editing -->
 
     <LinearLayout
         android:layout_width="match_parent"

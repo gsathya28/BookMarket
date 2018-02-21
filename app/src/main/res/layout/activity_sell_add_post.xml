@@ -7,6 +7,8 @@
     android:background="#66cc66"
     tools:context="com.clairvoyance.bookmarket.ActSellAddBook">
 
+    <!-- Todo: Get rid of notes in GUI - Because notes are in each book -->
+
     <android.support.v7.widget.Toolbar
         android:id="@+id/add_post_toolbar"
         android:layout_width="match_parent"

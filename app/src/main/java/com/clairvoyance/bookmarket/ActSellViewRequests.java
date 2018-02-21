@@ -25,7 +25,10 @@ import java.util.Set;
 public class ActSellViewRequests extends AppCompatActivity {
 
     // Load Request Data and basic User/Book Data with the Request.
+    // Todo: Update Requests Page to list by book - each book button will lead to a dialog (No Search/Dropdown necessary)
+    // The dialog will show who requested the book in order of first to last.
     // Todo: Finish View Requests Page
+    // Todo: Add some sort of Intent to a view that shows message history (Create that GUI too)
 
     User mainUser;
     ArrayList<String> requestIDs = new ArrayList<>();
@@ -127,9 +130,12 @@ public class ActSellViewRequests extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // This is where Dialog will go (Needs a dialog builder!)
+                /*
                 Intent intent =  new Intent(getApplicationContext(), ActSellViewRequest.class);
                 intent.putExtra("requestID", request.getRequestID());
                 startActivity(intent);
+                */
             }
         });
         mainLayout.addView(button);

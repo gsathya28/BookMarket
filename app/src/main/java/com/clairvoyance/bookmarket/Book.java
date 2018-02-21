@@ -2,9 +2,7 @@ package com.clairvoyance.bookmarket;
 
 import android.app.Notification;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
 
 import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
@@ -15,7 +13,9 @@ import java.util.UUID;
 
 /**
  * Created by Sathya on 12/22/2017.
- *
+ * Todo: Keep track of the number of requests along with who requests the book.
+ * Todo: Get rid of negotiable variable (The negotiation process is why Twilio is being used)
+ * Todo: Add some sort of marked as spam variable
  */
 @IgnoreExtraProperties
 class Book implements Serializable {
@@ -46,9 +46,8 @@ class Book implements Serializable {
     static final int INSTRUCTOR = 7;
     static final int AVAILABLE = 8;
 
-
     public Book(){
-
+        // Firebase Constructor (required)
     }
 
     // Only courseSubj and courseNumber are required
