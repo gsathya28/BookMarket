@@ -31,7 +31,6 @@ import java.util.Set;
 
 public class ActSellMainActivity extends AppCompatActivity {
 
-    // Todo: Fix discrepancy between back button and back-toolbar button
     // Todo: Search Button should go to Search/Scan GUI - and shouldn't generate a search bar thingy
     // Todo: Notification of a scan should go to a scan results page (possibly different from a search results page - for the sake of simplicity)
     // Todo: Notification of a request should go to the "My Requests" page and load up the dialog for the book requested and show the new requester (with a star or some other stupid id thing)
