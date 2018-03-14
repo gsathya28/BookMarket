@@ -8,6 +8,7 @@ import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.UUID;
 
@@ -32,6 +33,7 @@ class Book implements Serializable {
     private String bookID;
     private String uid;
     private long postDateInSecs;
+    private ArrayList<String> requestIDs = new ArrayList<>();
 
     // GUI Variables
     private String GUIRequestID;
@@ -92,6 +94,7 @@ class Book implements Serializable {
                 throw new IllegalArgumentException("Invalid Parameter");
         }
     }
+
     void set(int field, boolean value){
 
         switch (field){
@@ -100,6 +103,15 @@ class Book implements Serializable {
         }
 
     }
+
+    void addRequest(Request request){
+        requestIDs.add(request.getRequestID());
+    }
+
+    void addRequest(String requestID){
+        requestIDs.add(requestID);
+    }
+
     String get(int field){
         switch (field){
             case TITLE:
