@@ -31,7 +31,7 @@ class Book implements Serializable {
     private boolean isAvailable;
     private String bookID;
     private String uid;
-    private long negPostDateInSecs;
+    private long postDateInSecs;
 
     // GUI Variables
     private String GUIRequestID;
@@ -55,7 +55,7 @@ class Book implements Serializable {
         this.courseSubj = courseSubj;
         this.courseNumber = courseNumber;
         bookID = UUID.randomUUID().toString();
-        negPostDateInSecs = Calendar.getInstance().getTimeInMillis() * -1;
+        postDateInSecs = Calendar.getInstance().getTimeInMillis();
         this.uid = WebServiceHandler.getUID();
     }
 
@@ -152,7 +152,7 @@ class Book implements Serializable {
         return isAvailable;
     }
     long getPostDateInSecs() {
-        return negPostDateInSecs;
+        return postDateInSecs;
     }
     String getBookID() {
         return bookID;
@@ -172,7 +172,7 @@ class Book implements Serializable {
     @Exclude
     Calendar getPostDate(){
         Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(negPostDateInSecs * -1);
+        calendar.setTimeInMillis(postDateInSecs);
         return calendar;
     }
 

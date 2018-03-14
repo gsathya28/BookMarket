@@ -27,6 +27,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Set;
 
 public class ActSellMainActivity extends AppCompatActivity {
@@ -50,6 +51,7 @@ public class ActSellMainActivity extends AppCompatActivity {
                     books.add(book);
                 }
             }
+            Collections.reverse(books);
             // Layout is loaded only after all the data is loaded from the database
             updateUI();
         }

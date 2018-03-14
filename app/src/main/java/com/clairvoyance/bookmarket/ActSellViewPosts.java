@@ -32,7 +32,8 @@ public class ActSellViewPosts extends AppCompatActivity {
 
     User mainUser;
     ArrayList<String> bookIDs = new ArrayList<>();
-    ArrayList<String> displayedBooks = new ArrayList<>();
+    ArrayList<String> displayedBookIDs = new ArrayList<>();
+    ArrayList<Book> displayedBooks = new ArrayList<>();
     LinearLayout mainLayout;
     View dialogLayout;
 
@@ -89,15 +90,15 @@ public class ActSellViewPosts extends AppCompatActivity {
                     Book book = dataSnapshot.getValue(Book.class);
                     // Todo: Possibly compare User-BookKey with Book-stored Key
                     if (book != null){
-                        if (displayedBooks.contains(book.getBookID())){
-                            int index = displayedBooks.indexOf(book.getBookID());
+                        if (displayedBookIDs.contains(book.getBookID())){
+                            int index = displayedBookIDs.indexOf(book.getBookID());
                             // Run Update Code (index, book)
-                            updateBookInUI(index, book);
+                            updateBookInList(index, book);
                         }
                         else {
                             // Run Add code
-                            addBookToUI(book);
-                            displayedBooks.add(book.getBookID());
+                            addBookToList(book);
+                            displayedBookIDs.add(book.getBookID());
                         }
                     }
                 }
@@ -112,18 +113,35 @@ public class ActSellViewPosts extends AppCompatActivity {
         }
     }
 
-    private void addBookToUI(final Book book){
+    /**
+        @param book - final - Book that is added to the main Book List - to update layout
+
+        Adds book to displayedBooksList in order of when it was
+        made (not when it was edited... Notifications will solve any edit problems)
+     */
+    private void addBookToList(final Book book){
+
+        boolean added = false;
+        // Push the most recent book up first
+        for (int i = 0; i < displayedBooks.size(); i++){
+            if(book.getPostDateInSecs() > displayedBooks.get(i).getPostDateInSecs()){
+                displayedBooks.add(i, book);
+                added = true;
+                break;
+            }
+        }
+
+        // End case if it is the least recent book published - and wasn't added
+        if(!added){
+            displayedBooks.add(book);
+        }
+
         Button infoButton = new Button(getApplicationContext());
         setButtonLayout(infoButton);
 
-        int valueInPx = (int) getApplicationContext().getResources().getDimension(R.dimen.activity_horizontal_margin);
-
         String buttonText = book.getCourseSubj() + " " + book.getCourseNumber() + " - " + book.getTitle();
         infoButton.setText(buttonText);
-        infoButton.setBackgroundColor(Color.parseColor("#267326"));
-        infoButton.setSingleLine();
-        infoButton.setEllipsize(TextUtils.TruncateAt.END);
-        infoButton.setPadding(valueInPx, infoButton.getPaddingTop(), valueInPx, infoButton.getPaddingBottom());
+
         infoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -131,10 +149,10 @@ public class ActSellViewPosts extends AppCompatActivity {
             }
         });
 
-        mainLayout.addView(infoButton);
+        setMainLayout();
     }
 
-    private void updateBookInUI(int index, final Book book){
+    private void updateBookInList(int index, final Book book){
         Button infoButton = (Button) mainLayout.getChildAt(index);
         mainLayout.removeViewAt(index);
         String buttonText = book.getCourseSubj() + " " + book.getCourseNumber() + " - " + book.getTitle();
@@ -150,6 +168,7 @@ public class ActSellViewPosts extends AppCompatActivity {
     }
 
     private void deleteBookInUI(int index){
+        displayedBooks.remove(index);
         mainLayout.removeViewAt(index);
     }
 
@@ -160,6 +179,8 @@ public class ActSellViewPosts extends AppCompatActivity {
                 ViewGroup.LayoutParams.WRAP_CONTENT
         );
 
+        int valueInPx = (int) getApplicationContext().getResources().getDimension(R.dimen.activity_horizontal_margin);
+
         int topValueInPx = (int) getApplicationContext().getResources().getDimension(R.dimen.activity_vertical_margin);
         int bottomValueInPx = (int) getApplicationContext().getResources().getDimension(R.dimen.activity_vertical_margin);
         bottomValueInPx = bottomValueInPx / 2;
@@ -169,6 +190,29 @@ public class ActSellViewPosts extends AppCompatActivity {
         button.setLayoutParams(params);
         button.setGravity(Gravity.CENTER_VERTICAL);
         button.setBackgroundColor(Color.parseColor("#267326"));
+
+        button.setSingleLine();
+        button.setEllipsize(TextUtils.TruncateAt.END);
+        button.setPadding(valueInPx, button.getPaddingTop(), valueInPx, button.getPaddingBottom());
+    }
+
+    private void setMainLayout(){
+        mainLayout.removeAllViews();
+        for (final Book book: displayedBooks){
+            Button button = new Button(getApplicationContext());
+            setButtonLayout(button);
+
+            String buttonText = book.getCourseSubj() + " " + book.getCourseNumber() + " - " + book.getTitle();
+            button.setText(buttonText);
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    viewBookDialog(book).show();
+                }
+            });
+
+            mainLayout.addView(button);
+        }
     }
 
     private AlertDialog viewBookDialog(final Book book){
@@ -330,8 +374,8 @@ public class ActSellViewPosts extends AppCompatActivity {
                 WebServiceHandler.updateMainUserData(mainUser);
 
                 // Update UI
-                int index = displayedBooks.indexOf(book.getBookID());
-                displayedBooks.remove(index);
+                int index = displayedBookIDs.indexOf(book.getBookID());
+                displayedBookIDs.remove(index);
                 deleteBookInUI(index);
 
             }
@@ -358,4 +402,6 @@ public class ActSellViewPosts extends AppCompatActivity {
         builder.setNegativeButton("Cancel", null);
         return builder.create();
     }
+
+    // Todo: On destroy - should remove listener!
 }
