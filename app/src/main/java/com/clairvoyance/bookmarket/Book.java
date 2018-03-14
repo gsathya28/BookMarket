@@ -10,6 +10,7 @@ import com.google.firebase.database.IgnoreExtraProperties;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.UUID;
 
 /**
@@ -33,7 +34,7 @@ class Book implements Serializable {
     private String bookID;
     private String uid;
     private long postDateInSecs;
-    private ArrayList<String> requestIDs = new ArrayList<>();
+    private HashMap<String, Boolean> requestIDs = new HashMap<>();
 
     // GUI Variables
     private String GUIRequestID;
@@ -105,11 +106,19 @@ class Book implements Serializable {
     }
 
     void addRequest(Request request){
-        requestIDs.add(request.getRequestID());
+        requestIDs.put(request.getRequestID(), true);
     }
 
     void addRequest(String requestID){
-        requestIDs.add(requestID);
+        requestIDs.put(requestID, true);
+    }
+
+    void removeRequest(String requestID){
+        requestIDs.remove(requestID);
+    }
+
+    HashMap<String, Boolean> getRequestIDs(){
+        return requestIDs;
     }
 
     String get(int field){

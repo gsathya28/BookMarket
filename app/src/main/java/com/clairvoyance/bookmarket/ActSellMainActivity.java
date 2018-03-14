@@ -53,7 +53,7 @@ public class ActSellMainActivity extends AppCompatActivity {
             }
             Collections.reverse(books);
             // Layout is loaded only after all the data is loaded from the database
-            updateUI();
+            loadRequestData();
         }
 
         @Override
@@ -68,6 +68,7 @@ public class ActSellMainActivity extends AppCompatActivity {
             if (request != null){
                 requests.add(request);
             }
+            updateUI();
         }
 
         @Override
@@ -94,7 +95,7 @@ public class ActSellMainActivity extends AppCompatActivity {
         setToolbar();
         setOptionButtons();
         setMainUser();
-        loadData();
+        bookListRef.addValueEventListener(bookDataListener);
 
         Toast.makeText(getApplicationContext(), "Hello", Toast.LENGTH_LONG).show();
     }
@@ -177,7 +178,7 @@ public class ActSellMainActivity extends AppCompatActivity {
     }
 
     // Main Data Load from Database
-    private void loadData(){
+    private void loadRequestData(){
         // Get Request Data - note Listeners are triggered for sure once, but only after all the code has run in OnCreate
         // Get Keys for Request IDs - to see what the user has requested already
         Set keys = mainUser.getMyRequestIDs().keySet();
@@ -189,14 +190,11 @@ public class ActSellMainActivity extends AppCompatActivity {
         }
 
         // Set Database Listeners for Request Objects - so Request Data is ready when updateGUI() is called.
+        requests = new ArrayList<>();
         for (String requestID: requestIDs){
             DatabaseReference requestRef = WebServiceHandler.getRootRef().child("requests").child(requestID);
-            requestRef.addValueEventListener(requestDataListener);
-            requestRefs.add(requestRef);
+            requestRef.addListenerForSingleValueEvent(requestDataListener);
         }
-
-        // Set Database Listener for Public Book List
-        bookListRef.addValueEventListener(bookDataListener);
     }
 
     // Set Static Layouts - GUI Attributes stuff
@@ -394,7 +392,7 @@ public class ActSellMainActivity extends AppCompatActivity {
         builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                deleteRequest(requestID);
+                deleteRequest(book, requestID);
                 button.setOnCheckedChangeListener(null);
                 button.setChecked(false);
                 button.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -426,13 +424,22 @@ public class ActSellMainActivity extends AppCompatActivity {
 
     private void addRequest(Book bookRequested){
         Request request = new Request(mainUser, bookRequested);
+
+        bookRequested.addRequest(request);
+        WebServiceHandler.addPublicBook(bookRequested);
+
         mainUser.addMyRequest(request);
-        WebServiceHandler.updateMainUserData(mainUser);
         bookRequested.setGUIRequestID(request.getRequestID());
         WebServiceHandler.addRequest(request);
+        WebServiceHandler.updateMainUserData(mainUser);
+
+
     }
 
-    private void deleteRequest(String requestID){
+    private void deleteRequest(Book book, String requestID){
+        book.removeRequest(requestID);
+        WebServiceHandler.addPublicBook(book);
+
         WebServiceHandler.getRootRef().child("requests").child(requestID).removeValue();
         mainUser.getMyRequestIDs().remove(requestID);
         WebServiceHandler.updateMainUserData(mainUser);

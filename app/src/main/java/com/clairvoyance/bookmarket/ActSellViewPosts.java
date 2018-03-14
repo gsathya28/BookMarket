@@ -371,6 +371,16 @@ public class ActSellViewPosts extends AppCompatActivity {
                 // In User Book Ids
                 HashMap<String, Object> UserBookIds = mainUser.getBookIDs();
                 UserBookIds.remove(id);
+
+                // Delete requests attached to the book
+                HashMap<String, Boolean> requestIDs = book.getRequestIDs();
+                Set keySet = requestIDs.keySet();
+                for (Object object: keySet){
+                    if (object instanceof String){
+                        WebServiceHandler.removeRequest((String) object);
+                    }
+                }
+
                 WebServiceHandler.updateMainUserData(mainUser);
 
                 // Update UI

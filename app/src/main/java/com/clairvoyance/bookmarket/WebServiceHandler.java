@@ -141,6 +141,12 @@ class WebServiceHandler {
         }
     }
 
+    static void removeRequest(String requestID){
+        if (isMainUserAuthenticated()){
+            rootRef.child("requests").child(requestID).removeValue();
+        }
+    }
+
     private static void sendRequest(final Request request){
 
         if (isMainUserAuthenticated()) {
