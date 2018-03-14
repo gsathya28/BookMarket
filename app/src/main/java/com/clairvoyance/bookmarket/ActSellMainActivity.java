@@ -31,7 +31,6 @@ import java.util.Set;
 
 public class ActSellMainActivity extends AppCompatActivity {
 
-    // Todo: Search Button should go to Search/Scan GUI - and shouldn't generate a search bar thingy
     // Todo: Notification of a scan should go to a scan results page (possibly different from a search results page - for the sake of simplicity)
     // Todo: Notification of a request should go to the "My Requests" page and load up the dialog for the book requested and show the new requester (with a star or some other stupid id thing)
     // --> Or possibly a new dialog showing a list of everyone that requested something (in the My Requests page - I like this better)
@@ -126,7 +125,8 @@ public class ActSellMainActivity extends AppCompatActivity {
                 return true;
 
             case R.id.action_search_event:
-                // This will lead to an activity (GUI) that will Search/Scan
+                // Added from ToDoList 2.3 -
+                ActSellMainActivity.this.searchDialog().show();
                 return true;
 
             default:
@@ -197,6 +197,7 @@ public class ActSellMainActivity extends AppCompatActivity {
         bookListRef.addValueEventListener(bookDataListener);
     }
 
+    // Set Static Layouts - GUI Attributes stuff
     private void setInfoButtonLayout(Button button){
 
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
@@ -454,6 +455,47 @@ public class ActSellMainActivity extends AppCompatActivity {
     }
 
     // Remove ValueEventListeners when Activity is destroyed - to prevent memory leaks.
+
+    AlertDialog searchDialog(){
+
+        // What do we need for a search
+
+        // Make a layout
+        // Fields to look for
+        /*
+            Required: Course Subj and Num
+            Optional (Implement Later ... ):
+                Book Name
+                Price Range
+                Author
+                Instructor
+                V Num
+
+         */
+
+        // Make a builder - and set the view
+        AlertDialog.Builder builder = new AlertDialog.Builder(ActSellMainActivity.this);
+        builder.setTitle("Search Book");
+        builder.setView(R.layout.search_book_dialog_layout);
+
+        builder.setPositiveButton("Search", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                // Todo: Search Algorithm goes here...
+                boolean results = false;
+
+                // Send them to the new activity
+                Intent intent = new Intent(ActSellMainActivity.this, ActSellSearchResults.class);
+                intent.putExtra("results", results);
+                startActivity(intent);
+            }
+        });
+
+        builder.setNegativeButton("Cancel", null);
+
+        return builder.create();
+    }
+
     @Override
     public void onDestroy(){
         super.onDestroy();
@@ -463,4 +505,10 @@ public class ActSellMainActivity extends AppCompatActivity {
             requestRef.removeEventListener(requestDataListener);
         }
     }
+
+
+
 }
+
+
+

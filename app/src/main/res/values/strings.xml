@@ -44,4 +44,9 @@
     <string name="edit">Edit</string>
     <string name="sold_query">Sold?</string>
     <string name="sold_conf">Sold!</string>
+    <string name="required">Required:</string>
+    <string name="optional">Optional:</string>
+    <string name="min_price">Min Price</string>
+    <string name="max_price">Max Price</string>
+
 </resources>
