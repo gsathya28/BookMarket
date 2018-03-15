@@ -21,11 +21,6 @@ import java.util.ArrayList;
 
 public class ActSellViewRequests extends AppCompatActivity {
 
-    // Load Request Data and basic User/Book Data with the Request.
-    // Todo: Update Requests Page to list by book - each book button will lead to a dialog (No Search/Dropdown necessary)
-    // The dialog will show who requested the book in order of first to last.
-    // Todo: Finish View Requests Page
-    // Todo: Add some sort of Intent to a view that shows message history (Create that GUI too)
 
     User mainUser;
 

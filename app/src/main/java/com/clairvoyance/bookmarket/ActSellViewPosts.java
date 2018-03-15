@@ -40,6 +40,12 @@ public class ActSellViewPosts extends AppCompatActivity {
     // Todo: Query sort!! Currently sorted using keys alphanumerically
     // Todo: When Books are deleted, the requests on the books need to be deleted as well.
 
+    // Load Request Data and basic User/Book Data with the Request.
+    // Todo: Update Requests Page to list by book - each book button will lead to a dialog (No Search/Dropdown necessary)
+    // The dialog will show who requested the book in order of first to last.
+    // Todo: Finish View Requests Page
+    // Todo: Add some sort of Intent to a view that shows message history (Create that GUI too)
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,7 +54,7 @@ public class ActSellViewPosts extends AppCompatActivity {
 
         setToolbar();
         setMainUser();
-        setLayout();
+        loadData();
     }
 
     private void setToolbar(){
@@ -71,7 +77,7 @@ public class ActSellViewPosts extends AppCompatActivity {
         }
     }
 
-    private void setLayout(){
+    private void loadData(){
 
         Set keys = mainUser.getBookIDs().keySet();
 
@@ -84,12 +90,13 @@ public class ActSellViewPosts extends AppCompatActivity {
         for (final String id: bookIDs){
 
             DatabaseReference bookRef = FirebaseDatabase.getInstance().getReference().child("books").child(id);
-            ValueEventListener getData = new ValueEventListener() {
+            ValueEventListener getBookData = new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     Book book = dataSnapshot.getValue(Book.class);
                     // Todo: Possibly compare User-BookKey with Book-stored Key
                     if (book != null){
+                        loadRequestData(book);
                         if (displayedBookIDs.contains(book.getBookID())){
                             int index = displayedBookIDs.indexOf(book.getBookID());
                             // Run Update Code (index, book)
@@ -108,8 +115,7 @@ public class ActSellViewPosts extends AppCompatActivity {
 
                 }
             };
-
-            bookRef.addValueEventListener(getData);
+            bookRef.addValueEventListener(getBookData);
         }
     }
 
@@ -136,23 +142,13 @@ public class ActSellViewPosts extends AppCompatActivity {
             displayedBooks.add(book);
         }
 
-        Button infoButton = new Button(getApplicationContext());
-        setButtonLayout(infoButton);
-
-        String buttonText = book.getCourseSubj() + " " + book.getCourseNumber() + " - " + book.getTitle();
-        infoButton.setText(buttonText);
-
-        infoButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                viewBookDialog(book).show();
-            }
-        });
-
         setMainLayout();
     }
 
     private void updateBookInList(int index, final Book book){
+
+
+
         Button infoButton = (Button) mainLayout.getChildAt(index);
         mainLayout.removeViewAt(index);
         String buttonText = book.getCourseSubj() + " " + book.getCourseNumber() + " - " + book.getTitle();
@@ -170,6 +166,39 @@ public class ActSellViewPosts extends AppCompatActivity {
     private void deleteBookInUI(int index){
         displayedBooks.remove(index);
         mainLayout.removeViewAt(index);
+    }
+
+    // This is called whenever a book is added or updated (so when a request is made, the book data is updated so this should work - fingers crossed)
+    private void loadRequestData(Book book){
+        final ArrayList<Request> requests = new ArrayList<>();
+        ArrayList<String> requestIDs = new ArrayList<>();
+        Set requestIDSet = book.getRequestIDs().keySet();
+
+        for (Object object: requestIDSet){
+            if (object instanceof String){
+                requestIDs.add((String) object);
+            }
+        }
+
+        for (String id: requestIDs){
+
+            DatabaseReference requestRef = WebServiceHandler.getRootRef().child("requests").child(id);
+            ValueEventListener requestListener = new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    Request request = dataSnapshot.getValue(Request.class);
+                    requests.add(request);
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            };
+
+            requestRef.addListenerForSingleValueEvent(requestListener);
+        }
+        book.addRequestList(requests);
     }
 
     private void setButtonLayout(Button button){

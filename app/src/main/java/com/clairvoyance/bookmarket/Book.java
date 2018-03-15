@@ -35,6 +35,7 @@ class Book implements Serializable {
     private String uid;
     private long postDateInSecs;
     private HashMap<String, Boolean> requestIDs = new HashMap<>();
+    private ArrayList<Request> requests = new ArrayList<>();
 
     // GUI Variables
     private String GUIRequestID;
@@ -105,16 +106,20 @@ class Book implements Serializable {
 
     }
 
-    void addRequest(Request request){
+    void addRequestID(Request request){
         requestIDs.put(request.getRequestID(), true);
     }
 
-    void addRequest(String requestID){
+    void addRequestID(String requestID){
         requestIDs.put(requestID, true);
     }
 
-    void removeRequest(String requestID){
+    void removeRequestID(String requestID){
         requestIDs.remove(requestID);
+    }
+
+    void addRequestList(ArrayList<Request> requests){
+        this.requests = requests;
     }
 
     HashMap<String, Boolean> getRequestIDs(){
@@ -186,6 +191,7 @@ class Book implements Serializable {
     void setGUIRequestID(String GUIRequestID) {
         this.GUIRequestID = GUIRequestID;
     }
+
     @Exclude
     String getGUIRequestID() {
         return GUIRequestID;
@@ -195,6 +201,10 @@ class Book implements Serializable {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(postDateInSecs);
         return calendar;
+    }
+    @Exclude
+    ArrayList<Request> getRequests(){
+        return requests;
     }
 
     void buildNotification(Context context){

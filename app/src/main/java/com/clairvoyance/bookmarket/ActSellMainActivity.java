@@ -425,7 +425,7 @@ public class ActSellMainActivity extends AppCompatActivity {
     private void addRequest(Book bookRequested){
         Request request = new Request(mainUser, bookRequested);
 
-        bookRequested.addRequest(request);
+        bookRequested.addRequestID(request);
         WebServiceHandler.addPublicBook(bookRequested);
 
         mainUser.addMyRequest(request);
@@ -437,7 +437,7 @@ public class ActSellMainActivity extends AppCompatActivity {
     }
 
     private void deleteRequest(Book book, String requestID){
-        book.removeRequest(requestID);
+        book.removeRequestID(requestID);
         WebServiceHandler.addPublicBook(book);
 
         WebServiceHandler.getRootRef().child("requests").child(requestID).removeValue();
