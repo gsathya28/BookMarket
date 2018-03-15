@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
@@ -228,19 +229,37 @@ public class ActSellViewPosts extends AppCompatActivity {
     private void setMainLayout(){
         mainLayout.removeAllViews();
         for (final Book book: displayedBooks){
-            Button button = new Button(getApplicationContext());
-            setButtonLayout(button);
+
+            LinearLayout singleBookLayout = new LinearLayout(getApplicationContext());
+            singleBookLayout.setOrientation(LinearLayout.HORIZONTAL);
+
+            // Info Button
+            Button infoButton = new Button(getApplicationContext());
+            setButtonLayout(infoButton);
 
             String buttonText = book.getCourseSubj() + " " + book.getCourseNumber() + " - " + book.getTitle();
-            button.setText(buttonText);
-            button.setOnClickListener(new View.OnClickListener() {
+            infoButton.setText(buttonText);
+            infoButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     viewBookDialog(book).show();
                 }
             });
 
-            mainLayout.addView(button);
+            // Requests Button
+            Button reqButton = new Button(getApplicationContext());
+            reqButton.setText(R.string.request);
+            reqButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    bookRequestsDialog(book).show();
+                }
+            });
+
+            singleBookLayout.addView(infoButton);
+            singleBookLayout.addView(reqButton);
+
+            mainLayout.addView(singleBookLayout);
         }
     }
 
@@ -439,6 +458,29 @@ public class ActSellViewPosts extends AppCompatActivity {
         builder.setView(dialogLayout);
         builder.setPositiveButton("Save", null);
         builder.setNegativeButton("Cancel", null);
+        return builder.create();
+    }
+
+    private AlertDialog bookRequestsDialog(Book book){
+        AlertDialog.Builder builder = new AlertDialog.Builder(ActSellViewPosts.this);
+        builder.setTitle("Requests on your book");
+
+        StringBuilder stringBuilder = new StringBuilder();
+
+        stringBuilder.append("Requests:");
+        stringBuilder.append("\n");
+
+        ArrayList<Request> requests = book.getRequests();
+        for (Request request: requests){
+            stringBuilder.append("\t");
+            stringBuilder.append(request.getRequestorName());
+            stringBuilder.append("\n");
+        }
+
+        TextView textView = new TextView(ActSellViewPosts.this);
+        textView.setText(stringBuilder.toString());
+        builder.setView(textView);
+
         return builder.create();
     }
 
