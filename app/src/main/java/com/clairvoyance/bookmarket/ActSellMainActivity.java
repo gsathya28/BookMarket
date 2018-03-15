@@ -393,26 +393,24 @@ public class ActSellMainActivity extends AppCompatActivity {
     private void addRequest(Book bookRequested){
         // NO need to add to bookRequests, since bookRequests is a pointer AND it will update the Firebase Database
         Request request = new Request(mainUser, bookRequested);
+        WebServiceHandler.addRequest(request);
 
         bookRequested.addRequestID(request);
         WebServiceHandler.addPublicBook(bookRequested);
 
         mainUser.addMyRequest(request);
-        WebServiceHandler.addRequest(request);
         WebServiceHandler.updateMainUserData(mainUser);
     }
 
     private void deleteRequest(Book book, String requestID){
         // NO need to delete to bookRequests, since bookRequests is a pointer (mainUser.getMyRequestIDs) AND it will update the Firebase Database
+        WebServiceHandler.getRootRef().child("requests").child(requestID).removeValue();
 
         book.removeRequestID(requestID);
         WebServiceHandler.addPublicBook(book);
 
         mainUser.getMyRequestIDs().remove(book.getBookID());
         WebServiceHandler.updateMainUserData(mainUser);
-
-        WebServiceHandler.getRootRef().child("requests").child(requestID).removeValue();
-
     }
 
     private void checkedConditional(ToggleButton reqButton, boolean isChecked, Book book){
@@ -481,9 +479,6 @@ public class ActSellMainActivity extends AppCompatActivity {
         bookListRef.removeEventListener(bookDataListener);
 
     }
-
-
-
 }
 
 

@@ -206,7 +206,8 @@ public class ActSellViewPosts extends AppCompatActivity {
 
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                1.0f
         );
 
         int valueInPx = (int) getApplicationContext().getResources().getDimension(R.dimen.activity_horizontal_margin);
@@ -216,7 +217,7 @@ public class ActSellViewPosts extends AppCompatActivity {
         bottomValueInPx = bottomValueInPx / 2;
         int leftValueInPx = (int) getApplicationContext().getResources().getDimension(R.dimen.activity_horizontal_margin);
 
-        params.setMargins(leftValueInPx, topValueInPx, leftValueInPx, bottomValueInPx);
+        params.setMargins(leftValueInPx, topValueInPx, leftValueInPx / 2, bottomValueInPx);
         button.setLayoutParams(params);
         button.setGravity(Gravity.CENTER_VERTICAL);
         button.setBackgroundColor(Color.parseColor("#267326"));
@@ -224,6 +225,26 @@ public class ActSellViewPosts extends AppCompatActivity {
         button.setSingleLine();
         button.setEllipsize(TextUtils.TruncateAt.END);
         button.setPadding(valueInPx, button.getPaddingTop(), valueInPx, button.getPaddingBottom());
+    }
+
+    private void setReqButtonLayout(Button button){
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                3.0f
+        );
+
+        int topValueInPx = (int) getApplicationContext().getResources().getDimension(R.dimen.activity_vertical_margin);
+        int bottomValueInPx = (int) getApplicationContext().getResources().getDimension(R.dimen.activity_vertical_margin);
+        bottomValueInPx = bottomValueInPx / 2;
+        int leftValueInPx = (int) getApplicationContext().getResources().getDimension(R.dimen.activity_horizontal_margin);
+
+        params.setMargins(leftValueInPx, topValueInPx, leftValueInPx / 2, bottomValueInPx);
+        button.setLayoutParams(params);
+        button.setGravity(Gravity.CENTER);
+
+        button.setSingleLine();
+        button.setEllipsize(TextUtils.TruncateAt.END);
     }
 
     private void setMainLayout(){
@@ -236,7 +257,6 @@ public class ActSellViewPosts extends AppCompatActivity {
             // Info Button
             Button infoButton = new Button(getApplicationContext());
             setButtonLayout(infoButton);
-
             String buttonText = book.getCourseSubj() + " " + book.getCourseNumber() + " - " + book.getTitle();
             infoButton.setText(buttonText);
             infoButton.setOnClickListener(new View.OnClickListener() {
@@ -248,7 +268,8 @@ public class ActSellViewPosts extends AppCompatActivity {
 
             // Requests Button
             Button reqButton = new Button(getApplicationContext());
-            reqButton.setText(R.string.request);
+            setReqButtonLayout(reqButton);
+            reqButton.setText("Req.");
             reqButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -480,6 +501,8 @@ public class ActSellViewPosts extends AppCompatActivity {
         TextView textView = new TextView(ActSellViewPosts.this);
         textView.setText(stringBuilder.toString());
         builder.setView(textView);
+
+        builder.setPositiveButton("OK", null);
 
         return builder.create();
     }
