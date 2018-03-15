@@ -118,6 +118,7 @@ class WebServiceHandler {
         }
     }
 
+    // This also updates books!
     static void addPublicBook(Book book){
         if (isMainUserAuthenticated()) { // Add function to only allow certain people to post
             DatabaseReference postRef = WebServiceHandler.rootRef.child("books").child(book.getBookID());
@@ -133,8 +134,6 @@ class WebServiceHandler {
             DatabaseReference myRequestRef = rootRef.child("requests").child(request.getRequestID());
             myRequestRef.setValue(request);
 
-            sendRequest(request);
-
         }
         else {
             throw new IllegalStateException("User not authorized");
@@ -147,33 +146,4 @@ class WebServiceHandler {
         }
     }
 
-    private static void sendRequest(final Request request){
-
-        if (isMainUserAuthenticated()) {
-            String receiverUID = request.getRequesteeID();
-            final DatabaseReference receiverUserRef = rootRef.child("users").child(receiverUID);
-            ValueEventListener receiverUserListener = new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    User receiver = dataSnapshot.getValue(User.class);
-                    if (receiver == null){
-                        onCancelled(DatabaseError.fromException(new IllegalStateException("Not a valid USER - Send no request")));
-                    }
-                    else{
-                        // Update data in listener
-                        receiver.addPublicRequest(request);
-                        receiverUserRef.setValue(receiver);
-                    }
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-                    // Do something here, I guess...
-                }
-            };
-
-            receiverUserRef.addListenerForSingleValueEvent(receiverUserListener);
-
-        }
-    }
 }

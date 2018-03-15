@@ -1,6 +1,5 @@
 package com.clairvoyance.bookmarket;
 
-import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
 import java.io.Serializable;
 import java.util.HashMap;
@@ -34,24 +33,10 @@ class User implements Serializable {
     void addBook(Book book){
         bookIDs.put(book.getBookID(), true);
     }
-    void addBook(String bookID) {bookIDs.put(bookID, true);}
     void addMyRequest(Request request){
         myRequestIDs.put(request.getRequestID(), true);
     }
-    void addMyRequest(String requestID){
-        myRequestIDs.put(requestID, true);
-    }
-    void addPublicRequest(Request request){
-        publicRequestIDs.put(request.getRequestID(), true);
-    }
-    void addPublicRequest(String requestID){
-        publicRequestIDs.put(requestID, true);
-    }
 
-    @Exclude
-    String getUid() {
-        return uid;
-    }
 
     String getName() {
         return name;
@@ -68,10 +53,5 @@ class User implements Serializable {
     HashMap<String, Object> getMyRequestIDs() {
         return myRequestIDs;
     }
-    HashMap<String, Object> getPublicRequestIDs(){
-        return publicRequestIDs;
-    }
-
-    // Todo: Still need to implement/override equals method if I plan on have local store of user data
 
 }
