@@ -22,13 +22,12 @@ import android.widget.ToggleButton;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Set;
+import java.util.HashMap;
 
 public class ActSellMainActivity extends AppCompatActivity {
 
@@ -54,20 +53,6 @@ public class ActSellMainActivity extends AppCompatActivity {
             Collections.reverse(books);
             // Layout is loaded only after all the data is loaded from the database
             loadRequestData();
-        }
-
-        @Override
-        public void onCancelled(DatabaseError databaseError) {
-
-        }
-    };
-    ValueEventListener requestDataListener = new ValueEventListener() {
-        @Override
-        public void onDataChange(DataSnapshot dataSnapshot) {
-            Request request = dataSnapshot.getValue(Request.class);
-            if (request != null){
-                requests.add(request);
-            }
             updateUI();
         }
 
@@ -79,9 +64,7 @@ public class ActSellMainActivity extends AppCompatActivity {
 
     // Local Machine Data
     ArrayList<Book> books;
-    ArrayList<String> requestIDs = new ArrayList<>();
-    ArrayList<Request> requests = new ArrayList<>();
-    ArrayList<DatabaseReference> requestRefs = new ArrayList<>();
+    HashMap<String, String> bookRequests = new HashMap<>();
 
     // GUI Variables
     LinearLayout mainLayout;
@@ -110,8 +93,9 @@ public class ActSellMainActivity extends AppCompatActivity {
         ActionBar ab = getSupportActionBar();
 
         // Enable the Up button
-        ab.setDisplayHomeAsUpEnabled(true);
-
+        if(ab != null) {
+            ab.setDisplayHomeAsUpEnabled(true);
+        }
     }
 
     @Override
@@ -179,22 +163,7 @@ public class ActSellMainActivity extends AppCompatActivity {
 
     // Main Data Load from Database
     private void loadRequestData(){
-        // Get Request Data - note Listeners are triggered for sure once, but only after all the code has run in OnCreate
-        // Get Keys for Request IDs - to see what the user has requested already
-        Set keys = mainUser.getMyRequestIDs().keySet();
-
-        for (Object object: keys){
-            if (object instanceof String){
-                requestIDs.add((String) object);
-            }
-        }
-
-        // Set Database Listeners for Request Objects - so Request Data is ready when updateGUI() is called.
-        requests = new ArrayList<>();
-        for (String requestID: requestIDs){
-            DatabaseReference requestRef = WebServiceHandler.getRootRef().child("requests").child(requestID);
-            requestRef.addListenerForSingleValueEvent(requestDataListener);
-        }
+        bookRequests = mainUser.getMyRequestIDs();
     }
 
     // Set Static Layouts - GUI Attributes stuff
@@ -242,6 +211,7 @@ public class ActSellMainActivity extends AppCompatActivity {
     }
 
     // Actual Data Incorporation - all of it runs after onCreate!
+    // We need book data and request data before this runs...
     private void updateUI(){
         // Remove all View since there is a new Book ArrayList in place
         mainLayout.removeAllViews();
@@ -267,13 +237,11 @@ public class ActSellMainActivity extends AppCompatActivity {
             setReqButtonLayout(reqButton);
 
             // Check if there's a pending request on the book by the user.
-            for (Request request: requests){
-                if (book.getBookID().equals(request.getBookID())){
-                    reqButton.setChecked(true);
-                    book.setGUIRequestID(request.getRequestID());
-                    break;
-                }
+
+            if (bookRequests.containsKey(book.getBookID())){
+                reqButton.setChecked(true);
             }
+
 
             // This is really important - adds and deletes request data when checked/unchecked
             reqButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -370,12 +338,12 @@ public class ActSellMainActivity extends AppCompatActivity {
             builder.setPositiveButton("Un-request", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
-                    String GUIRequestID = book.getGUIRequestID();
-                    if (GUIRequestID == null || GUIRequestID.equals("")){
+                    String requestID = bookRequests.get(book.getBookID());
+                    if (requestID == null || requestID.equals("")){
                         throw new IllegalStateException("Invalid GUI Request ID Values!!!!");
                     }
 
-                    AlertDialog dialog = removeRequestDialog(book, book.getGUIRequestID(), reqButton);
+                    AlertDialog dialog = removeRequestDialog(book, requestID, reqButton);
                     dialog.show();
                 }
             });
@@ -429,16 +397,15 @@ public class ActSellMainActivity extends AppCompatActivity {
         WebServiceHandler.addPublicBook(bookRequested);
 
         mainUser.addMyRequest(request);
-        bookRequested.setGUIRequestID(request.getRequestID());
+        bookRequests.put(bookRequested.getBookID(), request.getRequestID());
         WebServiceHandler.addRequest(request);
         WebServiceHandler.updateMainUserData(mainUser);
-
-
     }
 
     private void deleteRequest(Book book, String requestID){
         book.removeRequestID(requestID);
         WebServiceHandler.addPublicBook(book);
+        bookRequests.remove(book.getBookID());
 
         WebServiceHandler.getRootRef().child("requests").child(requestID).removeValue();
         mainUser.getMyRequestIDs().remove(requestID);
@@ -452,13 +419,13 @@ public class ActSellMainActivity extends AppCompatActivity {
         else {
 
             // Check if requestID exists Todo: Need to check if requestID is valid
-            String GUIRequestID = book.getGUIRequestID();
-            if (GUIRequestID == null || GUIRequestID.equals("")){
+            String requestID = bookRequests.get(book.getBookID());
+            if (requestID == null || requestID.equals("")){
                 throw new IllegalStateException("Invalid GUI Request ID Values!!!!");
             }
 
             // Add Delete? Dialog - to prevent accidental request removal -
-            AlertDialog dialog = removeRequestDialog(book, book.getGUIRequestID(), reqButton);
+            AlertDialog dialog = removeRequestDialog(book, requestID, reqButton);
             dialog.show();
         }
     }
@@ -509,10 +476,7 @@ public class ActSellMainActivity extends AppCompatActivity {
     public void onDestroy(){
         super.onDestroy();
         bookListRef.removeEventListener(bookDataListener);
-        // For loop to remove every ValueEventListener for requests
-        for (DatabaseReference requestRef: requestRefs){
-            requestRef.removeEventListener(requestDataListener);
-        }
+
     }
 
 

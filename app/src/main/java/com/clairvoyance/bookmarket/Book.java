@@ -188,14 +188,7 @@ class Book implements Serializable {
     }
 
     // GUI - Control Variables
-    void setGUIRequestID(String GUIRequestID) {
-        this.GUIRequestID = GUIRequestID;
-    }
 
-    @Exclude
-    String getGUIRequestID() {
-        return GUIRequestID;
-    }
     @Exclude
     Calendar getPostDate(){
         Calendar calendar = Calendar.getInstance();

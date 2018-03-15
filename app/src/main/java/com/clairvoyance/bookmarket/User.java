@@ -15,8 +15,8 @@ class User implements Serializable {
     private String uid;
     private String email;
     private HashMap<String, Object> bookIDs = new HashMap<>();
-    private HashMap<String, Object> myRequestIDs = new HashMap<>();
-    private HashMap<String, Object> publicRequestIDs = new HashMap<>();
+    // Key is bookID - Value is requestID
+    private HashMap<String, String> myRequestIDs = new HashMap<>();
     private boolean isEmailVerified = false;
 
     public User(){ }
@@ -34,7 +34,7 @@ class User implements Serializable {
         bookIDs.put(book.getBookID(), true);
     }
     void addMyRequest(Request request){
-        myRequestIDs.put(request.getRequestID(), true);
+        myRequestIDs.put(request.getBookID(), request.getRequestID());
     }
 
 
@@ -50,7 +50,7 @@ class User implements Serializable {
     HashMap<String, Object> getBookIDs() {
         return bookIDs;
     }
-    HashMap<String, Object> getMyRequestIDs() {
+    HashMap<String, String> getMyRequestIDs() {
         return myRequestIDs;
     }
 
