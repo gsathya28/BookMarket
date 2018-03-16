@@ -1,5 +1,6 @@
 package com.clairvoyance.bookmarket;
 
+import java.util.Calendar;
 import java.util.UUID;
 
 /**
@@ -10,11 +11,12 @@ import java.util.UUID;
 class Request {
 
     private String uid;
-    private String requestorName;
+    private String requesterName;
+    private String requesterEmail;
     private String bookID;
     private String requesteeID;
-    private boolean accepted = false;
     private String requestID;
+    private double requestTime;
     private String bookName;
 
     Request(){}
@@ -25,13 +27,12 @@ class Request {
         this.uid = WebServiceHandler.getUID();
         this.bookID = book.getBookID();
         this.requesteeID = book.getUid();
-        this.requestorName = user.getName();
+        this.requesterName = user.getName();
+        this.requesterEmail = user.getEmail();
         this.bookName = book.getTitle();
+        this.requestTime = Calendar.getInstance().getTimeInMillis();
     }
 
-    public boolean isAccepted() {
-        return accepted;
-    }
     String getUid() {
         return uid;
     }
@@ -41,14 +42,15 @@ class Request {
     String getRequestID() {
         return requestID;
     }
-    public String getRequesteeID() {
+    String getRequesteeID() {
         return requesteeID;
     }
-    public String getRequestorName() {
-        return requestorName;
+    String getRequesterName() {
+        return requesterName;
     }
-
-    public String getBookName() {
+    String getRequesterEmail() {return requesterEmail;}
+    String getBookName() {
         return bookName;
     }
+    double getRequestTime() {return requestTime;}
 }

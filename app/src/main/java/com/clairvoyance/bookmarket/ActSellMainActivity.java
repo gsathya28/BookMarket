@@ -146,7 +146,7 @@ public class ActSellMainActivity extends AppCompatActivity {
         viewBooksButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent viewPostsIntent = new Intent(getApplicationContext(), ActSellViewPosts.class);
+                Intent viewPostsIntent = new Intent(getApplicationContext(), ActSellViewBooks.class);
                 startActivity(viewPostsIntent);
             }
         });
@@ -330,6 +330,7 @@ public class ActSellMainActivity extends AppCompatActivity {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
                     reqButton.setChecked(true);
+                    viewBookDialog(book, reqButton).show();
                 }
             });
         }
@@ -480,6 +481,3 @@ public class ActSellMainActivity extends AppCompatActivity {
 
     }
 }
-
-
-

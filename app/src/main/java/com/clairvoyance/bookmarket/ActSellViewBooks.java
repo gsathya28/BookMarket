@@ -29,9 +29,35 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
-public class ActSellViewPosts extends AppCompatActivity {
+public class ActSellViewBooks extends AppCompatActivity {
 
     User mainUser;
+    ValueEventListener getBookData = new ValueEventListener() {
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+            Book book = dataSnapshot.getValue(Book.class);
+            // Todo: Possibly compare User-BookKey with Book-stored Key
+            if (book != null){
+                loadRequestData(book);
+                if (displayedBookIDs.contains(book.getBookID())){
+                    int index = displayedBookIDs.indexOf(book.getBookID());
+                    // Run Update Code (index, book)
+                    updateBookInList(index, book);
+                }
+                else {
+                    // Run Add code
+                    addBookToList(book);
+                    displayedBookIDs.add(book.getBookID());
+                }
+            }
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+
+        }
+    };
+
     ArrayList<String> bookIDs = new ArrayList<>();
     ArrayList<String> displayedBookIDs = new ArrayList<>();
     ArrayList<Book> displayedBooks = new ArrayList<>();
@@ -89,33 +115,7 @@ public class ActSellViewPosts extends AppCompatActivity {
         }
 
         for (final String id: bookIDs){
-
             DatabaseReference bookRef = FirebaseDatabase.getInstance().getReference().child("books").child(id);
-            ValueEventListener getBookData = new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    Book book = dataSnapshot.getValue(Book.class);
-                    // Todo: Possibly compare User-BookKey with Book-stored Key
-                    if (book != null){
-                        loadRequestData(book);
-                        if (displayedBookIDs.contains(book.getBookID())){
-                            int index = displayedBookIDs.indexOf(book.getBookID());
-                            // Run Update Code (index, book)
-                            updateBookInList(index, book);
-                        }
-                        else {
-                            // Run Add code
-                            addBookToList(book);
-                            displayedBookIDs.add(book.getBookID());
-                        }
-                    }
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-            };
             bookRef.addValueEventListener(getBookData);
         }
     }
@@ -147,8 +147,6 @@ public class ActSellViewPosts extends AppCompatActivity {
     }
 
     private void updateBookInList(int index, final Book book){
-
-
 
         Button infoButton = (Button) mainLayout.getChildAt(index);
         mainLayout.removeViewAt(index);
@@ -286,7 +284,7 @@ public class ActSellViewPosts extends AppCompatActivity {
 
     private AlertDialog viewBookDialog(final Book book){
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(ActSellViewPosts.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(ActSellViewBooks.this);
         builder.setTitle(book.getTitle());
 
         StringBuilder stringBuilder = new StringBuilder();
@@ -425,7 +423,7 @@ public class ActSellViewPosts extends AppCompatActivity {
 
     private AlertDialog deleteCheckDialog(final Book book){
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(ActSellViewPosts.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(ActSellViewBooks.this);
         builder.setMessage("Are you sure do you want to delete this post?");
         builder.setTitle("Delete?");
 
@@ -483,29 +481,48 @@ public class ActSellViewPosts extends AppCompatActivity {
     }
 
     private AlertDialog bookRequestsDialog(Book book){
-        AlertDialog.Builder builder = new AlertDialog.Builder(ActSellViewPosts.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(ActSellViewBooks.this);
         builder.setTitle("Requests on your book");
 
-        StringBuilder stringBuilder = new StringBuilder();
+        LinearLayout mainRequestLayout = new LinearLayout(ActSellViewBooks.this);
+        mainRequestLayout.setOrientation(LinearLayout.VERTICAL);
 
-        stringBuilder.append("Requests:");
-        stringBuilder.append("\n");
+        // Todo: Sort requests in descending order (most recent first)
 
         ArrayList<Request> requests = book.getRequests();
         for (Request request: requests){
-            stringBuilder.append("\t");
-            stringBuilder.append(request.getRequestorName());
-            stringBuilder.append("\n");
+
+            LinearLayout requestLayout = new LinearLayout(ActSellViewBooks.this);
+            requestLayout.setOrientation(LinearLayout.HORIZONTAL);
+
+            TextView requestInfo = new TextView(ActSellViewBooks.this);
+            String requestString = request.getRequesterName() + "\n" + request.getRequesterEmail();
+            requestInfo.setText(requestString);
+
+            requestLayout.addView(requestInfo);
+
+            Button acceptButton = new Button(ActSellViewBooks.this);
+            acceptButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(ActSellViewBooks.this, ActViewMessages.class);
+                    startActivity(intent);
+                }
+            });
         }
 
-        TextView textView = new TextView(ActSellViewPosts.this);
-        textView.setText(stringBuilder.toString());
-        builder.setView(textView);
-
+        builder.setView(mainRequestLayout);
         builder.setPositiveButton("OK", null);
 
         return builder.create();
     }
 
-    // Todo: On destroy - should remove listener!
+    @Override
+    protected void onDestroy() {
+        for (final String id: bookIDs){
+            DatabaseReference bookRef = FirebaseDatabase.getInstance().getReference().child("books").child(id);
+            bookRef.removeEventListener(getBookData);
+        }
+        super.onDestroy();
+    }
 }
