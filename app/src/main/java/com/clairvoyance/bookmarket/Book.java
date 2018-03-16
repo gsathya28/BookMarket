@@ -30,15 +30,11 @@ class Book implements Serializable {
     private String courseNumber;
     private String versionNumber;
     private String instructor;
-    private boolean isAvailable;
     private String bookID;
     private String uid;
     private long postDateInSecs;
     private HashMap<String, Boolean> requestIDs = new HashMap<>();
     private ArrayList<Request> requests = new ArrayList<>();
-
-    // GUI Variables
-    private String GUIRequestID;
 
     static final int TITLE = 0;
     static final int PRICE = 1;
@@ -95,15 +91,6 @@ class Book implements Serializable {
             default:
                 throw new IllegalArgumentException("Invalid Parameter");
         }
-    }
-
-    void set(int field, boolean value){
-
-        switch (field){
-            case AVAILABLE:
-                this.isAvailable = value;
-        }
-
     }
 
     void addRequestID(Request request){
@@ -173,9 +160,6 @@ class Book implements Serializable {
     }
     public String getNotes() {
         return notes;
-    }
-    boolean isAvailable() {
-        return isAvailable;
     }
     long getPostDateInSecs() {
         return postDateInSecs;
