@@ -33,6 +33,7 @@ class Book implements Serializable {
     private String bookID;
     private String uid;
     private long postDateInSecs;
+    private boolean isSpam = false;
     private HashMap<String, Boolean> requestIDs = new HashMap<>();
     private ArrayList<Request> requests = new ArrayList<>();
 
@@ -91,6 +92,10 @@ class Book implements Serializable {
             default:
                 throw new IllegalArgumentException("Invalid Parameter");
         }
+    }
+
+    public void setSpam(boolean spam) {
+        isSpam = spam;
     }
 
     void addRequestID(Request request){
@@ -170,8 +175,9 @@ class Book implements Serializable {
     String getUid() {
         return uid;
     }
-
-    // GUI - Control Variables
+    boolean isSpam() {
+        return isSpam;
+    }
 
     @Exclude
     Calendar getPostDate(){

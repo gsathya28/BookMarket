@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -17,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
@@ -177,7 +179,7 @@ public class ActSellMainActivity extends AppCompatActivity {
         button.setLayoutParams(params);
         button.setGravity(Gravity.START);
         button.setGravity(Gravity.CENTER_VERTICAL);
-
+        button.setTextColor(Color.WHITE);
     }
 
     private void setBookLayout(LinearLayout bookLayout){
@@ -220,6 +222,10 @@ public class ActSellMainActivity extends AppCompatActivity {
         for (final Book book: books){
 
             if(book.getUid().equals(WebServiceHandler.getUID())){
+                continue;
+            }
+
+            if(book.isSpam()){
                 continue;
             }
 
@@ -321,7 +327,35 @@ public class ActSellMainActivity extends AppCompatActivity {
         stringBuilder.append(System.getProperty("line.separator"));
         stringBuilder.append(System.getProperty("line.separator"));
 
-        builder.setMessage(stringBuilder.toString());
+        String infoText = stringBuilder.toString();
+        TextView infoTextView = new TextView(ActSellMainActivity.this);
+        infoTextView.setText(infoText);
+
+        LinearLayout linearLayout = new LinearLayout(ActSellMainActivity.this);
+        linearLayout.setOrientation(LinearLayout.VERTICAL);
+        linearLayout.addView(infoTextView);
+
+        if(!book.isSpam()){
+            final Button button = new Button(ActSellMainActivity.this);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+            );
+            button.setText("Flag");
+            button.setLayoutParams(params);
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    book.setSpam(true);
+                    WebServiceHandler.addSpam(book);
+                    WebServiceHandler.addPublicBook(book);
+                    button.setVisibility(View.GONE);
+                }
+            });
+            linearLayout.addView(button);
+        }
+
+        builder.setView(linearLayout);
 
         // If a request is not made for this book - button will prompt to make request
         // and the listener will set the toggleButton to isChecked which will run code to add request to database

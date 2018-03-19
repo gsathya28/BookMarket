@@ -146,4 +146,10 @@ class WebServiceHandler {
         }
     }
 
+    static void addSpam(Book book){
+        if (isMainUserAuthenticated()){
+            rootRef.child("spam").child(book.getBookID()).setValue(getUID());
+        }
+    }
+
 }
