@@ -52,7 +52,7 @@ class Book implements Serializable {
     }
 
     // Only courseSubj and courseNumber are required
-    public Book(String courseSubj, String courseNumber){
+    public Book(String courseSubj, String courseNumber) throws IllegalAccessException{
         this.courseSubj = courseSubj;
         this.courseNumber = courseNumber;
         bookID = UUID.randomUUID().toString();
@@ -94,7 +94,7 @@ class Book implements Serializable {
         }
     }
 
-    public void setSpam(boolean spam) {
+    void setSpam(boolean spam) {
         isSpam = spam;
     }
 

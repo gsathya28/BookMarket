@@ -1,5 +1,6 @@
 package com.clairvoyance.bookmarket;
 
+import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
 import java.io.Serializable;
 import java.util.HashMap;
@@ -54,4 +55,8 @@ class User implements Serializable {
         return myRequestIDs;
     }
 
+    @Exclude
+    public String getUid() {
+        return uid;
+    }
 }

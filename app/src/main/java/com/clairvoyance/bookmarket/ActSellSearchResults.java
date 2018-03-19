@@ -24,6 +24,9 @@ public class ActSellSearchResults extends AppCompatActivity {
         ActionBar ab = getSupportActionBar();
 
         // Enable the Up button
-        ab.setDisplayHomeAsUpEnabled(true);
+        if (ab != null){
+            ab.setDisplayHomeAsUpEnabled(true);
+        }
+
     }
 }

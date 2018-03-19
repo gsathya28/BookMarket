@@ -97,10 +97,10 @@ public class ActSellViewBooks extends AppCompatActivity {
     }
 
     private void setMainUser(){
-        mainUser = WebServiceHandler.generateMainUser();
-        if (mainUser == null){
-            Intent intent = new Intent(this, ActLoginActivity.class);
-            startActivity(intent);
+        try {
+            mainUser = WebServiceHandler.generateMainUser();
+        }catch (IllegalAccessException i){
+            illegalAccess();
         }
     }
 
@@ -442,13 +442,18 @@ public class ActSellViewBooks extends AppCompatActivity {
                 // Delete requests attached to the book
                 HashMap<String, Boolean> requestIDs = book.getRequestIDs();
                 Set keySet = requestIDs.keySet();
-                for (Object object: keySet){
-                    if (object instanceof String){
-                        WebServiceHandler.removeRequest((String) object);
-                    }
-                }
+                try {
 
-                WebServiceHandler.updateMainUserData(mainUser);
+                    for (Object object : keySet) {
+                        if (object instanceof String) {
+                            WebServiceHandler.removeRequest((String) object);
+                        }
+                    }
+                    WebServiceHandler.updateMainUserData(mainUser);
+
+                } catch (IllegalAccessException ie){
+                    illegalAccess();
+                }
 
                 // Update UI
                 int index = displayedBookIDs.indexOf(book.getBookID());
@@ -515,6 +520,11 @@ public class ActSellViewBooks extends AppCompatActivity {
         builder.setPositiveButton("OK", null);
 
         return builder.create();
+    }
+
+    private void illegalAccess(){
+        Intent intent = new Intent(this, ActLoginActivity.class);
+        startActivity(intent);
     }
 
     @Override

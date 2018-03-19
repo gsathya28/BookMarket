@@ -9,7 +9,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -126,10 +125,10 @@ public class ActSellMainActivity extends AppCompatActivity {
     }
 
     private void setMainUser(){
-        mainUser = WebServiceHandler.generateMainUser();
-        if (mainUser == null){
-            Intent intent = new Intent(this, ActLoginActivity.class);
-            startActivity(intent);
+        try {
+            mainUser = WebServiceHandler.generateMainUser();
+        }catch (IllegalAccessException i){
+            illegalAccess();
         }
     }
 
@@ -221,7 +220,7 @@ public class ActSellMainActivity extends AppCompatActivity {
         // Funnel through the data placing new Horizontal LinearLayout (to hold info and request buttons) for each book
         for (final Book book: books){
 
-            if(book.getUid().equals(WebServiceHandler.getUID())){
+            if(book.getUid().equals(mainUser.getUid())){
                 continue;
             }
 
@@ -347,8 +346,12 @@ public class ActSellMainActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View view) {
                     book.setSpam(true);
-                    WebServiceHandler.addSpam(book);
-                    WebServiceHandler.addPublicBook(book);
+                    try {
+                        WebServiceHandler.addSpam(book);
+                        WebServiceHandler.addPublicBook(book);
+                    }catch (IllegalAccessException i){
+                        illegalAccess();
+                    }
                     button.setVisibility(View.GONE);
                 }
             });
@@ -427,25 +430,33 @@ public class ActSellMainActivity extends AppCompatActivity {
 
     private void addRequest(Book bookRequested){
         // NO need to add to bookRequests, since bookRequests is a pointer AND it will update the Firebase Database
-        Request request = new Request(mainUser, bookRequested);
-        WebServiceHandler.addRequest(request);
+        try {
+            Request request = new Request(mainUser, bookRequested);
+            WebServiceHandler.addRequest(request);
 
-        bookRequested.addRequestID(request);
-        WebServiceHandler.addPublicBook(bookRequested);
+            bookRequested.addRequestID(request);
+            WebServiceHandler.addPublicBook(bookRequested);
 
-        mainUser.addMyRequest(request);
-        WebServiceHandler.updateMainUserData(mainUser);
+            mainUser.addMyRequest(request);
+            WebServiceHandler.updateMainUserData(mainUser);
+        }catch (IllegalAccessException i){
+            illegalAccess();
+        }
     }
 
     private void deleteRequest(Book book, String requestID){
         // NO need to delete to bookRequests, since bookRequests is a pointer (mainUser.getMyRequestIDs) AND it will update the Firebase Database
         WebServiceHandler.getRootRef().child("requests").child(requestID).removeValue();
 
-        book.removeRequestID(requestID);
-        WebServiceHandler.addPublicBook(book);
+        try {
+            book.removeRequestID(requestID);
+            WebServiceHandler.addPublicBook(book);
 
-        mainUser.getMyRequestIDs().remove(book.getBookID());
-        WebServiceHandler.updateMainUserData(mainUser);
+            mainUser.getMyRequestIDs().remove(book.getBookID());
+            WebServiceHandler.updateMainUserData(mainUser);
+        }catch (IllegalAccessException i){
+            illegalAccess();
+        }
     }
 
     private void checkedConditional(ToggleButton reqButton, boolean isChecked, Book book){
@@ -465,8 +476,6 @@ public class ActSellMainActivity extends AppCompatActivity {
             dialog.show();
         }
     }
-
-    // Remove ValueEventListeners when Activity is destroyed - to prevent memory leaks.
 
     AlertDialog searchDialog(){
 
@@ -508,6 +517,12 @@ public class ActSellMainActivity extends AppCompatActivity {
         return builder.create();
     }
 
+    private void illegalAccess(){
+        Intent intent = new Intent(this, ActLoginActivity.class);
+        startActivity(intent);
+    }
+
+    // Remove ValueEventListeners when Activity is destroyed - to prevent memory leaks.
     @Override
     public void onDestroy(){
         super.onDestroy();

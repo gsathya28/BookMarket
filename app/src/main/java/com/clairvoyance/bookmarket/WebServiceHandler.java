@@ -31,14 +31,19 @@ class WebServiceHandler {
         return rootRef;
     }
 
-    private static boolean isMainUserAuthenticated(){
+    private static boolean isMainUserAuthenticated() throws IllegalAccessException{
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
-        return mUser != null;
+        if (mUser == null){
+            throw new IllegalAccessException("User not authorized");
+        }
+        else{
+            return true;
+        }
     }
 
     @Nullable
-    static User generateMainUser(){
+    static User generateMainUser() throws IllegalAccessException{
         if (isMainUserAuthenticated()){
             User user = new User(mUser.getUid(), mUser.getEmail());
             user.setEmailVerified(mUser.isEmailVerified());
@@ -84,21 +89,18 @@ class WebServiceHandler {
         return loadedUser; // This will be null at first since the ValueEventListener only puts the data in this pointer after all the code (onCreate) has run
     }
 
-    private static void createNewUserData(User user){
-        if (isMainUserAuthenticated()){
-            DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child("users");
-            userRef.child(mUser.getUid()).setValue(user);
-        }
-        else {
-            throw new IllegalStateException("User not authorized");
-        }
+    private static void createNewUserData(User user) {
+
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child("users");
+        userRef.child(mUser.getUid()).setValue(user);
+
     }
 
     // Add/Update Data down below!
     // Todo: Some sort of trigger needs to run when a book is added - so correct notifications are given. (Either here, database backend (lambda), or when data is read in (background))
     // For above task-to-do: We can try to use some sort of state counter/dataset with each state showing what DB edits were made in a certain time frame
 
-    static void updateMainUserData(User user){
+    static void updateMainUserData(User user) throws IllegalAccessException{
         if (isMainUserAuthenticated()){
             DatabaseReference userRef = rootRef.child("users").child(mUser.getUid());
             userRef.setValue(user);
@@ -109,17 +111,17 @@ class WebServiceHandler {
         }
     }
 
-    static String getUID(){
+    static String getUID() throws IllegalAccessException{
         if(isMainUserAuthenticated()){
             return mUser.getUid();
         }
         else{
-            throw new IllegalStateException("User not authorized!");
+            return "";
         }
     }
 
     // This also updates books!
-    static void addPublicBook(Book book){
+    static void addPublicBook(Book book) throws IllegalAccessException{
         if (isMainUserAuthenticated()) { // Add function to only allow certain people to post
             DatabaseReference postRef = WebServiceHandler.rootRef.child("books").child(book.getBookID());
             postRef.setValue(book);
@@ -129,7 +131,7 @@ class WebServiceHandler {
         }
     }
 
-    static void addRequest(Request request){
+    static void addRequest(Request request) throws IllegalAccessException{
         if (isMainUserAuthenticated()) { // Add function to only allow certain people to post
             DatabaseReference myRequestRef = rootRef.child("requests").child(request.getRequestID());
             myRequestRef.setValue(request);
@@ -140,13 +142,13 @@ class WebServiceHandler {
         }
     }
 
-    static void removeRequest(String requestID){
+    static void removeRequest(String requestID) throws IllegalAccessException{
         if (isMainUserAuthenticated()){
             rootRef.child("requests").child(requestID).removeValue();
         }
     }
 
-    static void addSpam(Book book){
+    static void addSpam(Book book) throws IllegalAccessException{
         if (isMainUserAuthenticated()){
             rootRef.child("spam").child(book.getBookID()).setValue(getUID());
         }

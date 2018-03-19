@@ -21,7 +21,7 @@ class Request {
 
     Request(){}
 
-    Request(User user, Book book){
+    Request(User user, Book book) throws IllegalAccessException{
         // Todo: Check if IDS are valid ???
         this.requestID = UUID.randomUUID().toString();
         this.uid = WebServiceHandler.getUID();

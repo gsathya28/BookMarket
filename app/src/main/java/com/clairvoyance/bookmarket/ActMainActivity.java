@@ -13,12 +13,12 @@ public class ActMainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        User mainUser = WebServiceHandler.generateMainUser();
-        if (mainUser == null){
+        try {
+            User mainUser = WebServiceHandler.generateMainUser();
+        }catch (IllegalAccessException i) {
             Intent intent = new Intent(this, ActLoginActivity.class);
             startActivity(intent);
         }
-
         setButtons();
     }
 

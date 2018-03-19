@@ -50,7 +50,7 @@ public class ActSellViewRequests extends AppCompatActivity {
         mainLayout = findViewById(R.id.sell_request_layout);
 
         setToolbar();
-        loadData();
+        setMainUser();
     }
 
     private void setToolbar(){
@@ -67,14 +67,12 @@ public class ActSellViewRequests extends AppCompatActivity {
         }
     }
 
-    private void loadData(){
-
-        mainUser = WebServiceHandler.generateMainUser();
-        if (mainUser == null){
-            Intent intent = new Intent(getApplicationContext(), ActLoginActivity.class);
-            startActivity(intent);
+    private void setMainUser(){
+        try {
+            mainUser = WebServiceHandler.generateMainUser();
+        }catch (IllegalAccessException i){
+            illegalAccess();
         }
-
     }
 
     private void setButtonLayout(Button button){
@@ -97,4 +95,10 @@ public class ActSellViewRequests extends AppCompatActivity {
         button.setPadding(valueInPx, button.getPaddingTop(), valueInPx, button.getPaddingBottom());
         button.setBackgroundColor(Color.parseColor("#267326"));
     }
+
+    private void illegalAccess(){
+        Intent intent = new Intent(this, ActLoginActivity.class);
+        startActivity(intent);
+    }
+
 }

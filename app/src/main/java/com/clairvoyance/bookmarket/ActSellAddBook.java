@@ -46,14 +46,16 @@ public class ActSellAddBook extends AppCompatActivity {
         ActionBar ab = getSupportActionBar();
 
         // Enable the Up button
-        ab.setDisplayHomeAsUpEnabled(true);
+        if (ab != null) {
+            ab.setDisplayHomeAsUpEnabled(true);
+        }
     }
 
     private void setMainUser(){
-        mainUser = WebServiceHandler.generateMainUser();
-        if (mainUser == null){
-            Intent intent = new Intent(this, ActLoginActivity.class);
-            startActivity(intent);
+        try {
+            mainUser = WebServiceHandler.generateMainUser();
+        }catch (IllegalAccessException i) {
+            illegalAccess();
         }
     }
 
@@ -88,7 +90,13 @@ public class ActSellAddBook extends AppCompatActivity {
                                     Toast.makeText(getApplicationContext(), "Both Course Subject and Number required", Toast.LENGTH_LONG).show();
                                     return;
                                 }
-                                newBook = new Book(courseType, courseNumber);
+
+                                try{
+                                    newBook = new Book(courseType, courseNumber);
+                                }catch (IllegalAccessException i){
+                                    illegalAccess();
+                                    return; // Don't know why I need this...
+                                }
 
                                 String bookTitle = ((EditText) dialogLayout.findViewById(R.id.sell_book_title_text)).getText().toString();
                                 String author = ((EditText) dialogLayout.findViewById(R.id.sell_author_text)).getText().toString();
@@ -124,9 +132,19 @@ public class ActSellAddBook extends AppCompatActivity {
                 // Add books to database that are in temporary store (postBooks)
                 for(Book book: postBooks){
                     mainUser.addBook(book);
-                    WebServiceHandler.addPublicBook(book);
+                    try{
+                        WebServiceHandler.addPublicBook(book);
+                    }catch (IllegalAccessException i){
+                        illegalAccess();
+                    }
                 }
-                WebServiceHandler.updateMainUserData(mainUser);
+
+                try{
+                    WebServiceHandler.updateMainUserData(mainUser);
+                }catch (IllegalAccessException i){
+                    illegalAccess();
+                }
+
                 // Local Save - may remove later
                 DataHandler.saveMainUserData(mainUser, getApplicationContext());
 
@@ -195,7 +213,12 @@ public class ActSellAddBook extends AppCompatActivity {
                                     return;
                                 }
 
-                                newBook = new Book(courseType, courseNumber);
+                                try {
+                                    newBook = new Book(courseType, courseNumber);
+                                }catch (IllegalAccessException i){
+                                    illegalAccess();
+                                    return;
+                                }
 
                                 String bookTitle = ((EditText) dialogLayout.findViewById(R.id.sell_book_title_text)).getText().toString();
                                 String author = ((EditText) dialogLayout.findViewById(R.id.sell_author_text)).getText().toString();
@@ -297,4 +320,10 @@ public class ActSellAddBook extends AppCompatActivity {
         builder.setNegativeButton("DELETE", null);
         return builder.create();
     }
+
+    private void illegalAccess(){
+        Intent intent = new Intent(this, ActLoginActivity.class);
+        startActivity(intent);
+    }
+
 }
