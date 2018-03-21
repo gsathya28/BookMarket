@@ -6,20 +6,26 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
+import com.google.firebase.messaging.FirebaseMessaging;
+
 public class ActMainActivity extends AppCompatActivity {
+
+    User mainUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         try {
-            User mainUser = WebServiceHandler.generateMainUser();
+            mainUser = WebServiceHandler.generateMainUser();
         }catch (IllegalAccessException i) {
             Intent intent = new Intent(this, ActLoginActivity.class);
             startActivity(intent);
         }
         setButtons();
+
     }
 
     private void setButtons(){
