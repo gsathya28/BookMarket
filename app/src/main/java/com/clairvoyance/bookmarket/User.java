@@ -22,8 +22,7 @@ class User implements Serializable {
 
     public User(){ }
 
-    User(String uid, String email){
-        this.uid = uid;
+    User(String email){
         this.email = email;
     }
 
@@ -37,7 +36,6 @@ class User implements Serializable {
     void addMyRequest(Request request){
         myRequestIDs.put(request.getBookID(), request.getRequestID());
     }
-
 
     String getName() {
         return name;
@@ -55,8 +53,4 @@ class User implements Serializable {
         return myRequestIDs;
     }
 
-    @Exclude
-    public String getUid() {
-        return uid;
-    }
 }

@@ -32,11 +32,6 @@ import java.util.HashMap;
 
 public class ActSellMainActivity extends AppCompatActivity {
 
-    // Todo: Notification of a scan should go to a scan results page (possibly different from a search results page - for the sake of simplicity)
-    // Todo: Notification of a request should go to the "My Requests" page and load up the dialog for the book requested and show the new requester (with a star or some other stupid id thing)
-    // --> Or possibly a new dialog showing a list of everyone that requested something (in the My Requests page - I like this better)
-    // Todo: Notification of a new message should go to the Message page of the person who messaged
-
     // Firebase Data Transfer Variables
     User mainUser;
     Query bookListRef = WebServiceHandler.mBooks;
@@ -218,60 +213,64 @@ public class ActSellMainActivity extends AppCompatActivity {
         mainLayout.removeAllViews();
 
         // Funnel through the data placing new Horizontal LinearLayout (to hold info and request buttons) for each book
-        for (final Book book: books){
+        try {
+            for (final Book book : books) {
 
-            if(book.getUid().equals(mainUser.getUid())){
-                continue;
-            }
-
-            if(book.isSpam()){
-                continue;
-            }
-
-            LinearLayout bookLayout = new LinearLayout(getApplicationContext());
-            setBookLayout(bookLayout);
-
-            int valueInPx = (int) getApplicationContext().getResources().getDimension(R.dimen.activity_horizontal_margin);
-
-            // Set layout for Buttons in BookLayout
-            final ToggleButton reqButton = new ToggleButton(getApplicationContext());
-            bookLayout.addView(reqButton);
-            Button infoButton = new Button(getApplicationContext());
-            bookLayout.addView(infoButton);
-            setInfoButtonLayout(infoButton);
-            setReqButtonLayout(reqButton);
-
-            // Check if there's a pending request on the book by the user.
-
-            if (bookRequests.containsKey(book.getBookID())){
-                reqButton.setChecked(true);
-            }
-
-
-            // This is really important - adds and deletes request data when checked/unchecked
-            reqButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
-                    checkedConditional(reqButton, isChecked, book);
+                if (book.getUid().equals(WebServiceHandler.getUID())) {
+                    continue;
                 }
-            });
 
-            // Set Button Text
-            String buttonText = book.getCourseSubj() + " " + book.getCourseNumber() + " - " + book.getTitle();
-            infoButton.setText(buttonText);
-            infoButton.setBackgroundColor(Color.parseColor("#267326"));
-            infoButton.setSingleLine();
-            infoButton.setEllipsize(TextUtils.TruncateAt.END);
-            infoButton.setPadding(valueInPx, infoButton.getPaddingTop(), valueInPx, infoButton.getPaddingBottom());
-            infoButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    // Set Info Dialog (different from Delete? Dialog)
-                    viewBookDialog(book, reqButton).show();
+                if (book.isSpam()) {
+                    continue;
                 }
-            });
 
-            mainLayout.addView(bookLayout);
+                LinearLayout bookLayout = new LinearLayout(getApplicationContext());
+                setBookLayout(bookLayout);
+
+                int valueInPx = (int) getApplicationContext().getResources().getDimension(R.dimen.activity_horizontal_margin);
+
+                // Set layout for Buttons in BookLayout
+                final ToggleButton reqButton = new ToggleButton(getApplicationContext());
+                bookLayout.addView(reqButton);
+                Button infoButton = new Button(getApplicationContext());
+                bookLayout.addView(infoButton);
+                setInfoButtonLayout(infoButton);
+                setReqButtonLayout(reqButton);
+
+                // Check if there's a pending request on the book by the user.
+
+                if (bookRequests.containsKey(book.getBookID())) {
+                    reqButton.setChecked(true);
+                }
+
+
+                // This is really important - adds and deletes request data when checked/unchecked
+                reqButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                        checkedConditional(reqButton, isChecked, book);
+                    }
+                });
+
+                // Set Button Text
+                String buttonText = book.getCourseSubj() + " " + book.getCourseNumber() + " - " + book.getTitle();
+                infoButton.setText(buttonText);
+                infoButton.setBackgroundColor(Color.parseColor("#267326"));
+                infoButton.setSingleLine();
+                infoButton.setEllipsize(TextUtils.TruncateAt.END);
+                infoButton.setPadding(valueInPx, infoButton.getPaddingTop(), valueInPx, infoButton.getPaddingBottom());
+                infoButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        // Set Info Dialog (different from Delete? Dialog)
+                        viewBookDialog(book, reqButton).show();
+                    }
+                });
+
+                mainLayout.addView(bookLayout);
+            }
+        }catch (IllegalAccessException i){
+            illegalAccess();
         }
     }
 

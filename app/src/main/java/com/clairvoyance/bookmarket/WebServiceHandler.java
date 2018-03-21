@@ -45,7 +45,7 @@ class WebServiceHandler {
     @Nullable
     static User generateMainUser() throws IllegalAccessException{
         if (isMainUserAuthenticated()){
-            User user = new User(mUser.getUid(), mUser.getEmail());
+            User user = new User(mUser.getEmail());
             user.setEmailVerified(mUser.isEmailVerified());
             user.setName(mUser.getDisplayName());
             // Key-line
