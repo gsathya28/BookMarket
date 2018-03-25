@@ -18,7 +18,6 @@ import com.google.firebase.database.ValueEventListener;
 
 class WebServiceHandler {
 
-
     final static int RC_SIGN_IN = 2899;
     final static String WEB_CLIENT_ID = "483082602147-bmhfbbj3k1proa5r2ll3hr694d9s5mrr.apps.googleusercontent.com";
     private static FirebaseUser mUser;

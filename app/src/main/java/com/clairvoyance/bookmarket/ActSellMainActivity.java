@@ -76,7 +76,6 @@ public class ActSellMainActivity extends AppCompatActivity {
         setMainUser();
         bookListRef.addValueEventListener(bookDataListener);
 
-        Toast.makeText(getApplicationContext(), "Hello", Toast.LENGTH_LONG).show();
     }
 
     // Toolbar Methods - setToolbar, onCreateOptionsMenu, onOptionsItemSelected

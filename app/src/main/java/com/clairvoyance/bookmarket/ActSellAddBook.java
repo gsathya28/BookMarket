@@ -145,9 +145,6 @@ public class ActSellAddBook extends AppCompatActivity {
                     illegalAccess();
                 }
 
-                // Local Save - may remove later
-                DataHandler.saveMainUserData(mainUser, getApplicationContext());
-
                 // Go back to the Sell-MainActivity
                 Intent savePost = new Intent(getApplicationContext(), ActSellMainActivity.class);
                 startActivity(savePost);
