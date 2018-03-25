@@ -47,7 +47,6 @@ public class ActSellViewBooks extends AppCompatActivity {
                 else {
                     // Run Add code
                     addBookToList(book);
-                    displayedBookIDs.add(book.getBookID());
                 }
             }
         }
@@ -60,7 +59,7 @@ public class ActSellViewBooks extends AppCompatActivity {
 
     ArrayList<String> bookIDs = new ArrayList<>();
     ArrayList<String> displayedBookIDs = new ArrayList<>();
-    ArrayList<Book> displayedBooks = new ArrayList<>();
+    ArrayList<Book> mBooks = new ArrayList<>();
     LinearLayout mainLayout;
     View dialogLayout;
 
@@ -130,9 +129,9 @@ public class ActSellViewBooks extends AppCompatActivity {
 
         boolean added = false;
         // Push the most recent book up first
-        for (int i = 0; i < displayedBooks.size(); i++){
-            if(book.getPostDateInSecs() > displayedBooks.get(i).getPostDateInSecs()){
-                displayedBooks.add(i, book);
+        for (int i = 0; i < mBooks.size(); i++){
+            if(book.getPostDateInSecs() > mBooks.get(i).getPostDateInSecs()){
+                mBooks.add(i, book);
                 added = true;
                 break;
             }
@@ -140,16 +139,25 @@ public class ActSellViewBooks extends AppCompatActivity {
 
         // End case if it is the least recent book published - and wasn't added
         if(!added){
-            displayedBooks.add(book);
+            mBooks.add(book);
         }
+
+        displayedBookIDs = new ArrayList<>();
+        for (Book listBook: mBooks){
+            displayedBookIDs.add(listBook.getBookID());
+        }
+
 
         setMainLayout();
     }
 
     private void updateBookInList(int index, final Book book){
 
-        Button infoButton = (Button) mainLayout.getChildAt(index);
+        LinearLayout infoLayout = (LinearLayout) mainLayout.getChildAt(index);
         mainLayout.removeViewAt(index);
+
+        Button infoButton = (Button) infoLayout.getChildAt(0);
+
         String buttonText = book.getCourseSubj() + " " + book.getCourseNumber() + " - " + book.getTitle();
         infoButton.setText(buttonText);
         infoButton.setOnClickListener(new View.OnClickListener() {
@@ -159,11 +167,12 @@ public class ActSellViewBooks extends AppCompatActivity {
             }
         });
 
-        mainLayout.addView(infoButton, index);
+        mainLayout.addView(infoLayout, index);
+
     }
 
     private void deleteBookInUI(int index){
-        displayedBooks.remove(index);
+        mBooks.remove(index);
         mainLayout.removeViewAt(index);
     }
 
@@ -247,7 +256,7 @@ public class ActSellViewBooks extends AppCompatActivity {
 
     private void setMainLayout(){
         mainLayout.removeAllViews();
-        for (final Book book: displayedBooks){
+        for (final Book book: mBooks){
 
             LinearLayout singleBookLayout = new LinearLayout(getApplicationContext());
             singleBookLayout.setOrientation(LinearLayout.HORIZONTAL);
