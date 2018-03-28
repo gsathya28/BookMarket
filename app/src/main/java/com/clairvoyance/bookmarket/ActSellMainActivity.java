@@ -24,7 +24,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -75,11 +74,6 @@ public class ActSellMainActivity extends AppCompatActivity {
         setOptionButtons();
         setMainUser();
         bookListRef.addValueEventListener(bookDataListener);
-        try {
-            WebServiceHandler.updateToken(FirebaseInstanceId.getInstance().getToken());
-        }catch (IllegalAccessException i){
-            illegalAccess();
-        }
     }
 
     // Toolbar Methods - setToolbar, onCreateOptionsMenu, onOptionsItemSelected
@@ -441,6 +435,16 @@ public class ActSellMainActivity extends AppCompatActivity {
     }
 
     private AlertDialog removeRequestDialog(final Book book, final String requestID, final ToggleButton button){
+
+        button.setOnCheckedChangeListener(null);
+        button.setChecked(true);
+        button.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                checkedConditional(button, button.isChecked(), book);
+            }
+        });
+
         AlertDialog.Builder builder = new AlertDialog.Builder(ActSellMainActivity.this);
         builder.setTitle("Remove Request?");
         builder.setMessage("Are you sure you want to remove your request for this book?");

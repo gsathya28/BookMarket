@@ -40,7 +40,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     }
 
     private void createNotification(RemoteMessage.Notification notification) {
-        Intent intent = new Intent( this , ActSellMainActivity. class );
+        Intent intent = new Intent( this , ActSellViewBooks.class );
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent resultIntent = PendingIntent.getActivity( this , 0, intent,
                 PendingIntent.FLAG_ONE_SHOT);

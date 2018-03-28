@@ -11,7 +11,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
-import com.google.firebase.iid.FirebaseInstanceIdService;
+
 
 /**
  * Created by Sathya on 12/21/2017.
@@ -97,6 +97,7 @@ class WebServiceHandler {
 
     static void updateMainUserData(User user) throws IllegalAccessException{
         if (isMainUserAuthenticated()){
+            user.setRegistrationToken(FirebaseInstanceId.getInstance().getToken());
             DatabaseReference userRef = rootRef.child("users").child(mUser.getUid());
             userRef.setValue(user);
         }
@@ -115,10 +116,10 @@ class WebServiceHandler {
         }
     }
 
-    static void updateToken(String token) throws IllegalAccessException{
+    static void updateToken() throws IllegalAccessException{
         if(isMainUserAuthenticated()){
-            loadedUser.setRegistrationToken(token);
-            updateMainUserData(loadedUser);
+            User user = generateMainUser();
+            updateMainUserData(user);
         }
     }
 
