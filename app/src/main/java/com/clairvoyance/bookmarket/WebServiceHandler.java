@@ -10,6 +10,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.FirebaseInstanceIdService;
 
 /**
  * Created by Sathya on 12/21/2017.
@@ -41,7 +43,6 @@ class WebServiceHandler {
         }
     }
 
-    @Nullable
     static User generateMainUser() throws IllegalAccessException{
         if (isMainUserAuthenticated()){
             User user = new User(mUser.getEmail());
@@ -53,7 +54,6 @@ class WebServiceHandler {
         }
         else {
             throw new IllegalStateException("Main User not Authenticated");
-            // Todo: Throw Exception to send back to Login Activity
         }
     }
 
@@ -95,10 +95,6 @@ class WebServiceHandler {
 
     }
 
-    // Add/Update Data down below!
-    // Todo: Some sort of trigger needs to run when a book is added - so correct notifications are given. (Either here, database backend (lambda), or when data is read in (background))
-    // For above task-to-do: We can try to use some sort of state counter/dataset with each state showing what DB edits were made in a certain time frame
-
     static void updateMainUserData(User user) throws IllegalAccessException{
         if (isMainUserAuthenticated()){
             DatabaseReference userRef = rootRef.child("users").child(mUser.getUid());
@@ -116,6 +112,13 @@ class WebServiceHandler {
         }
         else{
             return "";
+        }
+    }
+
+    static void updateToken(String token) throws IllegalAccessException{
+        if(isMainUserAuthenticated()){
+            loadedUser.setRegistrationToken(token);
+            updateMainUserData(loadedUser);
         }
     }
 
@@ -152,5 +155,7 @@ class WebServiceHandler {
             rootRef.child("spam").child(book.getBookID()).setValue(getUID());
         }
     }
+
+
 
 }

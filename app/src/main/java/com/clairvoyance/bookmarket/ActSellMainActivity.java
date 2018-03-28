@@ -18,13 +18,13 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -48,7 +48,7 @@ public class ActSellMainActivity extends AppCompatActivity {
             }
             Collections.reverse(books);
             // Layout is loaded only after all the data is loaded from the database
-            loadRequestData();
+            loadData();
             updateUI();
         }
 
@@ -75,7 +75,11 @@ public class ActSellMainActivity extends AppCompatActivity {
         setOptionButtons();
         setMainUser();
         bookListRef.addValueEventListener(bookDataListener);
-
+        try {
+            WebServiceHandler.updateToken(FirebaseInstanceId.getInstance().getToken());
+        }catch (IllegalAccessException i){
+            illegalAccess();
+        }
     }
 
     // Toolbar Methods - setToolbar, onCreateOptionsMenu, onOptionsItemSelected
@@ -118,14 +122,6 @@ public class ActSellMainActivity extends AppCompatActivity {
         }
     }
 
-    private void setMainUser(){
-        try {
-            mainUser = WebServiceHandler.generateMainUser();
-        }catch (IllegalAccessException i){
-            illegalAccess();
-        }
-    }
-
     // Set Listeners for Option Buttons generated at the Bottom of the layout
     private void setOptionButtons(){
         Button addBookButton = findViewById(R.id.sell_add_post);
@@ -156,8 +152,15 @@ public class ActSellMainActivity extends AppCompatActivity {
         });
     }
 
-    // Main Data Load from Database
-    private void loadRequestData(){
+    private void setMainUser(){
+        try {
+            mainUser = WebServiceHandler.generateMainUser();
+        }catch (IllegalAccessException i){
+            illegalAccess();
+        }
+    }
+
+    private void loadData(){
         bookRequests = mainUser.getMyRequestIDs();
     }
 
@@ -205,8 +208,7 @@ public class ActSellMainActivity extends AppCompatActivity {
         reqButton.setTextOn("Unrequest");
     }
 
-    // Actual Data Incorporation - all of it runs after onCreate!
-    // We need book data and request data before this runs...
+    // Actual Data Incorporation - all of it runs after onCreate! - We need book data and request data before this runs...
     private void updateUI(){
         // Remove all View since there is a new Book ArrayList in place
         mainLayout.removeAllViews();
@@ -270,6 +272,55 @@ public class ActSellMainActivity extends AppCompatActivity {
             }
         }catch (IllegalAccessException i){
             illegalAccess();
+        }
+    }
+
+    private void addRequest(Book bookRequested){
+        // NO need to add to bookRequests, since bookRequests is a pointer AND it will update the Firebase Database
+        try {
+            Request request = new Request(mainUser, bookRequested);
+            WebServiceHandler.addRequest(request);
+
+            bookRequested.addRequestID(request);
+            WebServiceHandler.addPublicBook(bookRequested);
+
+            mainUser.addMyRequest(request);
+            WebServiceHandler.updateMainUserData(mainUser);
+        }catch (IllegalAccessException i){
+            illegalAccess();
+        }
+    }
+
+    private void deleteRequest(Book book, String requestID){
+        // NO need to delete to bookRequests, since bookRequests is a pointer (mainUser.getMyRequestIDs) AND it will update the Firebase Database
+        WebServiceHandler.getRootRef().child("requests").child(requestID).removeValue();
+
+        try {
+            book.removeRequestID(requestID);
+            WebServiceHandler.addPublicBook(book);
+
+            mainUser.getMyRequestIDs().remove(book.getBookID());
+            WebServiceHandler.updateMainUserData(mainUser);
+        }catch (IllegalAccessException i){
+            illegalAccess();
+        }
+    }
+
+    private void checkedConditional(ToggleButton reqButton, boolean isChecked, Book book){
+        if (isChecked){
+            addRequest(book);
+        }
+        else {
+
+            // Check if requestID exists Todo: Need to check if requestID is valid
+            String requestID = bookRequests.get(book.getBookID());
+            if (requestID == null || requestID.equals("")){
+                throw new IllegalStateException("Invalid GUI Request ID Values!!!!");
+            }
+
+            // Add Delete? Dialog - to prevent accidental request removal -
+            AlertDialog dialog = removeRequestDialog(book, requestID, reqButton);
+            dialog.show();
         }
     }
 
@@ -426,56 +477,7 @@ public class ActSellMainActivity extends AppCompatActivity {
         return builder.create();
     }
 
-    private void addRequest(Book bookRequested){
-        // NO need to add to bookRequests, since bookRequests is a pointer AND it will update the Firebase Database
-        try {
-            Request request = new Request(mainUser, bookRequested);
-            WebServiceHandler.addRequest(request);
-
-            bookRequested.addRequestID(request);
-            WebServiceHandler.addPublicBook(bookRequested);
-
-            mainUser.addMyRequest(request);
-            WebServiceHandler.updateMainUserData(mainUser);
-        }catch (IllegalAccessException i){
-            illegalAccess();
-        }
-    }
-
-    private void deleteRequest(Book book, String requestID){
-        // NO need to delete to bookRequests, since bookRequests is a pointer (mainUser.getMyRequestIDs) AND it will update the Firebase Database
-        WebServiceHandler.getRootRef().child("requests").child(requestID).removeValue();
-
-        try {
-            book.removeRequestID(requestID);
-            WebServiceHandler.addPublicBook(book);
-
-            mainUser.getMyRequestIDs().remove(book.getBookID());
-            WebServiceHandler.updateMainUserData(mainUser);
-        }catch (IllegalAccessException i){
-            illegalAccess();
-        }
-    }
-
-    private void checkedConditional(ToggleButton reqButton, boolean isChecked, Book book){
-        if (isChecked){
-            addRequest(book);
-        }
-        else {
-
-            // Check if requestID exists Todo: Need to check if requestID is valid
-            String requestID = bookRequests.get(book.getBookID());
-            if (requestID == null || requestID.equals("")){
-                throw new IllegalStateException("Invalid GUI Request ID Values!!!!");
-            }
-
-            // Add Delete? Dialog - to prevent accidental request removal -
-            AlertDialog dialog = removeRequestDialog(book, requestID, reqButton);
-            dialog.show();
-        }
-    }
-
-    AlertDialog searchDialog(){
+    private AlertDialog searchDialog(){
 
         // What do we need for a search
 

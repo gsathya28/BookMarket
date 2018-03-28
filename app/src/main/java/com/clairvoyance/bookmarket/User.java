@@ -18,6 +18,7 @@ class User implements Serializable {
     // Key is bookID - Value is requestID
     private HashMap<String, String> myRequestIDs = new HashMap<>();
     private boolean isEmailVerified = false;
+    private String registrationToken;
 
     public User(){ }
 
@@ -35,6 +36,9 @@ class User implements Serializable {
     void addMyRequest(Request request){
         myRequestIDs.put(request.getBookID(), request.getRequestID());
     }
+    void setRegistrationToken(String registrationToken) {
+        this.registrationToken = registrationToken;
+    }
 
     String getName() {
         return name;
@@ -51,5 +55,7 @@ class User implements Serializable {
     HashMap<String, String> getMyRequestIDs() {
         return myRequestIDs;
     }
-
+    String getRegistrationToken() {
+        return registrationToken;
+    }
 }

@@ -152,6 +152,24 @@ public class ActSellAddBook extends AppCompatActivity {
         });
     }
 
+    private void setButtonLayout(Button bookButton){
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+        );
+
+        int topValueInPx = (int) getApplicationContext().getResources().getDimension(R.dimen.activity_vertical_margin);
+        int bottomValueInPx = (int) getApplicationContext().getResources().getDimension(R.dimen.activity_vertical_margin);
+        bottomValueInPx = bottomValueInPx / 2;
+        int leftValueInPx = (int) getApplicationContext().getResources().getDimension(R.dimen.activity_horizontal_margin);
+
+
+        params.setMargins(leftValueInPx, topValueInPx, leftValueInPx, bottomValueInPx);
+        bookButton.setLayoutParams(params);
+
+        bookButton.setBackgroundColor(Color.parseColor("#267326"));
+    }
+
     private void addToList(final Book book){
         final LinearLayout listLayout = findViewById(R.id.sell_add_book_list);
 
@@ -254,24 +272,6 @@ public class ActSellAddBook extends AppCompatActivity {
                 editBookDialog.show();
             }
         });
-    }
-
-    private void setButtonLayout(Button bookButton){
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-        );
-
-        int topValueInPx = (int) getApplicationContext().getResources().getDimension(R.dimen.activity_vertical_margin);
-        int bottomValueInPx = (int) getApplicationContext().getResources().getDimension(R.dimen.activity_vertical_margin);
-        bottomValueInPx = bottomValueInPx / 2;
-        int leftValueInPx = (int) getApplicationContext().getResources().getDimension(R.dimen.activity_horizontal_margin);
-
-
-        params.setMargins(leftValueInPx, topValueInPx, leftValueInPx, bottomValueInPx);
-        bookButton.setLayoutParams(params);
-
-        bookButton.setBackgroundColor(Color.parseColor("#267326"));
     }
 
     private void deleteBookFromList(Button bookButton){

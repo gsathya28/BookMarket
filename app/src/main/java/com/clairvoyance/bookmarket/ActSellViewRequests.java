@@ -12,34 +12,11 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
-
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.ValueEventListener;
-
-import java.util.ArrayList;
-
 public class ActSellViewRequests extends AppCompatActivity {
 
+    // Todo: This will hold the requests made by the User themselves.
 
     User mainUser;
-
-    ArrayList<Request> requests = new ArrayList<>();
-    ValueEventListener requestDataListener = new ValueEventListener() {
-        @Override
-        public void onDataChange(DataSnapshot dataSnapshot) {
-            Request request = dataSnapshot.getValue(Request.class);
-            if (request != null){
-                requests.add(request);
-            }
-        }
-
-        @Override
-        public void onCancelled(DatabaseError databaseError) {
-
-        }
-    };
-
     LinearLayout mainLayout;
 
     @Override

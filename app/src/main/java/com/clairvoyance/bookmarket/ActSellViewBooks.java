@@ -56,21 +56,12 @@ public class ActSellViewBooks extends AppCompatActivity {
 
         }
     };
-
     ArrayList<String> bookIDs = new ArrayList<>();
     ArrayList<String> displayedBookIDs = new ArrayList<>();
     ArrayList<Book> mBooks = new ArrayList<>();
+
     LinearLayout mainLayout;
     View dialogLayout;
-
-    // Todo: Query sort!! Currently sorted using keys alphanumerically
-    // Todo: When Books are deleted, the requests on the books need to be deleted as well.
-
-    // Load Request Data and basic User/Book Data with the Request.
-    // Todo: Update Requests Page to list by book - each book button will lead to a dialog (No Search/Dropdown necessary)
-    // The dialog will show who requested the book in order of first to last.
-    // Todo: Finish View Requests Page
-    // Todo: Add some sort of Intent to a view that shows message history (Create that GUI too)
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

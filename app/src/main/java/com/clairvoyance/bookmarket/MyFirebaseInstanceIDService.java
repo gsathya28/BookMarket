@@ -20,9 +20,15 @@ public class MyFirebaseInstanceIDService extends FirebaseInstanceIdService {
         String refreshedToken = FirebaseInstanceId.getInstance().getToken();
         //Log the token
         Log.d(TAG, "Refreshed token: " + refreshedToken);
+
+        // Update UserData - to store the registration token
+        try {
+            WebServiceHandler.updateToken(refreshedToken);
+        }
+        catch (IllegalAccessException i){
+            Log.d("AccessTokenDenied", i.getMessage());
+        }
     }
-    private void sendRegistrationToServer(String token) {
-        //Implement this method if you want to store the token on your server
-    }
+
     
 }

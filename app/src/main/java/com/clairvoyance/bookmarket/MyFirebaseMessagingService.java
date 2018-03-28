@@ -32,14 +32,14 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             Log.d(TAG, "From: " + remoteMessage.getFrom());
             Log.d(TAG, "Notification Message Body: " + remoteMessage.getNotification());
             //create notification
-            createNotification(remoteMessage.getNotification().getBody());
+            createNotification(notification);
         }
         else{
-            // Throw something
+            throw new IllegalStateException();
         }
     }
 
-    private void createNotification( String messageBody) {
+    private void createNotification(RemoteMessage.Notification notification) {
         Intent intent = new Intent( this , ActSellMainActivity. class );
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent resultIntent = PendingIntent.getActivity( this , 0, intent,
@@ -50,8 +50,8 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
         NotificationCompat.Builder mNotificationBuilder = new NotificationCompat.Builder( this, CHANNEL_ID)
                 .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentTitle("Android Tutorial Point FCM Tutorial")
-                .setContentText(messageBody)
+                .setContentTitle(notification.getTitle())
+                .setContentText(notification.getBody())
                 .setAutoCancel( true )
                 .setSound(notificationSoundURI)
                 .setContentIntent(resultIntent);
@@ -74,7 +74,5 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         if (notificationManager != null) {
             notificationManager.notify(0, mNotificationBuilder.build());
         }
-
     }
-
 }

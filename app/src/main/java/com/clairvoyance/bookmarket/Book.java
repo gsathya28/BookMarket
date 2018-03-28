@@ -1,9 +1,5 @@
 package com.clairvoyance.bookmarket;
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.content.Context;
-
 import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
 
@@ -15,10 +11,9 @@ import java.util.UUID;
 
 /**
  * Created by Sathya on 12/22/2017.
- * Todo: Keep track of the number of requests along with who requests the book.
- * Todo: Get rid of negotiable variable (The negotiation process is why Twilio is being used)
- * Todo: Add some sort of marked as spam variable
+ * Custom Book Variable
  */
+
 @IgnoreExtraProperties
 class Book implements Serializable {
 
@@ -45,7 +40,6 @@ class Book implements Serializable {
     static final int COURSE_NUMBER = 5;
     static final int VERSION_NUMBER = 6;
     static final int INSTRUCTOR = 7;
-    static final int AVAILABLE = 8;
 
     public Book(){
         // Firebase Constructor (required)
@@ -100,10 +94,6 @@ class Book implements Serializable {
 
     void addRequestID(Request request){
         requestIDs.put(request.getRequestID(), true);
-    }
-
-    void addRequestID(String requestID){
-        requestIDs.put(requestID, true);
     }
 
     void removeRequestID(String requestID){
@@ -180,25 +170,8 @@ class Book implements Serializable {
     }
 
     @Exclude
-    Calendar getPostDate(){
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(postDateInSecs);
-        return calendar;
-    }
-    @Exclude
     ArrayList<Request> getRequests(){
         return requests;
-    }
-
-    void buildNotification(Context context){
-        Notification.Builder builder = new Notification.Builder(context);
-        builder.setContentTitle("New Book Available!");
-        builder.setContentText("Course: " + courseSubj + " " + courseNumber + "\nBook: " + title + "\nAuthor: " + author + "\nPrice: " + price);
-
-        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        if (notificationManager != null){
-            notificationManager.notify(NotificationPublisher.NOTIFICATION_ID, builder.build());
-        }
     }
 
 }
