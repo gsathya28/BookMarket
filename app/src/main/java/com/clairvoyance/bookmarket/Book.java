@@ -23,6 +23,7 @@ class Book implements Serializable {
     private String notes;
     private String courseSubj;
     private String courseNumber;
+    private String courseTotal;
     private String versionNumber;
     private String instructor;
     private String bookID;
@@ -49,6 +50,7 @@ class Book implements Serializable {
     public Book(String courseSubj, String courseNumber) throws IllegalAccessException{
         this.courseSubj = courseSubj;
         this.courseNumber = courseNumber;
+        this.courseTotal = courseSubj + courseNumber;
         bookID = UUID.randomUUID().toString();
         postDateInSecs = Calendar.getInstance().getTimeInMillis();
         this.uid = WebServiceHandler.getUID();
@@ -132,7 +134,7 @@ class Book implements Serializable {
     }
 
     // Firebase-Required Getters
-    public String getTitle() {
+    String getTitle() {
         return title;
     }
     String getAuthor() {
@@ -143,6 +145,9 @@ class Book implements Serializable {
     }
     String getCourseNumber() {
         return courseNumber;
+    }
+    String getCourseTotal() {
+        return courseTotal;
     }
     String getPrice() {
         return price;

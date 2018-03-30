@@ -3,6 +3,7 @@ package com.clairvoyance.bookmarket;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
 import android.media.RingtoneManager;
@@ -13,6 +14,8 @@ import android.util.Log;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
+
+import java.util.Map;
 
 /**
  * Created by Sathya on 1/24/2018.
@@ -26,24 +29,36 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
-        //Log data to Log Cat
-        RemoteMessage.Notification notification = remoteMessage.getNotification();
-        if (notification != null) {
-            Log.d(TAG, "From: " + remoteMessage.getFrom());
-            Log.d(TAG, "Notification Message Body: " + remoteMessage.getNotification());
-            //create notification
-            createNotification(notification);
-        }
-        else{
-            throw new IllegalStateException();
-        }
+        createNotification(remoteMessage);
     }
 
-    private void createNotification(RemoteMessage.Notification notification) {
+    private void createNotification(RemoteMessage remoteMessage) {
+
+        try {
+            User mainUser = WebServiceHandler.generateMainUser();
+        }catch (IllegalAccessException i){
+            Log.d("NotifAccess", i.getMessage());
+        }
+        RemoteMessage.Notification notification = remoteMessage.getNotification();
+
+        Log.d(TAG, "From: " + remoteMessage.getFrom());
+        Log.d(TAG, "Notification Message Body: " + remoteMessage.getNotification());
+
+        if(notification == null){
+            return;
+        }
+
+        Map<String, String> data = remoteMessage.getData();
+
         Intent intent = new Intent( this , ActSellViewBooks.class );
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        PendingIntent resultIntent = PendingIntent.getActivity( this , 0, intent,
-                PendingIntent.FLAG_ONE_SHOT);
+
+        // Create the TaskStackBuilder and add the intent, which inflates the back stack
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+        stackBuilder.addNextIntentWithParentStack(intent);
+
+        // intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        intent.putExtra("bookID", data.get("bookID"));
+        PendingIntent resultIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
 
         Uri notificationSoundURI = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationManager notificationManager = (NotificationManager) (this.getSystemService(Context.NOTIFICATION_SERVICE));
@@ -55,7 +70,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 .setAutoCancel( true )
                 .setSound(notificationSoundURI)
                 .setContentIntent(resultIntent);
-
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             // Create the NotificationChannel, but only on API 26+ because

@@ -62,16 +62,22 @@ public class ActSellViewBooks extends AppCompatActivity {
 
     LinearLayout mainLayout;
     View dialogLayout;
+    AlertDialog notifDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sell_view_posts);
+
         mainLayout = findViewById(R.id.sell_my_post_layout);
 
         setToolbar();
         setMainUser();
         loadData();
+        // After request data is loaded - show the dialog!
+        if(notifDialog != null){
+            notifDialog.show();
+        }
     }
 
     private void setToolbar(){
@@ -279,6 +285,17 @@ public class ActSellViewBooks extends AppCompatActivity {
             singleBookLayout.addView(reqButton);
 
             mainLayout.addView(singleBookLayout);
+        }
+
+        // Add Dialog if Activity was loaded from Notification Intent
+        Intent notifIntent = getIntent();
+        String notifBookID = notifIntent.getStringExtra("bookID");
+        if(notifBookID != null){
+            // Use displayedBookIDs - because this represents the order - (May replace later with HashMap?)
+            int index = displayedBookIDs.indexOf(notifBookID);
+            if(index != -1) {
+                notifDialog = bookRequestsDialog(mBooks.get(index));
+            }
         }
     }
 
@@ -507,6 +524,7 @@ public class ActSellViewBooks extends AppCompatActivity {
             requestLayout.addView(requestInfo);
 
             Button acceptButton = new Button(ActSellViewBooks.this);
+            acceptButton.setText("Accept");
             acceptButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -514,6 +532,9 @@ public class ActSellViewBooks extends AppCompatActivity {
                     startActivity(intent);
                 }
             });
+
+            requestLayout.addView(acceptButton);
+            mainRequestLayout.addView(requestLayout);
         }
 
         builder.setView(mainRequestLayout);
