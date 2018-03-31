@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,9 +36,11 @@ public class ActSellViewBooks extends AppCompatActivity {
     ValueEventListener getBookData = new ValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
+
             Book book = dataSnapshot.getValue(Book.class);
             // Todo: Possibly compare User-BookKey with Book-stored Key
             if (book != null){
+                Log.d("LifecycleOrder", "getBookDataListener" + book.getBookID());
                 loadRequestData(book);
                 if (displayedBookIDs.contains(book.getBookID())){
                     int index = displayedBookIDs.indexOf(book.getBookID());
@@ -48,6 +51,7 @@ public class ActSellViewBooks extends AppCompatActivity {
                     // Run Add code
                     addBookToList(book);
                 }
+                Log.d("LifecycleOrder", "getBookDataListenerEnd" + book.getBookID());
             }
         }
 
@@ -69,18 +73,31 @@ public class ActSellViewBooks extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sell_view_posts);
 
+        Log.d("LifecycleOrder", "onCreate");
+
         mainLayout = findViewById(R.id.sell_my_post_layout);
 
         setToolbar();
         setMainUser();
         loadData();
+
         // After request data is loaded - show the dialog!
+        Intent notifIntent = getIntent();
+        String notifBookID = notifIntent.getStringExtra("bookID");
+        if(notifBookID != null){
+            // Use displayedBookIDs - because this represents the order - (May replace later with HashMap?)
+            int index = displayedBookIDs.indexOf(notifBookID);
+            if(index != -1) {
+                notifDialog = bookRequestsDialog(mBooks.get(index));
+            }
+        }
         if(notifDialog != null){
             notifDialog.show();
         }
     }
 
     private void setToolbar(){
+        Log.d("LifecycleOrder", "setToolbar");
         Toolbar myToolbar = findViewById(R.id.view_posts_toolbar);
         myToolbar.setTitleTextColor(Color.parseColor("#FFFFFF"));
         myToolbar.setTitle("Your Posts");
@@ -89,10 +106,12 @@ public class ActSellViewBooks extends AppCompatActivity {
         ActionBar ab = getSupportActionBar();
 
         // Enable the Up button
-        ab.setDisplayHomeAsUpEnabled(true);
+        if(ab != null)
+            ab.setDisplayHomeAsUpEnabled(true);
     }
 
     private void setMainUser(){
+        Log.d("LifecycleOrder", "setMainUser");
         try {
             mainUser = WebServiceHandler.generateMainUser();
         }catch (IllegalAccessException i){
@@ -102,6 +121,7 @@ public class ActSellViewBooks extends AppCompatActivity {
 
     private void loadData(){
 
+        Log.d("LifecycleOrder", "loadDataBegin");
         Set keys = mainUser.getBookIDs().keySet();
 
         for (Object object: keys){
@@ -114,6 +134,45 @@ public class ActSellViewBooks extends AppCompatActivity {
             DatabaseReference bookRef = FirebaseDatabase.getInstance().getReference().child("books").child(id);
             bookRef.addValueEventListener(getBookData);
         }
+
+        Log.d("LifecycleOrder", "loadDataEnd");
+    }
+
+    // This is called whenever a book is added or updated
+    private void loadRequestData(final Book book){
+
+        Log.d("LifecycleOrder", "loadRequestDataBegin");
+        final ArrayList<Request> requests = new ArrayList<>();
+        ArrayList<String> requestIDs = new ArrayList<>();
+        Set requestIDSet = book.getRequestIDs().keySet();
+
+        for (Object object: requestIDSet){
+            if (object instanceof String){
+                requestIDs.add((String) object);
+            }
+        }
+
+        for (String id: requestIDs){
+
+            DatabaseReference requestRef = WebServiceHandler.getRootRef().child("requests").child(id);
+            ValueEventListener requestListener = new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    Log.d("LifecycleOrder", "requestListener" + book.getBookID());
+                    Request request = dataSnapshot.getValue(Request.class);
+                    requests.add(request);
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            };
+
+            requestRef.addListenerForSingleValueEvent(requestListener);
+        }
+        Log.d("LifecycleOrder", "loadRequestDataEnd");
+        book.addRequestList(requests);
     }
 
     /**
@@ -123,6 +182,8 @@ public class ActSellViewBooks extends AppCompatActivity {
         made (not when it was edited... Notifications will solve any edit problems)
      */
     private void addBookToList(final Book book){
+
+        Log.d("LifecycleOrder", "addBookToList");
 
         boolean added = false;
         // Push the most recent book up first
@@ -170,40 +231,8 @@ public class ActSellViewBooks extends AppCompatActivity {
 
     private void deleteBookInUI(int index){
         mBooks.remove(index);
+        displayedBookIDs.remove(index);
         mainLayout.removeViewAt(index);
-    }
-
-    // This is called whenever a book is added or updated (so when a request is made, the book data is updated so this should work - fingers crossed)
-    private void loadRequestData(Book book){
-        final ArrayList<Request> requests = new ArrayList<>();
-        ArrayList<String> requestIDs = new ArrayList<>();
-        Set requestIDSet = book.getRequestIDs().keySet();
-
-        for (Object object: requestIDSet){
-            if (object instanceof String){
-                requestIDs.add((String) object);
-            }
-        }
-
-        for (String id: requestIDs){
-
-            DatabaseReference requestRef = WebServiceHandler.getRootRef().child("requests").child(id);
-            ValueEventListener requestListener = new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    Request request = dataSnapshot.getValue(Request.class);
-                    requests.add(request);
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-            };
-
-            requestRef.addListenerForSingleValueEvent(requestListener);
-        }
-        book.addRequestList(requests);
     }
 
     private void setButtonLayout(Button button){
@@ -252,6 +281,7 @@ public class ActSellViewBooks extends AppCompatActivity {
     }
 
     private void setMainLayout(){
+        Log.d("LifecycleOrder", "setMainLayout");
         mainLayout.removeAllViews();
         for (final Book book: mBooks){
 
@@ -288,15 +318,6 @@ public class ActSellViewBooks extends AppCompatActivity {
         }
 
         // Add Dialog if Activity was loaded from Notification Intent
-        Intent notifIntent = getIntent();
-        String notifBookID = notifIntent.getStringExtra("bookID");
-        if(notifBookID != null){
-            // Use displayedBookIDs - because this represents the order - (May replace later with HashMap?)
-            int index = displayedBookIDs.indexOf(notifBookID);
-            if(index != -1) {
-                notifDialog = bookRequestsDialog(mBooks.get(index));
-            }
-        }
     }
 
     private AlertDialog viewBookDialog(final Book book){
@@ -473,8 +494,8 @@ public class ActSellViewBooks extends AppCompatActivity {
                 }
 
                 // Update UI
+                bookIDs.remove(id);
                 int index = displayedBookIDs.indexOf(book.getBookID());
-                displayedBookIDs.remove(index);
                 deleteBookInUI(index);
 
             }

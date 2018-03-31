@@ -34,11 +34,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     private void createNotification(RemoteMessage remoteMessage) {
 
-        try {
-            User mainUser = WebServiceHandler.generateMainUser();
-        }catch (IllegalAccessException i){
-            Log.d("NotifAccess", i.getMessage());
-        }
         RemoteMessage.Notification notification = remoteMessage.getNotification();
 
         Log.d(TAG, "From: " + remoteMessage.getFrom());
