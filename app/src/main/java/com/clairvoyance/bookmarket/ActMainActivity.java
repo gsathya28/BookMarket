@@ -42,6 +42,5 @@ public class ActMainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         Log.d("MainActivityCycle", "CutFunctionMain");
-        WebServiceHandler.cutUserDataListener();
     }
 }

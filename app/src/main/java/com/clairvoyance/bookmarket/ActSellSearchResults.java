@@ -430,7 +430,6 @@ public class ActSellSearchResults extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        WebServiceHandler.cutUserDataListener();
         super.onDestroy();
     }
 }

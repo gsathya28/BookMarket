@@ -160,12 +160,4 @@ class WebServiceHandler {
         }
     }
 
-    static void cutUserDataListener(){
-        if(userRef != null && userEventListener != null)
-        {
-            Log.d("MainActivityCycle", "cutListener");
-            userRef.removeEventListener(userEventListener);
-        }
-    }
-
 }

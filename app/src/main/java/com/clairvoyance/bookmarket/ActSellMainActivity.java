@@ -549,6 +549,5 @@ public class ActSellMainActivity extends AppCompatActivity {
         super.onDestroy();
         Log.d("MainActivityCycle", "CutFunctionSell");
         bookListRef.removeEventListener(bookDataListener);
-        WebServiceHandler.cutUserDataListener();
     }
 }
