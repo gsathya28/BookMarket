@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#66cc66"
+    android:background="#b3ffd9"
     tools:context="com.clairvoyance.bookmarket.ActSellSearchResults">
 
     <android.support.v7.widget.Toolbar

@@ -9,19 +9,23 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
@@ -39,6 +43,7 @@ public class ActSellMainActivity extends AppCompatActivity {
         public void onDataChange(DataSnapshot dataSnapshot) {
             // Add Book Objects in to arrayList
             books = new ArrayList<>();
+            Log.d("MainActivityCycle", "BookData");
             for (DataSnapshot d: dataSnapshot.getChildren()){
                 Book book = d.getValue(Book.class);
                 if (book != null){
@@ -148,6 +153,7 @@ public class ActSellMainActivity extends AppCompatActivity {
 
     private void setMainUser(){
         try {
+            Log.d("MainActivityCycle", "mainUserFunc");
             mainUser = WebServiceHandler.generateMainUser();
         }catch (IllegalAccessException i){
             illegalAccess();
@@ -155,6 +161,7 @@ public class ActSellMainActivity extends AppCompatActivity {
     }
 
     private void loadData(){
+        Log.d("MainActivityCycle", "loadRequestData");
         bookRequests = mainUser.getMyRequestIDs();
     }
 
@@ -501,18 +508,28 @@ public class ActSellMainActivity extends AppCompatActivity {
         // Make a builder - and set the view
         AlertDialog.Builder builder = new AlertDialog.Builder(ActSellMainActivity.this);
         builder.setTitle("Search Book");
+        LayoutInflater inflater = getLayoutInflater();
+        final View dialogLayout = inflater.inflate(R.layout.add_book_dialog_layout, null);
         builder.setView(R.layout.search_book_dialog_layout);
 
         builder.setPositiveButton("Search", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                // Todo: Search Algorithm goes here...
-                boolean results = false;
 
+                String courseSubj = ((EditText) dialogLayout.findViewById(R.id.sell_course_type_text)).getText().toString();
+                String courseNum = ((EditText) dialogLayout.findViewById(R.id.sell_course_number_text)).getText().toString();
+
+                try {
+                    Log.d("LifeCycle", courseSubj);
+                    Book searchBook = new Book(courseSubj, courseNum);
+                    Intent intent = new Intent(ActSellMainActivity.this, ActSellSearchResults.class);
+                    intent.putExtra("queryBook", searchBook);
+                    Log.d("LifeCycle", searchBook.getCourseTotal());
+                    startActivity(intent);
+                }catch (IllegalAccessException iae){
+                    illegalAccess();
+                }
                 // Send them to the new activity
-                Intent intent = new Intent(ActSellMainActivity.this, ActSellSearchResults.class);
-                intent.putExtra("results", results);
-                startActivity(intent);
             }
         });
 
@@ -530,7 +547,8 @@ public class ActSellMainActivity extends AppCompatActivity {
     @Override
     public void onDestroy(){
         super.onDestroy();
+        Log.d("MainActivityCycle", "CutFunctionSell");
         bookListRef.removeEventListener(bookDataListener);
-
+        WebServiceHandler.cutUserDataListener();
     }
 }
