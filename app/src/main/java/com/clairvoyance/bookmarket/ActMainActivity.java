@@ -28,19 +28,13 @@ public class ActMainActivity extends AppCompatActivity {
     }
 
     private void setButtons(){
-        Button sellMainButton = findViewById(R.id.main_sell);
-        sellMainButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent sellMainActivity = new Intent(getApplicationContext(), ActSellMainActivity.class);
-                startActivity(sellMainActivity);
-            }
-        });
+
+
+
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.d("MainActivityCycle", "CutFunctionMain");
     }
 }
