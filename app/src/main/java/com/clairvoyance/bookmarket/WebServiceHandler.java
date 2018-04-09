@@ -12,7 +12,6 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 
-
 /**
  * Created by Sathya on 12/21/2017.
  * Firebase Authentication and Database Handler
@@ -24,8 +23,6 @@ class WebServiceHandler {
     final static String WEB_CLIENT_ID = "483082602147-bmhfbbj3k1proa5r2ll3hr694d9s5mrr.apps.googleusercontent.com";
     private static FirebaseUser mUser;
     private static User loadedUser;
-    private static DatabaseReference userRef;
-    private static ValueEventListener userEventListener;
 
     private static DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
     static Query mBooks = rootRef.child("books").orderByChild("postDateInSecs").limitToFirst(100);
@@ -62,10 +59,10 @@ class WebServiceHandler {
     private static User loadMainUserData(final User user){
         // Load main data (and set listener) from database - if not already loaded
         if (loadedUser == null) {
-            userRef = rootRef.child("users").child(mUser.getUid());
+            DatabaseReference userRef = rootRef.child("users").child(mUser.getUid());
 
             // Read Data
-            userEventListener = new ValueEventListener() {
+            userRef.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     if (!dataSnapshot.exists()) {
@@ -85,8 +82,8 @@ class WebServiceHandler {
                 public void onCancelled(DatabaseError databaseError) {
 
                 }
-            };
-            userRef.addValueEventListener(userEventListener);
+            });
+
         }
         return loadedUser; // This will be null at first since the ValueEventListener only puts the data in this pointer after all the code (onCreate) has run
     }
