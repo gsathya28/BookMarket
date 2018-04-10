@@ -240,11 +240,9 @@ public class ActSellMainActivity extends AppCompatActivity {
                 setReqButtonLayout(reqButton);
 
                 // Check if there's a pending request on the book by the user.
-
                 if (bookRequests.containsKey(book.getBookID())) {
                     reqButton.setChecked(true);
                 }
-
 
                 // This is really important - adds and deletes request data when checked/unchecked
                 reqButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -523,7 +521,7 @@ public class ActSellMainActivity extends AppCompatActivity {
                     Log.d("LifeCycle", courseSubj);
                     Book searchBook = new Book(courseSubj, courseNum);
                     Intent intent = new Intent(ActSellMainActivity.this, ActSellSearchResults.class);
-                    intent.putExtra("queryBook", searchBook);
+                    // intent.putExtra("queryBook", searchBook);
                     Log.d("LifeCycle", searchBook.getCourseTotal());
                     startActivity(intent);
                 }catch (IllegalAccessException iae){
