@@ -21,6 +21,11 @@ import java.util.UUID;
 @IgnoreExtraProperties
 class Book implements Serializable, Parcelable {
 
+    public static final String MY_BOOK_SELL = "mBookSell";
+    public static final String MY_BOOK_BUY = "mBookBuy";
+    public static final String ALL_BOOK_BUY = "allBookBuy";
+    public static final String ALL_BOOK_SELL = "allBookSell";
+
     private String title;
     private String price;
     private String author;

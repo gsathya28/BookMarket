@@ -4,12 +4,16 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
@@ -22,14 +26,31 @@ import java.util.ArrayList;
  */
 public class BookListFragment extends Fragment {
 
-    // TODO: Customize parameter argument names
-    private static final String ARG_BOOKS = "books";
-    private static final String ARG_TYPE = "color";
-    // TODO: Customize parameters
-    private int mColumnCount = 1;
-    private ArrayList<Book> mBooks;
-    private String mType;
+    RecyclerView recyclerView;
+    private ArrayList<Book> sellBooks = new ArrayList<>();
+    private ValueEventListener mSellBookData = new ValueEventListener() {
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+            sellBooks.clear();
+            for(DataSnapshot d: dataSnapshot.getChildren()){
+                Book book = d.getValue(Book.class);
+                if (book != null){
+                    sellBooks.add(book);
+                }
+            }
+            recyclerView.setAdapter(new BookRecyclerAdapter(sellBooks, mType, mListener));
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+
+        }
+    };
     private OnListFragmentInteractionListener mListener;
+
+
+    private static final String ARG_TYPE = "type";
+    private String mType;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -40,10 +61,9 @@ public class BookListFragment extends Fragment {
 
     // TODO: Customize parameter initialization
     @SuppressWarnings("unused")
-    public static BookListFragment newInstance(ArrayList<Book> books, String type) {
+    public static BookListFragment newInstance(String type) {
         BookListFragment fragment = new BookListFragment();
         Bundle args = new Bundle();
-        args.putParcelableArrayList(ARG_BOOKS, books);
         args.putString(ARG_TYPE, type);
         fragment.setArguments(args);
         return fragment;
@@ -54,7 +74,6 @@ public class BookListFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         if (getArguments() != null) {
-            mBooks = getArguments().getParcelableArrayList(ARG_BOOKS);
             mType = getArguments().getString(ARG_TYPE);
         }
     }
@@ -63,26 +82,35 @@ public class BookListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_book_list, container, false);
-        if(mType.equals("SELL"))
+        if(mType.equals(Book.ALL_BOOK_SELL) || mType.equals(Book.MY_BOOK_SELL)) {
             view.setBackgroundColor(Color.parseColor("#c2efc2"));
-        else if(mType.equals("BUY")){
+        }
+        else if(mType.equals(Book.ALL_BOOK_BUY) || mType.equals(Book.MY_BOOK_BUY)){
             view.setBackgroundColor(Color.parseColor("#cce0ff"));
         }
         // Set the adapter
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
-            RecyclerView recyclerView = (RecyclerView) view;
-            if (mColumnCount <= 1) {
-                recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            } else {
-                recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
-            }
-            // Todo: Change this
-            recyclerView.setAdapter(new BookRecyclerAdapter(mBooks, mType, mListener));
+            recyclerView = (RecyclerView) view;
+            recyclerView.setLayoutManager(new LinearLayoutManager(context));
+            loadPrivateData();
         }
         return view;
     }
 
+    private void loadPrivateData(){
+        try {
+            Query query = WebServiceHandler.getRootRef().child("books").orderByChild("uid").equalTo(WebServiceHandler.getUID());
+            query.addListenerForSingleValueEvent(mSellBookData);
+        }
+        catch (IllegalAccessException i){
+            illegalAccess();
+        }
+    }
+
+    public void illegalAccess(){
+
+    }
 
     @Override
     public void onAttach(Context context) {

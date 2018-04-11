@@ -54,9 +54,9 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
         button.setGravity(Gravity.START);
         button.setGravity(Gravity.CENTER_VERTICAL);
         button.setTextColor(Color.WHITE);
-        if(mType.equals("SELL")) {
+        if(mType.equals(Book.ALL_BOOK_SELL) || mType.equals(Book.MY_BOOK_SELL)) {
             button.setBackgroundColor(Color.parseColor("#2aa22a"));
-        }else if(mType.equals("BUY")){
+        }else if(mType.equals(Book.ALL_BOOK_BUY) || mType.equals(Book.MY_BOOK_BUY)){
             button.setBackgroundColor(Color.parseColor("#3385ff"));
         }
         button.setSingleLine();
