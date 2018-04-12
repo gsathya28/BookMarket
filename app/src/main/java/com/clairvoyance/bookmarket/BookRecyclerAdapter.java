@@ -37,6 +37,7 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
     private final OnListFragmentInteractionListener mListener;
     private final String mType;
     private final User mainUser;
+    private View dialogLayout;
 
     private final HashMap<String, String> bookRequests;
 
@@ -172,15 +173,11 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
                     viewPublicBookDialog(book, reqButton).show();
                 }
             });
-
         }
-
     }
 
+    // User Book Functions
     private AlertDialog viewMyBookDialog(final Book book, final Context context){
-
-        LayoutInflater inflater = LayoutInflater.from(context);
-        final View dialogLayout = inflater.inflate(R.layout.add_book_dialog_layout, null);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle(book.getTitle());
@@ -375,7 +372,7 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
 
         LayoutInflater inflater = LayoutInflater.from(context);
-        View dialogLayout = inflater.inflate(R.layout.add_book_dialog_layout, null);
+        dialogLayout = inflater.inflate(R.layout.add_book_dialog_layout, null);
 
         builder.setView(dialogLayout);
         builder.setPositiveButton("Save", null);
@@ -383,6 +380,7 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
         return builder.create();
     }
 
+    // Public Book Functions
     private AlertDialog viewPublicBookDialog(final Book book, final ToggleButton reqButton){
 
         AlertDialog.Builder builder = new AlertDialog.Builder(reqButton.getContext());
@@ -606,7 +604,7 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         final View mView;
-        public Book mItem;
+        Book mItem;
 
         ViewHolder(View view) {
             super(view);
