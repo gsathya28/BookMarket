@@ -25,7 +25,6 @@ import android.widget.ToggleButton;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
@@ -37,7 +36,7 @@ public class ActSellMainActivity extends AppCompatActivity {
 
     // Firebase Data Transfer Variables
     User mainUser;
-    Query bookListRef = WebServiceHandler.mBooks;
+    Query bookListRef = WebServiceHandler.allSellBooks;
     ValueEventListener bookDataListener = new ValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {

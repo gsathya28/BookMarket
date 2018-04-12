@@ -80,7 +80,6 @@ public class BookListFragment extends Fragment {
     };
     private OnListFragmentInteractionListener mListener;
 
-
     private static final String ARG_TYPE = "type";
     private String mType;
 
@@ -113,7 +112,12 @@ public class BookListFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        // Layout selection
         View view = inflater.inflate(R.layout.fragment_book_list, container, false);
+
+
+        // Color Scheme
         if(mType.equals(Book.ALL_BOOK_SELL) || mType.equals(Book.MY_BOOK_SELL)) {
             view.setBackgroundColor(Color.parseColor("#c2efc2"));
         }
@@ -132,10 +136,10 @@ public class BookListFragment extends Fragment {
 
     private void loadPrivateData(){
         if(mType.equals(Book.MY_BOOK_SELL)) {
-            query = WebServiceHandler.getRootRef().child("books").orderByChild("uid").equalTo(WebServiceHandler.getUID());
+            query = WebServiceHandler.mySellBooks;
             query.addListenerForSingleValueEvent(mBookData);
         }else if(mType.equals(Book.ALL_BOOK_SELL)){
-            query = WebServiceHandler.mBooks;
+            query = WebServiceHandler.allSellBooks;
             query.addListenerForSingleValueEvent(allBookData);
         }
     }

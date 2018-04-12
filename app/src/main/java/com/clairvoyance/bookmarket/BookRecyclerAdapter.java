@@ -1,5 +1,6 @@
 package com.clairvoyance.bookmarket;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -9,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.ToggleButton;
 
 import com.clairvoyance.bookmarket.BookListFragment.OnListFragmentInteractionListener;
 
@@ -33,8 +35,13 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.fragment_book, parent, false);
+        View view = parent;
+        if(mType.equals(Book.MY_BOOK_SELL) || mType.equals(Book.MY_BOOK_BUY)) {
+            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.my_fragment_book, parent, false);
+        }
+        else if(mType.equals(Book.ALL_BOOK_SELL) || mType.equals(Book.ALL_BOOK_BUY)){
+            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.all_fragment_book, parent, false);
+        }
         return new ViewHolder(view);
     }
 
@@ -49,7 +56,9 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
         bottomValueInPx = bottomValueInPx / 2;
         int valueInPx = (int) button.getContext().getResources().getDimension(R.dimen.activity_horizontal_margin);
 
-        params.setMargins(params.leftMargin, params.topMargin, params.rightMargin, bottomValueInPx*2);
+        if(mType.equals(Book.MY_BOOK_SELL) || mType.equals(Book.MY_BOOK_BUY)){
+            params.setMargins(params.leftMargin, params.topMargin, params.rightMargin, bottomValueInPx*2);
+        }
 
         button.setGravity(Gravity.START);
         button.setGravity(Gravity.CENTER_VERTICAL);
@@ -65,15 +74,60 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
         button.setLayoutParams(params);
     }
 
+    private void setReqButtonLayout(ToggleButton reqButton){
+        LinearLayout.LayoutParams checkParams = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+        );
+
+        reqButton.setLayoutParams(checkParams);
+        reqButton.setText(R.string.request);
+        reqButton.setTextOff("Request");
+        reqButton.setTextOn("Unrequest");
+    }
+
+    private void setBookLayout(LinearLayout bookLayout){
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+        );
+
+        int topValueInPx = (int) bookLayout.getContext().getResources().getDimension(R.dimen.activity_vertical_margin);
+        int bottomValueInPx = (int) bookLayout.getContext().getResources().getDimension(R.dimen.activity_vertical_margin);
+        bottomValueInPx = bottomValueInPx / 2;
+        int valueInPx = (int) bookLayout.getContext().getResources().getDimension(R.dimen.activity_horizontal_margin);
+
+        params.setMargins(params.leftMargin, topValueInPx, valueInPx/2, bottomValueInPx);
+
+        bookLayout.setGravity(Gravity.CENTER_VERTICAL);
+        bookLayout.setOrientation(LinearLayout.HORIZONTAL);
+        bookLayout.setLayoutParams(params);
+    }
+
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
-
-        if(holder.mView instanceof Button){
+        String buttonText = holder.mItem.getCourseSubj() + " " + holder.mItem.getCourseNumber() + " - " + holder.mItem.getTitle();
+        if(holder.mView instanceof Button){ // Personal Book
             Button button = (Button) holder.mView;
-            String buttonText = holder.mItem.getCourseSubj() + " " + holder.mItem.getCourseNumber() + " - " + holder.mItem.getTitle();
             button.setText(buttonText);
             setButtonLayout(button);
+        }
+        else if(holder.mView instanceof LinearLayout){ // Public Book
+
+            LinearLayout bookLayout = (LinearLayout) holder.mView;
+            setBookLayout(bookLayout);
+
+            Context context = bookLayout.getContext();
+
+            final ToggleButton reqButton = new ToggleButton(context);
+            bookLayout.addView(reqButton);
+            setReqButtonLayout(reqButton);
+
+            Button infoButton = new Button(context);
+            infoButton.setText(buttonText);
+            bookLayout.addView(infoButton);
+            setButtonLayout(infoButton);
         }
 
         holder.mView.setOnClickListener(new View.OnClickListener() {

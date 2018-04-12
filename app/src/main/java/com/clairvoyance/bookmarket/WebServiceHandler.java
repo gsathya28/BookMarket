@@ -12,6 +12,8 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 
+import java.util.HashMap;
+
 /**
  * Created by Sathya on 12/21/2017.
  * Firebase Authentication and Database Handler
@@ -25,7 +27,8 @@ class WebServiceHandler {
     private static User loadedUser;
 
     private static DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
-    static Query mBooks = rootRef.child("books").orderByChild("postDateInSecs").limitToFirst(100);
+    static Query allSellBooks = rootRef.child("books").orderByChild("postDateInSecs").limitToFirst(100);
+    static Query mySellBooks = rootRef.child("books").orderByChild("uid").equalTo(getUID());
 
     static DatabaseReference getRootRef() {
         return rootRef;
@@ -108,6 +111,8 @@ class WebServiceHandler {
     }
 
     static String getUID(){
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        mUser = mAuth.getCurrentUser();
         if(mUser != null){
             return mUser.getUid();
         }
