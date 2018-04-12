@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,7 +43,7 @@ public class BookListFragment extends Fragment {
                     books.add(book);
                 }
             }
-            recyclerView.setAdapter(new BookRecyclerAdapter(books, mType, mListener));
+            recyclerView.setAdapter(new BookRecyclerAdapter(books, mType, mListener, mainUser));
         }
 
         @Override
@@ -70,7 +71,7 @@ public class BookListFragment extends Fragment {
             }
 
             Collections.reverse(books);
-            recyclerView.setAdapter(new BookRecyclerAdapter(books, mType, mListener));
+            recyclerView.setAdapter(new BookRecyclerAdapter(books, mType, mListener, mainUser));
         }
 
         @Override
@@ -83,6 +84,9 @@ public class BookListFragment extends Fragment {
     private static final String ARG_TYPE = "type";
     private String mType;
 
+    private static final String ARG_USER = "user";
+    private User mainUser;
+
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
@@ -92,10 +96,11 @@ public class BookListFragment extends Fragment {
 
     // TODO: Customize parameter initialization
     @SuppressWarnings("unused")
-    public static BookListFragment newInstance(String type) {
+    public static BookListFragment newInstance(String type, User user) {
         BookListFragment fragment = new BookListFragment();
         Bundle args = new Bundle();
         args.putString(ARG_TYPE, type);
+        args.putSerializable(ARG_USER, user);
         fragment.setArguments(args);
         return fragment;
     }
@@ -106,6 +111,9 @@ public class BookListFragment extends Fragment {
 
         if (getArguments() != null) {
             mType = getArguments().getString(ARG_TYPE);
+            mainUser = (User) getArguments().getSerializable(ARG_USER);
+            if(mainUser != null)
+                Log.d("UserData:", Integer.toString(mainUser.getMyRequestIDs().size()));
         }
     }
 
@@ -115,7 +123,6 @@ public class BookListFragment extends Fragment {
 
         // Layout selection
         View view = inflater.inflate(R.layout.fragment_book_list, container, false);
-
 
         // Color Scheme
         if(mType.equals(Book.ALL_BOOK_SELL) || mType.equals(Book.MY_BOOK_SELL)) {

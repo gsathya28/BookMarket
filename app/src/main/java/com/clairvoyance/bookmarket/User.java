@@ -12,10 +12,10 @@ import java.util.HashMap;
 @IgnoreExtraProperties
 class User implements Serializable {
     private String name;
-    private String uid;
     private String email;
     private HashMap<String, Object> bookIDs = new HashMap<>();
-    // Key is bookID - Value is requestID
+
+    // Key is bookID!!! - Value is requestID!!!!
     private HashMap<String, String> myRequestIDs = new HashMap<>();
     private boolean isEmailVerified = false;
     private String registrationToken;

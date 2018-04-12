@@ -8,9 +8,11 @@ import android.support.v4.app.FragmentPagerAdapter;
 public class TabPagerAdapter extends FragmentPagerAdapter {
 
     private String tabTitles[] = new String[] { Book.MY_BOOK_SELL, Book.MY_BOOK_BUY };
+    private User mainUser;
 
-    TabPagerAdapter(FragmentManager fm) {
+    TabPagerAdapter(FragmentManager fm, User user) {
         super(fm);
+        mainUser = user;
     }
 
     @Override
@@ -20,7 +22,7 @@ public class TabPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        return BookListFragment.newInstance(tabTitles[position]);
+        return BookListFragment.newInstance(tabTitles[position], mainUser);
     }
 
     @Nullable

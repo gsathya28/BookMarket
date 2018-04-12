@@ -14,6 +14,7 @@ import android.widget.ToggleButton;
 
 import com.clairvoyance.bookmarket.BookListFragment.OnListFragmentInteractionListener;
 
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -26,11 +27,16 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
     private final List<Book> mValues;
     private final OnListFragmentInteractionListener mListener;
     private final String mType;
+    private final User mainUser;
 
-    BookRecyclerAdapter(List<Book> items, String type, OnListFragmentInteractionListener listener) {
+    private final HashMap<String, String> bookRequests;
+
+    BookRecyclerAdapter(List<Book> items, String type, OnListFragmentInteractionListener listener, User user) {
         mValues = items;
         mListener = listener;
         mType = type;
+        mainUser = user;
+        bookRequests = mainUser.getMyRequestIDs();
     }
 
     @Override
@@ -128,6 +134,15 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
             infoButton.setText(buttonText);
             bookLayout.addView(infoButton);
             setButtonLayout(infoButton);
+
+            // Check if the book is already requested by the User
+            Book book = holder.mItem;
+            if(bookRequests.containsKey(book.getBookID())){
+                reqButton.setChecked(true);
+            }
+
+
+
         }
 
         holder.mView.setOnClickListener(new View.OnClickListener() {

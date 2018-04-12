@@ -15,18 +15,27 @@ import android.view.ViewGroup;
 
 public class MainFragment extends Fragment {
 
+    private static final String ARG_USER = "user";
+    private User mainUser;
 
     public MainFragment(){
 
     }
 
-    public static MainFragment newInstance(){
-        return new MainFragment();
+    public static MainFragment newInstance(User user){
+        MainFragment fragment = new MainFragment();
+        Bundle args = new Bundle();
+        args.putSerializable(ARG_USER, user);
+        fragment.setArguments(args);
+        return fragment;
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if(getArguments() != null) {
+            mainUser = (User) getArguments().getSerializable(ARG_USER);
+        }
     }
 
     @Nullable
@@ -36,7 +45,7 @@ public class MainFragment extends Fragment {
 
         // Set the View Pagers
         ViewPager tabViewPager = view.findViewById(R.id.sell_buy_pager);
-        tabViewPager.setAdapter(new TabPagerAdapter(getFragmentManager()));
+        tabViewPager.setAdapter(new TabPagerAdapter(getFragmentManager(), mainUser));
         TabLayout tabLayout = view.findViewById(R.id.tabLayout);
         tabLayout.setupWithViewPager(tabViewPager);
 
