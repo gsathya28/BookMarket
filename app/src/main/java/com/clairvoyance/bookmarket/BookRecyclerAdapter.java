@@ -12,14 +12,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.clairvoyance.bookmarket.BookListFragment.OnListFragmentInteractionListener;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 /**
  * {@link RecyclerView.Adapter} that can display a {@link Book} and makes a call to the
@@ -117,15 +122,18 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
+
         String buttonText = holder.mItem.getCourseSubj() + " " + holder.mItem.getCourseNumber() + " - " + holder.mItem.getTitle();
         if(holder.mView instanceof Button){ // Personal Book
             Button button = (Button) holder.mView;
             button.setText(buttonText);
             setButtonLayout(button);
+            final Book book = holder.mItem;
+            final Context context = holder.mView.getContext();
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-
+                    viewMyBookDialog(book, context).show();
                 }
             });
         }
@@ -167,16 +175,212 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
 
         }
 
-        holder.mView.setOnClickListener(new View.OnClickListener() {
+    }
+
+    private AlertDialog viewMyBookDialog(final Book book, final Context context){
+
+        LayoutInflater inflater = LayoutInflater.from(context);
+        final View dialogLayout = inflater.inflate(R.layout.add_book_dialog_layout, null);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle(book.getTitle());
+
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("Book Title");
+        stringBuilder.append(System.getProperty("line.separator"));
+        stringBuilder.append(book.getTitle());
+        stringBuilder.append(System.getProperty("line.separator"));
+        stringBuilder.append(System.getProperty("line.separator"));
+
+        stringBuilder.append("Course: ");
+        stringBuilder.append(System.getProperty("line.separator"));
+        stringBuilder.append(book.getCourseSubj());
+        stringBuilder.append(" ");
+        stringBuilder.append(book.getCourseNumber());
+        stringBuilder.append(System.getProperty("line.separator"));
+        stringBuilder.append(System.getProperty("line.separator"));
+
+        stringBuilder.append("Price: ");
+        stringBuilder.append(System.getProperty("line.separator"));
+        stringBuilder.append("$");
+        stringBuilder.append(book.getPrice());
+        stringBuilder.append(System.getProperty("line.separator"));
+        stringBuilder.append(System.getProperty("line.separator"));
+
+        stringBuilder.append("Author: ");
+        stringBuilder.append(System.getProperty("line.separator"));
+        stringBuilder.append(book.getAuthor());
+        stringBuilder.append(System.getProperty("line.separator"));
+        stringBuilder.append(System.getProperty("line.separator"));
+
+        stringBuilder.append("Version Number: ");
+        stringBuilder.append(System.getProperty("line.separator"));
+        stringBuilder.append(book.getVersionNumber());
+        stringBuilder.append(System.getProperty("line.separator"));
+        stringBuilder.append(System.getProperty("line.separator"));
+
+        stringBuilder.append("Instructor: ");
+        stringBuilder.append(System.getProperty("line.separator"));
+        stringBuilder.append(book.getInstructor());
+        stringBuilder.append(System.getProperty("line.separator"));
+        stringBuilder.append(System.getProperty("line.separator"));
+
+        stringBuilder.append("Notes: ");
+        stringBuilder.append(System.getProperty("line.separator"));
+        stringBuilder.append(book.getNotes());
+        stringBuilder.append(System.getProperty("line.separator"));
+        stringBuilder.append(System.getProperty("line.separator"));
+
+        builder.setMessage(stringBuilder.toString());
+        builder.setPositiveButton("Edit", new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                if (null != mListener) {
-                    // Notify the active callbacks interface (the activity, if the
-                    // fragment is attached to one) that an item has been selected.
-                    mListener.onListFragmentInteraction(holder.mItem);
-                }
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+                final AlertDialog editBookDialog = editBookDialog(context);
+
+                ((EditText) dialogLayout.findViewById(R.id.sell_course_type_text)).setText(book.get(Book.COURSE_SUBJECT));
+                ((EditText) dialogLayout.findViewById(R.id.sell_course_number_text)).setText(book.get(Book.COURSE_NUMBER));
+                ((EditText) dialogLayout.findViewById(R.id.sell_book_title_text)).setText(book.get(Book.TITLE));
+                ((EditText) dialogLayout.findViewById(R.id.sell_author_text)).setText(book.get(Book.AUTHOR));
+                ((EditText) dialogLayout.findViewById(R.id.sell_price_text)).setText(book.get(Book.PRICE));
+                ((EditText) dialogLayout.findViewById(R.id.sell_vnum_text)).setText(book.get(Book.VERSION_NUMBER));
+                ((EditText) dialogLayout.findViewById(R.id.sell_instructor_text)).setText(book.get(Book.INSTRUCTOR));
+                ((EditText) dialogLayout.findViewById(R.id.sell_book_notes_text)).setText(book.get(Book.NOTES));
+
+                editBookDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+                    @Override
+                    public void onShow(DialogInterface dialo3gInterface) {
+
+                        Button editButton = editBookDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                        editButton.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+
+                                String courseType = ((EditText) dialogLayout.findViewById(R.id.sell_course_type_text)).getText().toString();
+                                String courseNumber = ((EditText) dialogLayout.findViewById(R.id.sell_course_number_text)).getText().toString();
+
+                                if (courseType.equals("") && courseNumber.equals("")){
+                                    Toast.makeText(context, "Both Course Subject and Number required", Toast.LENGTH_LONG).show();
+                                    return;
+                                }
+
+                                book.set(Book.COURSE_SUBJECT, courseType);
+                                book.set(Book.COURSE_NUMBER, courseNumber);
+
+                                String bookTitle = ((EditText) dialogLayout.findViewById(R.id.sell_book_title_text)).getText().toString();
+                                String author = ((EditText) dialogLayout.findViewById(R.id.sell_author_text)).getText().toString();
+                                String price = ((EditText) dialogLayout.findViewById(R.id.sell_price_text)).getText().toString();
+                                String vnum = ((EditText) dialogLayout.findViewById(R.id.sell_vnum_text)).getText().toString();
+                                String instructor = ((EditText) dialogLayout.findViewById(R.id.sell_instructor_text)).getText().toString();
+                                String notes = ((EditText) dialogLayout.findViewById(R.id.sell_book_notes_text)).getText().toString();
+
+                                book.set(Book.TITLE, bookTitle);
+                                book.set(Book.AUTHOR, author);
+                                book.set(Book.PRICE, price);
+                                book.set(Book.VERSION_NUMBER, vnum);
+                                book.set(Book.NOTES, notes);
+                                book.set(Book.INSTRUCTOR, instructor);
+
+                                // Save Data -
+                                DatabaseReference bookRef = FirebaseDatabase.getInstance().getReference().child("books").child(book.getBookID());
+                                bookRef.setValue(book);
+
+                                editBookDialog.dismiss();
+                                viewMyBookDialog(book, context).show();
+                            }
+                        });
+
+                        Button deleteButton = editBookDialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+                        deleteButton.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                editBookDialog.dismiss();
+                                viewMyBookDialog(book, context).show();
+                            }
+                        });
+                    }
+                });
+
+                editBookDialog.show();
+
             }
         });
+
+        builder.setNegativeButton("Delete", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                // Load Delete Post Dialog!
+                deleteCheckDialog(book, context).show();
+            }
+        });
+
+        builder.setNeutralButton("Cancel", null);
+
+        return builder.create();
+    }
+
+    private AlertDialog deleteCheckDialog(final Book book, final Context context){
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setMessage("Are you sure do you want to delete this post?");
+        builder.setTitle("Delete?");
+
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                // In Books!
+                String id = book.getBookID();
+                DatabaseReference bookRef = FirebaseDatabase.getInstance().getReference().child("books").child(id);
+                bookRef.removeValue();
+
+                // In User Book Ids
+                HashMap<String, Object> UserBookIds = mainUser.getBookIDs();
+                UserBookIds.remove(id);
+
+                // Delete requests attached to the book
+                HashMap<String, Boolean> requestIDs = book.getRequestIDs();
+                Set keySet = requestIDs.keySet();
+                try {
+
+                    for (Object object : keySet) {
+                        if (object instanceof String) {
+                            WebServiceHandler.removeRequest((String) object);
+                        }
+                    }
+                    WebServiceHandler.updateMainUserData(mainUser);
+
+                } catch (IllegalAccessException ie){
+                    illegalAccess();
+                }
+
+                // Todo: Update UI
+                int index = mValues.indexOf(book);
+                mValues.remove(index);
+                notifyItemRemoved(index);
+
+            }
+        });
+        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                viewMyBookDialog(book, context).show();
+            }
+        });
+
+        return builder.create();
+    }
+
+    private AlertDialog editBookDialog(Context context){
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+
+        LayoutInflater inflater = LayoutInflater.from(context);
+        View dialogLayout = inflater.inflate(R.layout.add_book_dialog_layout, null);
+
+        builder.setView(dialogLayout);
+        builder.setPositiveButton("Save", null);
+        builder.setNegativeButton("Cancel", null);
+        return builder.create();
     }
 
     private AlertDialog viewPublicBookDialog(final Book book, final ToggleButton reqButton){
