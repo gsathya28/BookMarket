@@ -1,5 +1,6 @@
 package com.clairvoyance.bookmarket;
 
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -22,4 +23,15 @@ public class TabPagerAdapter extends FragmentPagerAdapter {
         return BookListFragment.newInstance(tabTitles[position]);
     }
 
+    @Nullable
+    @Override
+    public CharSequence getPageTitle(int position) {
+        switch (position){
+            case 0:
+                return "SELL";
+            case 1:
+                return "BUY";
+        }
+        return super.getPageTitle(position);
+    }
 }

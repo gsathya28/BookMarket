@@ -107,13 +107,11 @@ class WebServiceHandler {
         }
     }
 
-    static String getUID() throws IllegalAccessException{
-        if(isMainUserAuthenticated()){
+    static String getUID(){
+        if(mUser != null){
             return mUser.getUid();
         }
-        else{
-            return "";
-        }
+        return null;
     }
 
     static void updateToken() throws IllegalAccessException{

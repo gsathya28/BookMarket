@@ -215,62 +215,59 @@ public class ActSellMainActivity extends AppCompatActivity {
         mainLayout.removeAllViews();
 
         // Funnel through the data placing new Horizontal LinearLayout (to hold info and request buttons) for each book
-        try {
-            for (final Book book : books) {
 
-                if (book.getUid().equals(WebServiceHandler.getUID())) {
-                    continue;
-                }
+        for (final Book book : books) {
 
-                if (book.isSpam()) {
-                    continue;
-                }
-
-                LinearLayout bookLayout = new LinearLayout(getApplicationContext());
-                setBookLayout(bookLayout);
-
-                int valueInPx = (int) getApplicationContext().getResources().getDimension(R.dimen.activity_horizontal_margin);
-
-                // Set layout for Buttons in BookLayout
-                final ToggleButton reqButton = new ToggleButton(getApplicationContext());
-                bookLayout.addView(reqButton);
-                Button infoButton = new Button(getApplicationContext());
-                bookLayout.addView(infoButton);
-                setInfoButtonLayout(infoButton);
-                setReqButtonLayout(reqButton);
-
-                // Check if there's a pending request on the book by the user.
-                if (bookRequests.containsKey(book.getBookID())) {
-                    reqButton.setChecked(true);
-                }
-
-                // This is really important - adds and deletes request data when checked/unchecked
-                reqButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                    @Override
-                    public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
-                        checkedConditional(reqButton, isChecked, book);
-                    }
-                });
-
-                // Set Button Text
-                String buttonText = book.getCourseSubj() + " " + book.getCourseNumber() + " - " + book.getTitle();
-                infoButton.setText(buttonText);
-                infoButton.setBackgroundColor(Color.parseColor("#267326"));
-                infoButton.setSingleLine();
-                infoButton.setEllipsize(TextUtils.TruncateAt.END);
-                infoButton.setPadding(valueInPx, infoButton.getPaddingTop(), valueInPx, infoButton.getPaddingBottom());
-                infoButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        // Set Info Dialog (different from Delete? Dialog)
-                        viewBookDialog(book, reqButton).show();
-                    }
-                });
-
-                mainLayout.addView(bookLayout);
+            if (book.getUid().equals(WebServiceHandler.getUID())) {
+                continue;
             }
-        }catch (IllegalAccessException i){
-            illegalAccess();
+
+            if (book.isSpam()) {
+                continue;
+            }
+
+            LinearLayout bookLayout = new LinearLayout(getApplicationContext());
+            setBookLayout(bookLayout);
+
+            int valueInPx = (int) getApplicationContext().getResources().getDimension(R.dimen.activity_horizontal_margin);
+
+            // Set layout for Buttons in BookLayout
+            final ToggleButton reqButton = new ToggleButton(getApplicationContext());
+            bookLayout.addView(reqButton);
+            Button infoButton = new Button(getApplicationContext());
+            bookLayout.addView(infoButton);
+            setInfoButtonLayout(infoButton);
+            setReqButtonLayout(reqButton);
+
+            // Check if there's a pending request on the book by the user.
+            if (bookRequests.containsKey(book.getBookID())) {
+                reqButton.setChecked(true);
+            }
+
+            // This is really important - adds and deletes request data when checked/unchecked
+            reqButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                    checkedConditional(reqButton, isChecked, book);
+                }
+            });
+
+            // Set Button Text
+            String buttonText = book.getCourseSubj() + " " + book.getCourseNumber() + " - " + book.getTitle();
+            infoButton.setText(buttonText);
+            infoButton.setBackgroundColor(Color.parseColor("#267326"));
+            infoButton.setSingleLine();
+            infoButton.setEllipsize(TextUtils.TruncateAt.END);
+            infoButton.setPadding(valueInPx, infoButton.getPaddingTop(), valueInPx, infoButton.getPaddingBottom());
+            infoButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    // Set Info Dialog (different from Delete? Dialog)
+                    viewBookDialog(book, reqButton).show();
+                }
+            });
+
+            mainLayout.addView(bookLayout);
         }
     }
 

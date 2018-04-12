@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#66cc66"
+    android:background="#eaf1fc"
     tools:context="com.clairvoyance.bookmarket.ActSellAddBook">
 
     <!-- Todo: Get rid of notes in GUI - Because notes are in each book -->
@@ -20,9 +20,15 @@
 
     <ScrollView
         android:id="@+id/scrollView2"
-        android:layout_width="match_parent"
-        android:layout_height="215dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/sell_post_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/add_post_toolbar">
 
         <LinearLayout
@@ -37,13 +43,14 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <Button
+            <TextView
                 android:id="@+id/sell_default_no_book"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="#267326"
                 android:text="@string/no_books_added"
-                android:textColor="@android:color/background_light" />
+                android:textAlignment="center"
+                android:textColor="@android:color/black"
+                android:textSize="24sp" />
 
             <Button
                 android:id="@+id/sell_add_book_button"
@@ -53,41 +60,6 @@
 
         </LinearLayout>
     </ScrollView>
-
-    <EditText
-        android:id="@+id/sell_add_post_notes"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginTop="8dp"
-        android:background="#FFFFFF"
-        android:ems="10"
-        android:gravity="top|start"
-        android:hint="@string/notes"
-        android:inputType="textMultiLine"
-        android:paddingLeft="4dp"
-        android:paddingRight="4dp"
-        android:paddingStart="4dp"
-        android:paddingTop="2dp"
-        app:layout_constraintBottom_toTopOf="@+id/sell_post_button"
-        app:layout_constraintHorizontal_bias="0.502"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sell_post_negot_check"
-        app:layout_constraintVertical_bias="0.6" />
-
-    <CheckBox
-        android:id="@+id/sell_post_negot_check"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="@string/negotiableq"
-        android:textSize="18sp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/scrollView2" />
 
     <Button
         android:id="@+id/sell_post_button"

@@ -16,6 +16,8 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
 
 
 /**
@@ -27,18 +29,48 @@ import java.util.ArrayList;
 public class BookListFragment extends Fragment {
 
     RecyclerView recyclerView;
-    private ArrayList<Book> sellBooks = new ArrayList<>();
-    private ValueEventListener mSellBookData = new ValueEventListener() {
+    private ArrayList<Book> books = new ArrayList<>();
+
+    Query query;
+    private ValueEventListener mBookData = new ValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
-            sellBooks.clear();
+            books.clear();
             for(DataSnapshot d: dataSnapshot.getChildren()){
                 Book book = d.getValue(Book.class);
                 if (book != null){
-                    sellBooks.add(book);
+                    books.add(book);
                 }
             }
-            recyclerView.setAdapter(new BookRecyclerAdapter(sellBooks, mType, mListener));
+            recyclerView.setAdapter(new BookRecyclerAdapter(books, mType, mListener));
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+
+        }
+    };
+    private ValueEventListener allBookData = new ValueEventListener() {
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+            books.clear();
+            for(DataSnapshot d: dataSnapshot.getChildren()){
+                Book book = d.getValue(Book.class);
+                if (book != null){
+                    books.add(book);
+                }
+            }
+            // Get rid of own books - may move this somewhere else...
+            Iterator iterator = books.iterator();
+            while (iterator.hasNext()){
+                Book book = (Book) iterator.next();
+                if(book.getUid().equals(WebServiceHandler.getUID())){
+                    iterator.remove();
+                }
+            }
+
+            Collections.reverse(books);
+            recyclerView.setAdapter(new BookRecyclerAdapter(books, mType, mListener));
         }
 
         @Override
@@ -99,17 +131,19 @@ public class BookListFragment extends Fragment {
     }
 
     private void loadPrivateData(){
-        try {
-            Query query = WebServiceHandler.getRootRef().child("books").orderByChild("uid").equalTo(WebServiceHandler.getUID());
-            query.addListenerForSingleValueEvent(mSellBookData);
-        }
-        catch (IllegalAccessException i){
-            illegalAccess();
+        if(mType.equals(Book.MY_BOOK_SELL)) {
+            query = WebServiceHandler.getRootRef().child("books").orderByChild("uid").equalTo(WebServiceHandler.getUID());
+            query.addListenerForSingleValueEvent(mBookData);
+        }else if(mType.equals(Book.ALL_BOOK_SELL)){
+            query = WebServiceHandler.mBooks;
+            query.addListenerForSingleValueEvent(allBookData);
         }
     }
 
-    public void illegalAccess(){
-
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        // Detach any continuous listeners??
     }
 
     @Override

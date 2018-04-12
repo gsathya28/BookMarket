@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -23,14 +24,14 @@ public class ActSellAddBook extends AppCompatActivity {
     User mainUser;
     ArrayList<Book> postBooks = new ArrayList<>();
     View dialogLayout;
-    Button noBookButton;
+    TextView noBookText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_sell_add_post);
-        noBookButton = findViewById(R.id.sell_default_no_book);
+        noBookText = findViewById(R.id.sell_default_no_book);
 
         setToolbar();
         setMainUser();
@@ -283,7 +284,7 @@ public class ActSellAddBook extends AppCompatActivity {
 
         // Add the "No Books" text if there are no books left.
         if (postBooks.size() == 0){
-            listLayout.addView(noBookButton, 0);
+            listLayout.addView(noBookText, 0);
         }
     }
 
