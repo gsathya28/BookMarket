@@ -8,7 +8,7 @@ import java.util.HashMap;
  * Created by Sathya on 12/21/2017.
  *
  */
-
+// Todo: Implement Parcelable (for argument passing in bundles in fragments)
 @IgnoreExtraProperties
 class User implements Serializable {
     private String name;

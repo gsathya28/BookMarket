@@ -1,7 +1,9 @@
 package com.clairvoyance.bookmarket;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Color;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.Gravity;
@@ -9,7 +11,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import com.clairvoyance.bookmarket.BookListFragment.OnListFragmentInteractionListener;
@@ -118,6 +122,12 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
             Button button = (Button) holder.mView;
             button.setText(buttonText);
             setButtonLayout(button);
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                }
+            });
         }
         else if(holder.mView instanceof LinearLayout){ // Public Book
 
@@ -136,12 +146,24 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
             setButtonLayout(infoButton);
 
             // Check if the book is already requested by the User
-            Book book = holder.mItem;
+            final Book book = holder.mItem;
             if(bookRequests.containsKey(book.getBookID())){
                 reqButton.setChecked(true);
             }
 
+            reqButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                    checkedConditional(reqButton, isChecked, book);
+                }
+            });
 
+            infoButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    viewPublicBookDialog(book, reqButton).show();
+                }
+            });
 
         }
 
@@ -155,6 +177,222 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
                 }
             }
         });
+    }
+
+    private AlertDialog viewPublicBookDialog(final Book book, final ToggleButton reqButton){
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(reqButton.getContext());
+        builder.setTitle(book.getTitle());
+
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("Book Title");
+        stringBuilder.append(System.getProperty("line.separator"));
+        stringBuilder.append(book.getTitle());
+        stringBuilder.append(System.getProperty("line.separator"));
+        stringBuilder.append(System.getProperty("line.separator"));
+
+        stringBuilder.append("Course: ");
+        stringBuilder.append(System.getProperty("line.separator"));
+        stringBuilder.append(book.getCourseSubj());
+        stringBuilder.append(" ");
+        stringBuilder.append(book.getCourseNumber());
+        stringBuilder.append(System.getProperty("line.separator"));
+        stringBuilder.append(System.getProperty("line.separator"));
+
+        stringBuilder.append("Price: ");
+        stringBuilder.append(System.getProperty("line.separator"));
+        stringBuilder.append("$");
+        stringBuilder.append(book.getPrice());
+        stringBuilder.append(System.getProperty("line.separator"));
+        stringBuilder.append(System.getProperty("line.separator"));
+
+        stringBuilder.append("Author: ");
+        stringBuilder.append(System.getProperty("line.separator"));
+        stringBuilder.append(book.getAuthor());
+        stringBuilder.append(System.getProperty("line.separator"));
+        stringBuilder.append(System.getProperty("line.separator"));
+
+        stringBuilder.append("Version Number: ");
+        stringBuilder.append(System.getProperty("line.separator"));
+        stringBuilder.append(book.getVersionNumber());
+        stringBuilder.append(System.getProperty("line.separator"));
+        stringBuilder.append(System.getProperty("line.separator"));
+
+        stringBuilder.append("Instructor: ");
+        stringBuilder.append(System.getProperty("line.separator"));
+        stringBuilder.append(book.getInstructor());
+        stringBuilder.append(System.getProperty("line.separator"));
+        stringBuilder.append(System.getProperty("line.separator"));
+
+        stringBuilder.append("Notes: ");
+        stringBuilder.append(System.getProperty("line.separator"));
+        stringBuilder.append(book.getNotes());
+        stringBuilder.append(System.getProperty("line.separator"));
+        stringBuilder.append(System.getProperty("line.separator"));
+
+        String infoText = stringBuilder.toString();
+        TextView infoTextView = new TextView(reqButton.getContext());
+        infoTextView.setText(infoText);
+
+        LinearLayout linearLayout = new LinearLayout(reqButton.getContext());
+        linearLayout.setOrientation(LinearLayout.VERTICAL);
+        linearLayout.addView(infoTextView);
+
+        if(!book.isSpam()){
+            final Button button = new Button(reqButton.getContext());
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+            );
+            button.setText("Flag");
+            button.setLayoutParams(params);
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    book.setSpam(true);
+                    try {
+                        WebServiceHandler.addSpam(book);
+                        WebServiceHandler.addPublicBook(book);
+                    }catch (IllegalAccessException i){
+                        illegalAccess();
+                    }
+                    button.setVisibility(View.GONE);
+                }
+            });
+            linearLayout.addView(button);
+        }
+
+        builder.setView(linearLayout);
+
+        // If a request is not made for this book - button will prompt to make request
+        // and the listener will set the toggleButton to isChecked which will run code to add request to database
+        if (!reqButton.isChecked()) {
+            builder.setPositiveButton("Add to Request List", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    reqButton.setChecked(true);
+                    viewPublicBookDialog(book, reqButton).show();
+                }
+            });
+        }
+        // Else, the button will prompt to un-request, and the listener will load a dialog to make sure the un-request is intended.
+        else {
+            builder.setPositiveButton("Un-request", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    String requestID = bookRequests.get(book.getBookID());
+                    if (requestID == null || requestID.equals("")){
+                        throw new IllegalStateException("Invalid GUI Request ID Values!!!!");
+                    }
+
+                    AlertDialog dialog = removeRequestDialog(book, requestID, reqButton);
+                    dialog.show();
+                }
+            });
+        }
+        builder.setNegativeButton("Cancel", null);
+
+        return builder.create();
+    }
+
+    private void addRequest(Book bookRequested){
+        // NO need to add to bookRequests, since bookRequests is a pointer AND it will update the Firebase Database
+        try {
+            Request request = new Request(mainUser, bookRequested);
+            WebServiceHandler.addRequest(request);
+
+            bookRequested.addRequestID(request);
+            WebServiceHandler.addPublicBook(bookRequested);
+
+            mainUser.addMyRequest(request);
+            WebServiceHandler.updateMainUserData(mainUser);
+        }catch (IllegalAccessException i){
+            illegalAccess();
+        }
+    }
+
+    private void deleteRequest(Book book, String requestID){
+        // NO need to delete to bookRequests, since bookRequests is a pointer (mainUser.getMyRequestIDs) AND it will update the Firebase Database
+        WebServiceHandler.getRootRef().child("requests").child(requestID).removeValue();
+
+        try {
+            book.removeRequestID(requestID);
+            WebServiceHandler.addPublicBook(book);
+
+            mainUser.getMyRequestIDs().remove(book.getBookID());
+            WebServiceHandler.updateMainUserData(mainUser);
+        }catch (IllegalAccessException i){
+            illegalAccess();
+        }
+    }
+
+    private void checkedConditional(ToggleButton reqButton, boolean isChecked, Book book){
+        if (isChecked){
+            addRequest(book);
+        }
+        else {
+
+            // Check if requestID exists Todo: Need to check if requestID is valid
+            String requestID = bookRequests.get(book.getBookID());
+            if (requestID == null || requestID.equals("")){
+                throw new IllegalStateException("Invalid GUI Request ID Values!!!!");
+            }
+
+            // Add Delete? Dialog - to prevent accidental request removal -
+            AlertDialog dialog = removeRequestDialog(book, requestID, reqButton);
+            dialog.show();
+        }
+    }
+
+    private AlertDialog removeRequestDialog(final Book book, final String requestID, final ToggleButton button){
+
+        button.setOnCheckedChangeListener(null);
+        button.setChecked(true);
+        button.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                checkedConditional(button, button.isChecked(), book);
+            }
+        });
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(button.getContext());
+        builder.setTitle("Remove Request?");
+        builder.setMessage("Are you sure you want to remove your request for this book?");
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                deleteRequest(book, requestID);
+                button.setOnCheckedChangeListener(null);
+                button.setChecked(false);
+                button.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                        checkedConditional(button, button.isChecked(), book);
+                    }
+                });
+            }
+        });
+        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                if (book != null){
+                    // To prevent the triggering of code in the OnCheckedChangeListener
+                    button.setOnCheckedChangeListener(null);
+                    button.setChecked(true);
+                    button.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                        @Override
+                        public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                            checkedConditional(button, button.isChecked(), book);
+                        }
+                    });
+                }
+            }
+        });
+        return builder.create();
+    }
+
+    private void illegalAccess(){
+
     }
 
     @Override
