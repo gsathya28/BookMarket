@@ -121,12 +121,9 @@ public class ActSellAddBook extends AppCompatActivity {
                                     return;
                                 }
 
-                                try{
-                                    newBook = new Book(courseType, courseNumber);
-                                }catch (IllegalAccessException i){
-                                    illegalAccess();
-                                    return; // Don't know why I need this...
-                                }
+
+                                newBook = new Book(courseType, courseNumber);
+
 
                                 String bookTitle = ((EditText) dialogLayout.findViewById(R.id.sell_book_title_text)).getText().toString();
                                 String author = ((EditText) dialogLayout.findViewById(R.id.sell_author_text)).getText().toString();
@@ -255,12 +252,8 @@ public class ActSellAddBook extends AppCompatActivity {
                                     return;
                                 }
 
-                                try {
-                                    newBook = new Book(courseType, courseNumber);
-                                }catch (IllegalAccessException i){
-                                    illegalAccess();
-                                    return;
-                                }
+
+                                newBook = new Book(courseType, courseNumber);
 
                                 String bookTitle = ((EditText) dialogLayout.findViewById(R.id.sell_book_title_text)).getText().toString();
                                 String author = ((EditText) dialogLayout.findViewById(R.id.sell_author_text)).getText().toString();

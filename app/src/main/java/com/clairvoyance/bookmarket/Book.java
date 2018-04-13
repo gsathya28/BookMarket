@@ -25,6 +25,8 @@ class Book implements Serializable, Parcelable {
     public static final String MY_BOOK_BUY = "mBookBuy";
     public static final String ALL_BOOK_BUY = "allBookBuy";
     public static final String ALL_BOOK_SELL = "allBookSell";
+    public static final String SELL_BOOK = "sellBook";
+    public static final String BUY_BOOK = "buyBook";
 
     private String title;
     private String price;
@@ -37,6 +39,7 @@ class Book implements Serializable, Parcelable {
     private String instructor;
     private String bookID;
     private String uid;
+    private String type;
     private long postDateInSecs;
     private boolean isSpam = false;
     private HashMap<String, Boolean> requestIDs = new HashMap<>();
@@ -56,7 +59,7 @@ class Book implements Serializable, Parcelable {
     }
 
     // Only courseSubj and courseNumber are required
-    public Book(String courseSubj, String courseNumber) throws IllegalAccessException{
+    public Book(String courseSubj, String courseNumber){
         this.courseSubj = courseSubj;
         this.courseNumber = courseNumber;
         this.courseTotal = courseSubj + courseNumber;

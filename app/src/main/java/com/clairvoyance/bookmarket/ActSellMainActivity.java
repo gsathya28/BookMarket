@@ -513,16 +513,14 @@ public class ActSellMainActivity extends AppCompatActivity {
                 String courseSubj = ((EditText) dialogLayout.findViewById(R.id.sell_course_type_text)).getText().toString();
                 String courseNum = ((EditText) dialogLayout.findViewById(R.id.sell_course_number_text)).getText().toString();
 
-                try {
-                    Log.d("LifeCycle", courseSubj);
-                    Book searchBook = new Book(courseSubj, courseNum);
-                    Intent intent = new Intent(ActSellMainActivity.this, ActSellSearchResults.class);
-                    // intent.putExtra("queryBook", searchBook);
-                    Log.d("LifeCycle", searchBook.getCourseTotal());
-                    startActivity(intent);
-                }catch (IllegalAccessException iae){
-                    illegalAccess();
-                }
+
+                Log.d("LifeCycle", courseSubj);
+                Book searchBook = new Book(courseSubj, courseNum);
+                Intent intent = new Intent(ActSellMainActivity.this, ActSellSearchResults.class);
+                // intent.putExtra("queryBook", searchBook);
+                Log.d("LifeCycle", searchBook.getCourseTotal());
+                startActivity(intent);
+
                 // Send them to the new activity
             }
         });

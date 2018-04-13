@@ -12,7 +12,6 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 
-import java.util.HashMap;
 
 /**
  * Created by Sathya on 12/21/2017.
@@ -21,14 +20,23 @@ import java.util.HashMap;
 
 class WebServiceHandler {
 
+    private static final String SELL_BOOK_REF = "sellBooks";
+    private static final String BUY_BOOK_REF = "buyBooks";
+    private static final String REQUEST_REF = "requests";
+    private static final String USER_REF = "users";
+    private static final String UID_REF = "uid";
+    private static final String DATE_REF = "postDateInSecs";
+
     final static int RC_SIGN_IN = 2899;
     final static String WEB_CLIENT_ID = "483082602147-bmhfbbj3k1proa5r2ll3hr694d9s5mrr.apps.googleusercontent.com";
     private static FirebaseUser mUser;
     private static User loadedUser;
 
     private static DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
-    static Query allSellBooks = rootRef.child("books").orderByChild("postDateInSecs").limitToFirst(100);
-    static Query mySellBooks = rootRef.child("books").orderByChild("uid").equalTo(getUID());
+    static Query allSellBooks = rootRef.child(SELL_BOOK_REF).orderByChild(DATE_REF).limitToFirst(100);
+    static Query mySellBooks = rootRef.child(SELL_BOOK_REF).orderByChild(UID_REF).equalTo(getUID());
+    static Query allBuyBooks = rootRef.child(BUY_BOOK_REF).orderByChild(DATE_REF).limitToFirst(100);
+    static Query myBuyBooks = rootRef.child(BUY_BOOK_REF).orderByChild(UID_REF).equalTo(getUID());
 
     static DatabaseReference getRootRef() {
         return rootRef;
@@ -62,7 +70,7 @@ class WebServiceHandler {
     private static User loadMainUserData(final User user){
         // Load main data (and set listener) from database - if not already loaded
         if (loadedUser == null) {
-            DatabaseReference userRef = rootRef.child("users").child(mUser.getUid());
+            DatabaseReference userRef = rootRef.child(USER_REF).child(mUser.getUid());
 
             // Read Data
             userRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -93,7 +101,7 @@ class WebServiceHandler {
 
     private static void createNewUserData(User user) {
 
-        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child("users");
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child(USER_REF);
         userRef.child(mUser.getUid()).setValue(user);
 
     }
@@ -129,7 +137,7 @@ class WebServiceHandler {
     // This also updates books!
     static void addPublicBook(Book book) throws IllegalAccessException{
         if (isMainUserAuthenticated()) { // Add function to only allow certain people to post
-            DatabaseReference postRef = WebServiceHandler.rootRef.child("books").child(book.getBookID());
+            DatabaseReference postRef = WebServiceHandler.rootRef.child(SELL_BOOK_REF).child(book.getBookID());
             postRef.setValue(book);
         }
         else {
@@ -139,7 +147,7 @@ class WebServiceHandler {
 
     static void addRequest(Request request) throws IllegalAccessException{
         if (isMainUserAuthenticated()) { // Add function to only allow certain people to post
-            DatabaseReference myRequestRef = rootRef.child("requests").child(request.getRequestID());
+            DatabaseReference myRequestRef = rootRef.child(REQUEST_REF).child(request.getRequestID());
             myRequestRef.setValue(request);
 
         }
@@ -150,7 +158,7 @@ class WebServiceHandler {
 
     static void removeRequest(String requestID) throws IllegalAccessException{
         if (isMainUserAuthenticated()){
-            rootRef.child("requests").child(requestID).removeValue();
+            rootRef.child(REQUEST_REF).child(requestID).removeValue();
         }
     }
 
