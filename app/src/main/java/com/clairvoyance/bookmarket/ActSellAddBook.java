@@ -8,13 +8,20 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
@@ -23,14 +30,14 @@ public class ActSellAddBook extends AppCompatActivity {
     User mainUser;
     ArrayList<Book> postBooks = new ArrayList<>();
     View dialogLayout;
-    Button noBookButton;
+    TextView noBookText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_sell_add_post);
-        noBookButton = findViewById(R.id.sell_default_no_book);
+        noBookText = findViewById(R.id.sell_default_no_book);
 
         setToolbar();
         setMainUser();
@@ -51,12 +58,35 @@ public class ActSellAddBook extends AppCompatActivity {
         }
     }
 
-    private void setMainUser(){
-        try {
-            mainUser = WebServiceHandler.generateMainUser();
-        }catch (IllegalAccessException i) {
+    private void setMainUser() {
+        String uid = WebServiceHandler.getUID();
+        if (uid == null) {
             illegalAccess();
+            return;
         }
+
+        DatabaseReference userRef = WebServiceHandler.getRootRef().child("users").child(uid);
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (!dataSnapshot.exists()) {
+                    illegalAccess();
+                } else {
+                    // This works even after the initial data read since loadedUser's pointer is returned at the end of the method.
+                    Log.d("MainActivityCycle", "mainUserSet");
+                    mainUser = dataSnapshot.getValue(User.class);
+                    if (mainUser != null) {
+                        // Set up the GUI now that the mainUser is set (we'll need its data)
+                        setButtons();
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     private void setButtons(){
@@ -91,18 +121,14 @@ public class ActSellAddBook extends AppCompatActivity {
                                     return;
                                 }
 
-                                try{
-                                    newBook = new Book(courseType, courseNumber);
-                                }catch (IllegalAccessException i){
-                                    illegalAccess();
-                                    return; // Don't know why I need this...
-                                }
+
+                                newBook = new Book(courseType, courseNumber);
+
 
                                 String bookTitle = ((EditText) dialogLayout.findViewById(R.id.sell_book_title_text)).getText().toString();
                                 String author = ((EditText) dialogLayout.findViewById(R.id.sell_author_text)).getText().toString();
                                 String price = ((EditText) dialogLayout.findViewById(R.id.sell_price_text)).getText().toString();
                                 String vnum = ((EditText) dialogLayout.findViewById(R.id.sell_vnum_text)).getText().toString();
-                                String instructor = ((EditText) dialogLayout.findViewById(R.id.sell_instructor_text)).getText().toString();
                                 String notes = ((EditText) dialogLayout.findViewById(R.id.sell_book_notes_text)).getText().toString();
 
                                 newBook.set(Book.TITLE, bookTitle);
@@ -110,7 +136,6 @@ public class ActSellAddBook extends AppCompatActivity {
                                 newBook.set(Book.PRICE, price);
                                 newBook.set(Book.VERSION_NUMBER, vnum);
                                 newBook.set(Book.NOTES, notes);
-                                newBook.set(Book.INSTRUCTOR, instructor);
 
                                 postBooks.add(newBook);
                                 addToList(newBook);
@@ -146,7 +171,7 @@ public class ActSellAddBook extends AppCompatActivity {
                 }
 
                 // Go back to the Sell-MainActivity
-                Intent savePost = new Intent(getApplicationContext(), ActSellMainActivity.class);
+                Intent savePost = new Intent(getApplicationContext(), ActMainActivity.class);
                 startActivity(savePost);
             }
         });
@@ -204,7 +229,6 @@ public class ActSellAddBook extends AppCompatActivity {
                 ((EditText) dialogLayout.findViewById(R.id.sell_author_text)).setText(book.get(Book.AUTHOR));
                 ((EditText) dialogLayout.findViewById(R.id.sell_price_text)).setText(book.get(Book.PRICE));
                 ((EditText) dialogLayout.findViewById(R.id.sell_vnum_text)).setText(book.get(Book.VERSION_NUMBER));
-                ((EditText) dialogLayout.findViewById(R.id.sell_instructor_text)).setText(book.get(Book.INSTRUCTOR));
                 ((EditText) dialogLayout.findViewById(R.id.sell_book_notes_text)).setText(book.get(Book.NOTES));
 
                 // Handle Buttons (w/ Listeners) in dialog
@@ -228,18 +252,13 @@ public class ActSellAddBook extends AppCompatActivity {
                                     return;
                                 }
 
-                                try {
-                                    newBook = new Book(courseType, courseNumber);
-                                }catch (IllegalAccessException i){
-                                    illegalAccess();
-                                    return;
-                                }
+
+                                newBook = new Book(courseType, courseNumber);
 
                                 String bookTitle = ((EditText) dialogLayout.findViewById(R.id.sell_book_title_text)).getText().toString();
                                 String author = ((EditText) dialogLayout.findViewById(R.id.sell_author_text)).getText().toString();
                                 String price = ((EditText) dialogLayout.findViewById(R.id.sell_price_text)).getText().toString();
                                 String vnum = ((EditText) dialogLayout.findViewById(R.id.sell_vnum_text)).getText().toString();
-                                String instructor = ((EditText) dialogLayout.findViewById(R.id.sell_instructor_text)).getText().toString();
                                 String notes = ((EditText) dialogLayout.findViewById(R.id.sell_book_notes_text)).getText().toString();
 
                                 newBook.set(Book.TITLE, bookTitle);
@@ -247,7 +266,6 @@ public class ActSellAddBook extends AppCompatActivity {
                                 newBook.set(Book.PRICE, price);
                                 newBook.set(Book.VERSION_NUMBER, vnum);
                                 newBook.set(Book.NOTES, notes);
-                                newBook.set(Book.INSTRUCTOR, instructor);
 
                                 postBooks.remove(book);
                                 postBooks.add(newBook);
@@ -283,7 +301,7 @@ public class ActSellAddBook extends AppCompatActivity {
 
         // Add the "No Books" text if there are no books left.
         if (postBooks.size() == 0){
-            listLayout.addView(noBookButton, 0);
+            listLayout.addView(noBookText, 0);
         }
     }
 
@@ -293,6 +311,7 @@ public class ActSellAddBook extends AppCompatActivity {
         LayoutInflater inflater = getLayoutInflater();
         dialogLayout = inflater.inflate(R.layout.add_book_dialog_layout, null);
         builder.setView(dialogLayout);
+        builder.setTitle("New Book");
 
         // Add Buttons (onClickListeners added when onShowListener is added to AlertDialog after it is returned)
         builder.setPositiveButton("Save", null);

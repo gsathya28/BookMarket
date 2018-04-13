@@ -1,5 +1,8 @@
 package com.clairvoyance.bookmarket;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
 
@@ -7,6 +10,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -15,7 +19,14 @@ import java.util.UUID;
  */
 
 @IgnoreExtraProperties
-class Book implements Serializable {
+class Book implements Serializable, Parcelable {
+
+    public static final String MY_BOOK_SELL = "mBookSell";
+    public static final String MY_BOOK_BUY = "mBookBuy";
+    public static final String ALL_BOOK_BUY = "allBookBuy";
+    public static final String ALL_BOOK_SELL = "allBookSell";
+    public static final String SELL_BOOK = "sellBook";
+    public static final String BUY_BOOK = "buyBook";
 
     private String title;
     private String price;
@@ -28,6 +39,7 @@ class Book implements Serializable {
     private String instructor;
     private String bookID;
     private String uid;
+    private String type;
     private long postDateInSecs;
     private boolean isSpam = false;
     private HashMap<String, Boolean> requestIDs = new HashMap<>();
@@ -47,7 +59,7 @@ class Book implements Serializable {
     }
 
     // Only courseSubj and courseNumber are required
-    public Book(String courseSubj, String courseNumber) throws IllegalAccessException{
+    public Book(String courseSubj, String courseNumber){
         this.courseSubj = courseSubj;
         this.courseNumber = courseNumber;
         this.courseTotal = courseSubj + courseNumber;
@@ -178,5 +190,78 @@ class Book implements Serializable {
     ArrayList<Request> getRequests(){
         return requests;
     }
+
+
+    public static final Parcelable.Creator<Book> CREATOR = new Parcelable.Creator<Book>(){
+
+        @Override
+        public Book createFromParcel(Parcel parcel) {
+            return new Book(parcel);
+        }
+
+        @Override
+        public Book[] newArray(int i) {
+            return new Book[0];
+        }
+    };
+
+    private Book(Parcel in){
+        title = in.readString();
+        price = in.readString();
+        author = in.readString();
+        notes = in.readString();
+        courseSubj = in.readString();
+        courseNumber = in.readString();
+        courseTotal = in.readString();
+        versionNumber = in.readString();
+        instructor = in.readString();
+        bookID = in.readString();
+        uid = in.readString();
+        postDateInSecs = in.readLong();
+        isSpam = in.readByte() != 0;
+
+
+        int size = in.readInt();
+        for(int i = 0; i < size; i++){
+            String key = in.readString();
+            Boolean value = in.readByte() != 0;
+            requestIDs.put(key,value);
+        }
+
+    }
+
+    @Override
+    public int describeContents() {
+        return hashCode();
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(title);
+        parcel.writeString(price);
+        parcel.writeString(author);
+        parcel.writeString(notes);
+        parcel.writeString(courseSubj);
+        parcel.writeString(courseNumber);
+        parcel.writeString(courseTotal);
+        parcel.writeString(versionNumber);
+        parcel.writeString(instructor);
+        parcel.writeString(bookID);
+        parcel.writeString(uid);
+        parcel.writeLong(postDateInSecs);
+
+        byte spam = (byte) (isSpam ? 1 : 0);
+        parcel.writeByte(spam);
+
+        // Write requestIDs -
+        parcel.writeInt(requestIDs.size());
+        for(Map.Entry<String,Boolean> entry : requestIDs.entrySet()){
+            parcel.writeString(entry.getKey());
+            // This doesn't matter - all values are true..
+            byte x = (byte) (entry.getValue() ? 1 : 0);
+            parcel.writeByte(x);
+        }
+    }
+
 
 }
