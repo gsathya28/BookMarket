@@ -132,7 +132,6 @@ public class ActSellAddBook extends AppCompatActivity {
                                 String author = ((EditText) dialogLayout.findViewById(R.id.sell_author_text)).getText().toString();
                                 String price = ((EditText) dialogLayout.findViewById(R.id.sell_price_text)).getText().toString();
                                 String vnum = ((EditText) dialogLayout.findViewById(R.id.sell_vnum_text)).getText().toString();
-                                String instructor = ((EditText) dialogLayout.findViewById(R.id.sell_instructor_text)).getText().toString();
                                 String notes = ((EditText) dialogLayout.findViewById(R.id.sell_book_notes_text)).getText().toString();
 
                                 newBook.set(Book.TITLE, bookTitle);
@@ -140,7 +139,6 @@ public class ActSellAddBook extends AppCompatActivity {
                                 newBook.set(Book.PRICE, price);
                                 newBook.set(Book.VERSION_NUMBER, vnum);
                                 newBook.set(Book.NOTES, notes);
-                                newBook.set(Book.INSTRUCTOR, instructor);
 
                                 postBooks.add(newBook);
                                 addToList(newBook);
@@ -234,7 +232,6 @@ public class ActSellAddBook extends AppCompatActivity {
                 ((EditText) dialogLayout.findViewById(R.id.sell_author_text)).setText(book.get(Book.AUTHOR));
                 ((EditText) dialogLayout.findViewById(R.id.sell_price_text)).setText(book.get(Book.PRICE));
                 ((EditText) dialogLayout.findViewById(R.id.sell_vnum_text)).setText(book.get(Book.VERSION_NUMBER));
-                ((EditText) dialogLayout.findViewById(R.id.sell_instructor_text)).setText(book.get(Book.INSTRUCTOR));
                 ((EditText) dialogLayout.findViewById(R.id.sell_book_notes_text)).setText(book.get(Book.NOTES));
 
                 // Handle Buttons (w/ Listeners) in dialog
@@ -269,7 +266,6 @@ public class ActSellAddBook extends AppCompatActivity {
                                 String author = ((EditText) dialogLayout.findViewById(R.id.sell_author_text)).getText().toString();
                                 String price = ((EditText) dialogLayout.findViewById(R.id.sell_price_text)).getText().toString();
                                 String vnum = ((EditText) dialogLayout.findViewById(R.id.sell_vnum_text)).getText().toString();
-                                String instructor = ((EditText) dialogLayout.findViewById(R.id.sell_instructor_text)).getText().toString();
                                 String notes = ((EditText) dialogLayout.findViewById(R.id.sell_book_notes_text)).getText().toString();
 
                                 newBook.set(Book.TITLE, bookTitle);
@@ -277,7 +273,6 @@ public class ActSellAddBook extends AppCompatActivity {
                                 newBook.set(Book.PRICE, price);
                                 newBook.set(Book.VERSION_NUMBER, vnum);
                                 newBook.set(Book.NOTES, notes);
-                                newBook.set(Book.INSTRUCTOR, instructor);
 
                                 postBooks.remove(book);
                                 postBooks.add(newBook);
@@ -323,6 +318,7 @@ public class ActSellAddBook extends AppCompatActivity {
         LayoutInflater inflater = getLayoutInflater();
         dialogLayout = inflater.inflate(R.layout.add_book_dialog_layout, null);
         builder.setView(dialogLayout);
+        builder.setTitle("New Book");
 
         // Add Buttons (onClickListeners added when onShowListener is added to AlertDialog after it is returned)
         builder.setPositiveButton("Save", null);

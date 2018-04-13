@@ -16,7 +16,7 @@
     <string name="booktitle">Book Title</string>
     <string name="author">Author</string>
     <string name="price">Price</string>
-    <string name="vnum">Version #:</string>
+    <string name="vnum">Ed. #:</string>
     <string name="courseinstructor">Course Instructor:</string>
     <string name="sell_main_layout_title">People are looking for:</string>
     <string name="title_activity_login">Sign in</string>

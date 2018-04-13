@@ -216,12 +216,6 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
         stringBuilder.append(System.getProperty("line.separator"));
         stringBuilder.append(System.getProperty("line.separator"));
 
-        stringBuilder.append("Instructor: ");
-        stringBuilder.append(System.getProperty("line.separator"));
-        stringBuilder.append(book.getInstructor());
-        stringBuilder.append(System.getProperty("line.separator"));
-        stringBuilder.append(System.getProperty("line.separator"));
-
         stringBuilder.append("Notes: ");
         stringBuilder.append(System.getProperty("line.separator"));
         stringBuilder.append(book.getNotes());
@@ -241,7 +235,6 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
                 ((EditText) dialogLayout.findViewById(R.id.sell_author_text)).setText(book.get(Book.AUTHOR));
                 ((EditText) dialogLayout.findViewById(R.id.sell_price_text)).setText(book.get(Book.PRICE));
                 ((EditText) dialogLayout.findViewById(R.id.sell_vnum_text)).setText(book.get(Book.VERSION_NUMBER));
-                ((EditText) dialogLayout.findViewById(R.id.sell_instructor_text)).setText(book.get(Book.INSTRUCTOR));
                 ((EditText) dialogLayout.findViewById(R.id.sell_book_notes_text)).setText(book.get(Book.NOTES));
 
                 editBookDialog.setOnShowListener(new DialogInterface.OnShowListener() {
@@ -268,7 +261,6 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
                                 String author = ((EditText) dialogLayout.findViewById(R.id.sell_author_text)).getText().toString();
                                 String price = ((EditText) dialogLayout.findViewById(R.id.sell_price_text)).getText().toString();
                                 String vnum = ((EditText) dialogLayout.findViewById(R.id.sell_vnum_text)).getText().toString();
-                                String instructor = ((EditText) dialogLayout.findViewById(R.id.sell_instructor_text)).getText().toString();
                                 String notes = ((EditText) dialogLayout.findViewById(R.id.sell_book_notes_text)).getText().toString();
 
                                 book.set(Book.TITLE, bookTitle);
@@ -276,7 +268,6 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
                                 book.set(Book.PRICE, price);
                                 book.set(Book.VERSION_NUMBER, vnum);
                                 book.set(Book.NOTES, notes);
-                                book.set(Book.INSTRUCTOR, instructor);
 
                                 // Save Data -
                                 DatabaseReference bookRef = FirebaseDatabase.getInstance().getReference().child("books").child(book.getBookID());
