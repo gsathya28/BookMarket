@@ -18,13 +18,15 @@
             android:layout_height="match_parent"
             android:gravity="center"
             android:orientation="horizontal"
-            android:baselineAligned="false">
+            android:baselineAligned="false"
+            android:focusable="true">
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:focusable="true">
 
                 <TextView
                     android:layout_width="match_parent"
@@ -39,14 +41,20 @@
                     android:gravity="center"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="textCapCharacters" />
+                    android:inputType="textCapCharacters"
+                    android:nextFocusDown="@id/sell_course_number_text">
+                    <requestFocus />
+                </EditText>
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:focusable="true"
+                android:id="@+id/course_number_layout"
+                android:descendantFocusability="afterDescendants">
 
                 <TextView
                     android:layout_width="match_parent"
@@ -61,7 +69,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:inputType="number" />
+                    android:inputType="number"
+                    android:nextFocusDown="@id/sell_book_title_text"/>
             </LinearLayout>
 
         </LinearLayout>
@@ -83,7 +92,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textCapWords"
-            android:gravity="center"/>
+            android:gravity="center"
+            android:nextFocusDown="@id/sell_price_text"/>
 
         <!-- Book Author -->
 
@@ -114,7 +124,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="numberDecimal"
-                    android:gravity="center"/>
+                    android:gravity="center"
+                    android:nextFocusDown="@id/sell_author_text"/>
 
             </LinearLayout>
 
@@ -137,7 +148,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textCapWords"
-                    android:gravity="center"/>
+                    android:gravity="center"
+                    android:nextFocusDown="@id/sell_vnum_text"/>
             </LinearLayout>
 
             <LinearLayout
@@ -159,7 +171,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="number"
-                    android:gravity="center"/>
+                    android:gravity="center"
+                    android:nextFocusDown="@id/sell_book_notes_text"/>
             </LinearLayout>
 
 
