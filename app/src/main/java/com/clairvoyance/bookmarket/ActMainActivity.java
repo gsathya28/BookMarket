@@ -37,13 +37,13 @@ public class ActMainActivity extends AppCompatActivity implements BookListFragme
     }
 
     private void setMainUser() {
-        String uid = WebServiceHandler.getUID();
+        String uid = FirebaseHandler.getUID();
         if (uid == null) {
             illegalAccess();
             return;
         }
 
-        DatabaseReference userRef = WebServiceHandler.getRootRef().child("users").child(uid);
+        DatabaseReference userRef = FirebaseHandler.getRootRef().child("users").child(uid);
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {

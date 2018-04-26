@@ -37,7 +37,7 @@ public class ActLoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         // Set up the login form.
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(WebServiceHandler.WEB_CLIENT_ID)
+                .requestIdToken(FirebaseHandler.WEB_CLIENT_ID)
                 .requestEmail()
                 .build();
 
@@ -57,7 +57,7 @@ public class ActLoginActivity extends AppCompatActivity {
     private void signIn() {
         // Start Sign in Activity (launched by Google)
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-        startActivityForResult(signInIntent, WebServiceHandler.RC_SIGN_IN);
+        startActivityForResult(signInIntent, FirebaseHandler.RC_SIGN_IN);
     }
 
     @Override
@@ -66,7 +66,7 @@ public class ActLoginActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
-        if (requestCode == WebServiceHandler.RC_SIGN_IN) {
+        if (requestCode == FirebaseHandler.RC_SIGN_IN) {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             try {
                 // Google Sign In was successful, authenticate with Firebase
@@ -93,7 +93,7 @@ public class ActLoginActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
-                            // The user data will now be handled in WebServiceHandler.class
+                            // The user data will now be handled in FirebaseHandler.class
 
                             Log.d("AuthExchangeSuccess", "signInWithCredential:success");
                             Intent intent = new Intent(getApplicationContext(), ActMainActivity.class);

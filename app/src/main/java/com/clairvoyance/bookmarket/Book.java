@@ -54,6 +54,7 @@ class Book implements Serializable, Parcelable {
     static final int VERSION_NUMBER = 6;
     static final int INSTRUCTOR = 7;
 
+    @Deprecated // Must not use this constructor! All books require courseSubj and courseNumber
     public Book(){
         // Firebase Constructor (required)
     }
@@ -65,7 +66,7 @@ class Book implements Serializable, Parcelable {
         this.courseTotal = courseSubj + courseNumber;
         bookID = UUID.randomUUID().toString();
         postDateInSecs = Calendar.getInstance().getTimeInMillis();
-        this.uid = WebServiceHandler.getUID();
+        this.uid = FirebaseHandler.getUID();
     }
 
     void set(int field, String value){
@@ -114,10 +115,6 @@ class Book implements Serializable, Parcelable {
         requestIDs.remove(requestID);
     }
 
-    void addRequestList(ArrayList<Request> requests){
-        this.requests = requests;
-    }
-
     HashMap<String, Boolean> getRequestIDs(){
         return requestIDs;
     }
@@ -146,43 +143,43 @@ class Book implements Serializable, Parcelable {
     }
 
     // Firebase-Required Getters
-    String getTitle() {
+    public String getTitle() {
         return title;
     }
-    String getAuthor() {
+    public String getAuthor() {
         return author;
     }
-    String getCourseSubj() {
+    public String getCourseSubj() {
         return courseSubj;
     }
-    String getCourseNumber() {
+    public String getCourseNumber() {
         return courseNumber;
     }
-    String getCourseTotal() {
+    public String getCourseTotal() {
         return courseTotal;
     }
-    String getPrice() {
+    public String getPrice() {
         return price;
     }
-    String getVersionNumber() {
+    public String getVersionNumber() {
         return versionNumber;
     }
-    String getInstructor() {
+    public String getInstructor() {
         return instructor;
     }
     public String getNotes() {
         return notes;
     }
-    long getPostDateInSecs() {
+    public long getPostDateInSecs() {
         return postDateInSecs;
     }
-    String getBookID() {
+    public String getBookID() {
         return bookID;
     }
-    String getUid() {
+    public String getUid() {
         return uid;
     }
-    boolean isSpam() {
+    public boolean isSpam() {
         return isSpam;
     }
 

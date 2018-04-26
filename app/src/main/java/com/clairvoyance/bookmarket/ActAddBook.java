@@ -25,7 +25,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
-public class ActSellAddBook extends AppCompatActivity {
+public class ActAddBook extends AppCompatActivity {
 
     User mainUser;
     ArrayList<Book> postBooks = new ArrayList<>();
@@ -59,13 +59,13 @@ public class ActSellAddBook extends AppCompatActivity {
     }
 
     private void setMainUser() {
-        String uid = WebServiceHandler.getUID();
+        String uid = FirebaseHandler.getUID();
         if (uid == null) {
             illegalAccess();
             return;
         }
 
-        DatabaseReference userRef = WebServiceHandler.getRootRef().child("users").child(uid);
+        DatabaseReference userRef = FirebaseHandler.getRootRef().child("users").child(uid);
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -158,14 +158,14 @@ public class ActSellAddBook extends AppCompatActivity {
                 for(Book book: postBooks){
                     mainUser.addBook(book);
                     try{
-                        WebServiceHandler.addPublicBook(book);
+                        FirebaseHandler.addPublicBook(book);
                     }catch (IllegalAccessException i){
                         illegalAccess();
                     }
                 }
 
                 try{
-                    WebServiceHandler.updateMainUserData(mainUser);
+                    FirebaseHandler.updateMainUserData(mainUser);
                 }catch (IllegalAccessException i){
                     illegalAccess();
                 }

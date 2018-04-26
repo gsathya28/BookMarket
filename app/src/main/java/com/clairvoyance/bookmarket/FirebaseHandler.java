@@ -18,7 +18,7 @@ import com.google.firebase.iid.FirebaseInstanceId;
  * Firebase Authentication and Database Handler
  */
 
-class WebServiceHandler {
+class FirebaseHandler {
 
     private static final String SELL_BOOK_REF = "sellBooks";
     private static final String BUY_BOOK_REF = "buyBooks";
@@ -114,7 +114,6 @@ class WebServiceHandler {
         }
         else {
             throw new IllegalStateException("User not authorized");
-            // Todo: Implement Try-catch to send activities back to the Login Activity
         }
     }
 
@@ -137,7 +136,7 @@ class WebServiceHandler {
     // This also updates books!
     static void addPublicBook(Book book) throws IllegalAccessException{
         if (isMainUserAuthenticated()) { // Add function to only allow certain people to post
-            DatabaseReference postRef = WebServiceHandler.rootRef.child(SELL_BOOK_REF).child(book.getBookID());
+            DatabaseReference postRef = FirebaseHandler.rootRef.child(SELL_BOOK_REF).child(book.getBookID());
             postRef.setValue(book);
         }
         else {

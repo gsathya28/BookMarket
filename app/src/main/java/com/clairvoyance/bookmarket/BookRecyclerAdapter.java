@@ -332,10 +332,10 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
 
                     for (Object object : keySet) {
                         if (object instanceof String) {
-                            WebServiceHandler.removeRequest((String) object);
+                            FirebaseHandler.removeRequest((String) object);
                         }
                     }
-                    WebServiceHandler.updateMainUserData(mainUser);
+                    FirebaseHandler.updateMainUserData(mainUser);
 
                 } catch (IllegalAccessException ie){
                     illegalAccess();
@@ -444,8 +444,8 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
                 public void onClick(View view) {
                     book.setSpam(true);
                     try {
-                        WebServiceHandler.addSpam(book);
-                        WebServiceHandler.addPublicBook(book);
+                        FirebaseHandler.addSpam(book);
+                        FirebaseHandler.addPublicBook(book);
                     }catch (IllegalAccessException i){
                         illegalAccess();
                     }
@@ -492,13 +492,13 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
         // NO need to add to bookRequests, since bookRequests is a pointer AND it will update the Firebase Database
         try {
             Request request = new Request(mainUser, bookRequested);
-            WebServiceHandler.addRequest(request);
+            FirebaseHandler.addRequest(request);
 
             bookRequested.addRequestID(request);
-            WebServiceHandler.addPublicBook(bookRequested);
+            FirebaseHandler.addPublicBook(bookRequested);
 
             mainUser.addMyRequest(request);
-            WebServiceHandler.updateMainUserData(mainUser);
+            FirebaseHandler.updateMainUserData(mainUser);
         }catch (IllegalAccessException i){
             illegalAccess();
         }
@@ -506,14 +506,14 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
 
     private void deleteRequest(Book book, String requestID){
         // NO need to delete to bookRequests, since bookRequests is a pointer (mainUser.getMyRequestIDs) AND it will update the Firebase Database
-        WebServiceHandler.getRootRef().child("requests").child(requestID).removeValue();
+        FirebaseHandler.getRootRef().child("requests").child(requestID).removeValue();
 
         try {
             book.removeRequestID(requestID);
-            WebServiceHandler.addPublicBook(book);
+            FirebaseHandler.addPublicBook(book);
 
             mainUser.getMyRequestIDs().remove(book.getBookID());
-            WebServiceHandler.updateMainUserData(mainUser);
+            FirebaseHandler.updateMainUserData(mainUser);
         }catch (IllegalAccessException i){
             illegalAccess();
         }

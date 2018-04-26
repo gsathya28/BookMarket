@@ -27,7 +27,7 @@
         </activity>
         <activity android:name=".ActMainActivity" />
         <activity
-            android:name=".ActSellAddBook"
+            android:name=".ActAddBook"
             android:parentActivityName=".ActMainActivity">
 
             <!-- Parent activity meta-data to support 4.0 and lower -->

@@ -15,7 +15,7 @@ class User implements Serializable {
     private String email;
     private HashMap<String, Object> bookIDs = new HashMap<>();
 
-    // Key is bookID!!! - Value is requestID!!!!
+    // Key is bookID!!! - Value is requestID!!!! (Todo: Refactor Name)
     private HashMap<String, String> myRequestIDs = new HashMap<>();
     private boolean isEmailVerified = false;
     private String registrationToken;
@@ -40,22 +40,22 @@ class User implements Serializable {
         this.registrationToken = registrationToken;
     }
 
-    String getName() {
+    public String getName() {
         return name;
     }
-    String getEmail() {
+    public String getEmail() {
         return email;
     }
-    boolean isEmailVerified() {
+    public boolean isEmailVerified() {
         return isEmailVerified;
     }
-    HashMap<String, Object> getBookIDs() {
+    public HashMap<String, Object> getBookIDs() {
         return bookIDs;
     }
-    HashMap<String, String> getMyRequestIDs() {
+    public HashMap<String, String> getMyRequestIDs() {
         return myRequestIDs;
     }
-    String getRegistrationToken() {
+    public String setRegistrationToken() {
         return registrationToken;
     }
 }

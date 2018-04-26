@@ -80,7 +80,7 @@ public class ActSellSearchResults extends AppCompatActivity {
 
     private void setMainUser(){
         try {
-            mainUser = WebServiceHandler.generateMainUser();
+            mainUser = FirebaseHandler.generateMainUser();
         }catch (IllegalAccessException i){
             illegalAccess();
         }
@@ -93,7 +93,7 @@ public class ActSellSearchResults extends AppCompatActivity {
         if(searchBook != null) {
             Log.d("LifeCycle", "setQuery");
             Log.d("LifeCycle", "books " + searchBook.getCourseTotal());
-            Query searchQuery = WebServiceHandler.getRootRef().child("books").equalTo("courseTotal", searchBook.getCourseTotal());
+            Query searchQuery = FirebaseHandler.getRootRef().child("books").equalTo("courseTotal", searchBook.getCourseTotal());
             searchQuery.addListenerForSingleValueEvent(searchBooks);
         }
 
@@ -110,7 +110,7 @@ public class ActSellSearchResults extends AppCompatActivity {
 
         for (final Book book : resultBooks) {
 
-            if (book.getUid().equals(WebServiceHandler.getUID())) {
+            if (book.getUid().equals(FirebaseHandler.getUID())) {
                 continue;
             }
 
@@ -230,13 +230,13 @@ public class ActSellSearchResults extends AppCompatActivity {
         // NO need to add to bookRequests, since bookRequests is a pointer AND it will update the Firebase Database
         try {
             Request request = new Request(mainUser, bookRequested);
-            WebServiceHandler.addRequest(request);
+            FirebaseHandler.addRequest(request);
 
             bookRequested.addRequestID(request);
-            WebServiceHandler.addPublicBook(bookRequested);
+            FirebaseHandler.addPublicBook(bookRequested);
 
             mainUser.addMyRequest(request);
-            WebServiceHandler.updateMainUserData(mainUser);
+            FirebaseHandler.updateMainUserData(mainUser);
         }catch (IllegalAccessException i){
             illegalAccess();
         }
@@ -244,14 +244,14 @@ public class ActSellSearchResults extends AppCompatActivity {
 
     private void deleteRequest(Book book, String requestID){
         // NO need to delete to bookRequests, since bookRequests is a pointer (mainUser.getMyRequestIDs) AND it will update the Firebase Database
-        WebServiceHandler.getRootRef().child("requests").child(requestID).removeValue();
+        FirebaseHandler.getRootRef().child("requests").child(requestID).removeValue();
 
         try {
             book.removeRequestID(requestID);
-            WebServiceHandler.addPublicBook(book);
+            FirebaseHandler.addPublicBook(book);
 
             mainUser.getMyRequestIDs().remove(book.getBookID());
-            WebServiceHandler.updateMainUserData(mainUser);
+            FirebaseHandler.updateMainUserData(mainUser);
         }catch (IllegalAccessException i){
             illegalAccess();
         }
@@ -329,8 +329,8 @@ public class ActSellSearchResults extends AppCompatActivity {
                 public void onClick(View view) {
                     book.setSpam(true);
                     try {
-                        WebServiceHandler.addSpam(book);
-                        WebServiceHandler.addPublicBook(book);
+                        FirebaseHandler.addSpam(book);
+                        FirebaseHandler.addPublicBook(book);
                     }catch (IllegalAccessException i){
                         illegalAccess();
                     }
