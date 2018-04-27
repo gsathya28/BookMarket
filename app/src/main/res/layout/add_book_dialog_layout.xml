@@ -13,18 +13,58 @@
 
         <!-- Course Type -->
 
+        <TextView
+            android:id="@+id/textView5"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/new_book"
+            android:layout_marginTop="18dp"
+            android:textAlignment="center"
+            android:textColor="@android:color/black"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <RadioGroup
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:id="@+id/sell_buy_radio">
+
+            <RadioButton
+                android:id="@+id/radioSell"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:text="@string/Sell"
+                android:textSize="18sp" />
+
+            <RadioButton
+                android:id="@+id/radioBuy"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:layout_gravity="center"
+                android:text="@string/Buy"
+                android:textSize="18sp" />
+        </RadioGroup>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"
             android:orientation="horizontal"
-            android:baselineAligned="false">
+            android:baselineAligned="false"
+            android:focusable="true">
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:focusable="true">
 
                 <TextView
                     android:layout_width="match_parent"
@@ -32,21 +72,28 @@
                     android:layout_marginTop="10dp"
                     android:labelFor="@id/sell_course_type_text"
                     android:text="@string/coursesubj"
-                    android:textAlignment="center" />
+                    android:textAlignment="center"
+                    android:textColor="@android:color/black" />
 
                 <EditText
                     android:id="@+id/sell_course_type_text"
                     android:gravity="center"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="textCapCharacters" />
+                    android:inputType="textCapCharacters"
+                    android:nextFocusDown="@id/sell_course_number_text">
+                    <requestFocus />
+                </EditText>
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:focusable="true"
+                android:id="@+id/course_number_layout"
+                android:descendantFocusability="afterDescendants">
 
                 <TextView
                     android:layout_width="match_parent"
@@ -54,14 +101,16 @@
                     android:layout_marginTop="10dp"
                     android:labelFor="@id/sell_course_number_text"
                     android:text="@string/coursenumber"
-                    android:textAlignment="center" />
+                    android:textAlignment="center"
+                    android:textColor="@android:color/black" />
 
                 <EditText
                     android:id="@+id/sell_course_number_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:inputType="number" />
+                    android:inputType="number"
+                    android:nextFocusDown="@id/sell_book_title_text"/>
             </LinearLayout>
 
         </LinearLayout>
@@ -70,20 +119,31 @@
         <!-- Course Number -->
 
         <!-- Book Title -->
+
         <TextView
-            android:labelFor="@id/sell_book_title_text"
+            android:id="@+id/textView4"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:text="@string/exampleCourse"
+            android:textAlignment="center"
+            android:textSize="18sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:labelFor="@id/sell_book_title_text"
             android:text="@string/booktitle"
-            android:textAlignment="center" />
+            android:textAlignment="center"
+            android:textColor="@android:color/black" />
 
         <EditText
             android:id="@+id/sell_book_title_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textCapWords"
-            android:gravity="center"/>
+            android:gravity="center"
+            android:nextFocusDown="@id/sell_price_text"/>
 
         <!-- Book Author -->
 
@@ -107,14 +167,16 @@
                     android:layout_marginTop="10dp"
                     android:labelFor="@id/sell_price_text"
                     android:text="@string/price"
-                    android:textAlignment="center" />
+                    android:textAlignment="center"
+                    android:textColor="@android:color/black" />
 
                 <EditText
                     android:id="@+id/sell_price_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="numberDecimal"
-                    android:gravity="center"/>
+                    android:gravity="center"
+                    android:nextFocusDown="@id/sell_author_text"/>
 
             </LinearLayout>
 
@@ -130,14 +192,16 @@
                     android:layout_marginTop="10dp"
                     android:labelFor="@id/sell_author_text"
                     android:text="@string/author"
-                    android:textAlignment="center" />
+                    android:textAlignment="center"
+                    android:textColor="@android:color/black" />
 
                 <EditText
                     android:id="@+id/sell_author_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textCapWords"
-                    android:gravity="center"/>
+                    android:gravity="center"
+                    android:nextFocusDown="@id/sell_vnum_text"/>
             </LinearLayout>
 
             <LinearLayout
@@ -152,14 +216,16 @@
                     android:layout_marginTop="10dp"
                     android:labelFor="@id/sell_vnum_text"
                     android:text="@string/vnum"
-                    android:textAlignment="center" />
+                    android:textAlignment="center"
+                    android:textColor="@android:color/black" />
 
                 <EditText
                     android:id="@+id/sell_vnum_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="number"
-                    android:gravity="center"/>
+                    android:gravity="center"
+                    android:nextFocusDown="@id/sell_book_notes_text"/>
             </LinearLayout>
 
 
@@ -172,13 +238,14 @@
         <!-- Course Professor -->
 
         <TextView
-            android:labelFor="@id/sell_book_notes_text"
             android:id="@+id/textView2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:labelFor="@id/sell_book_notes_text"
             android:paddingTop="10dp"
             android:text="@string/notes"
-            android:textAlignment="center" />
+            android:textAlignment="center"
+            android:textColor="@android:color/black" />
 
         <EditText
             android:id="@+id/sell_book_notes_text"

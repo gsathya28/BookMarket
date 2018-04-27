@@ -15,6 +15,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,7 +27,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
-public class ActSellAddBook extends AppCompatActivity {
+public class ActAddBook extends AppCompatActivity {
 
     User mainUser;
     ArrayList<Book> postBooks = new ArrayList<>();
@@ -59,13 +61,13 @@ public class ActSellAddBook extends AppCompatActivity {
     }
 
     private void setMainUser() {
-        String uid = WebServiceHandler.getUID();
+        String uid = FirebaseHandler.getUID();
         if (uid == null) {
             illegalAccess();
             return;
         }
 
-        DatabaseReference userRef = WebServiceHandler.getRootRef().child("users").child(uid);
+        DatabaseReference userRef = FirebaseHandler.getRootRef().child("users").child(uid);
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -121,8 +123,17 @@ public class ActSellAddBook extends AppCompatActivity {
                                     return;
                                 }
 
+                                RadioGroup radioGroup = dialogLayout.findViewById(R.id.sell_buy_radio);
+                                RadioButton button = dialogLayout.findViewById(radioGroup.getCheckedRadioButtonId());
 
-                                newBook = new Book(courseType, courseNumber);
+                                String type = button.getText().toString();
+                                if(type.equals(getString(R.string.Sell))){
+                                    type = Book.SELL_BOOK;
+                                }else if(type.equals(getString(R.string.Buy))){
+                                    type = Book.BUY_BOOK;
+                                }
+
+                                newBook = new Book(courseType, courseNumber, type);
 
 
                                 String bookTitle = ((EditText) dialogLayout.findViewById(R.id.sell_book_title_text)).getText().toString();
@@ -158,14 +169,14 @@ public class ActSellAddBook extends AppCompatActivity {
                 for(Book book: postBooks){
                     mainUser.addBook(book);
                     try{
-                        WebServiceHandler.addPublicBook(book);
+                        FirebaseHandler.addPublicBook(book);
                     }catch (IllegalAccessException i){
                         illegalAccess();
                     }
                 }
 
                 try{
-                    WebServiceHandler.updateMainUserData(mainUser);
+                    FirebaseHandler.updateMainUserData(mainUser);
                 }catch (IllegalAccessException i){
                     illegalAccess();
                 }
@@ -192,7 +203,6 @@ public class ActSellAddBook extends AppCompatActivity {
         params.setMargins(leftValueInPx, topValueInPx, leftValueInPx, bottomValueInPx);
         bookButton.setLayoutParams(params);
 
-        bookButton.setBackgroundColor(Color.parseColor("#267326"));
     }
 
     private void addToList(final Book book){
@@ -207,6 +217,12 @@ public class ActSellAddBook extends AppCompatActivity {
         final Button bookButton = new Button(this);
         listLayout.addView(bookButton, 0);
         setButtonLayout(bookButton);
+
+        if(book.getType().equals(Book.SELL_BOOK)){
+            bookButton.setBackgroundColor(Color.parseColor("#2aa22a"));
+        }else if(book.getType().equals(Book.BUY_BOOK)){
+            bookButton.setBackgroundColor(Color.parseColor("#3385ff"));
+        }
 
         // Set text using the Book object
         String courseSubj = book.get(Book.COURSE_SUBJECT);
@@ -223,6 +239,12 @@ public class ActSellAddBook extends AppCompatActivity {
                 final AlertDialog editBookDialog = editBookDialog();
 
                 // Load current data into dialog
+                if(book.getType().equals(Book.SELL_BOOK)){
+                    ((RadioButton) dialogLayout.findViewById(R.id.radioSell)).setChecked(true);
+                }else if(book.getType().equals(Book.BUY_BOOK)){
+                    ((RadioButton) dialogLayout.findViewById(R.id.radioBuy)).setChecked(true);
+                }
+
                 ((EditText) dialogLayout.findViewById(R.id.sell_course_type_text)).setText(book.get(Book.COURSE_SUBJECT));
                 ((EditText) dialogLayout.findViewById(R.id.sell_course_number_text)).setText(book.get(Book.COURSE_NUMBER));
                 ((EditText) dialogLayout.findViewById(R.id.sell_book_title_text)).setText(book.get(Book.TITLE));
@@ -251,9 +273,17 @@ public class ActSellAddBook extends AppCompatActivity {
                                     Toast.makeText(getApplicationContext(), "Both Course Subject and Number required", Toast.LENGTH_LONG).show();
                                     return;
                                 }
+                                RadioGroup radioGroup = dialogLayout.findViewById(R.id.sell_buy_radio);
+                                RadioButton button = dialogLayout.findViewById(radioGroup.getCheckedRadioButtonId());
 
+                                String type = button.getText().toString();
+                                if(type.equals(getString(R.string.Sell))){
+                                    type = Book.SELL_BOOK;
+                                }else if(type.equals(getString(R.string.Buy))){
+                                    type = Book.BUY_BOOK;
+                                }
 
-                                newBook = new Book(courseType, courseNumber);
+                                newBook = new Book(courseType, courseNumber, type);
 
                                 String bookTitle = ((EditText) dialogLayout.findViewById(R.id.sell_book_title_text)).getText().toString();
                                 String author = ((EditText) dialogLayout.findViewById(R.id.sell_author_text)).getText().toString();
@@ -310,8 +340,22 @@ public class ActSellAddBook extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
         dialogLayout = inflater.inflate(R.layout.add_book_dialog_layout, null);
+
+        RadioGroup radioGroup = dialogLayout.findViewById(R.id.sell_buy_radio);
+        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup radioGroup, int i) {
+                if(i == R.id.radioSell){
+                    dialogLayout.setBackgroundColor(Color.parseColor("#c2efc2"));
+                }else if(i == R.id.radioBuy){
+                    dialogLayout.setBackgroundColor(Color.parseColor("#cce0ff"));
+                }
+            }
+        });
+
+        RadioButton button = dialogLayout.findViewById(R.id.radioSell);
+        button.setChecked(true);
         builder.setView(dialogLayout);
-        builder.setTitle("New Book");
 
         // Add Buttons (onClickListeners added when onShowListener is added to AlertDialog after it is returned)
         builder.setPositiveButton("Save", null);
@@ -330,6 +374,18 @@ public class ActSellAddBook extends AppCompatActivity {
         LayoutInflater inflater = getLayoutInflater();
         dialogLayout = inflater.inflate(R.layout.add_book_dialog_layout, null);
         builder.setView(dialogLayout);
+
+        RadioGroup radioGroup = dialogLayout.findViewById(R.id.sell_buy_radio);
+        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup radioGroup, int i) {
+                if(i == R.id.radioSell){
+                    dialogLayout.setBackgroundColor(Color.parseColor("#c2efc2"));
+                }else if(i == R.id.radioBuy){
+                    dialogLayout.setBackgroundColor(Color.parseColor("#cce0ff"));
+                }
+            }
+        });
 
         // Add Buttons (onClickListeners added when onShowListener is added to AlertDialog after it is returned)
         builder.setPositiveButton("Save", null);

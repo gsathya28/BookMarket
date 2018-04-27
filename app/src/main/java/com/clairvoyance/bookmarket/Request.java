@@ -17,40 +17,39 @@ class Request {
     private String requesteeID;
     private String requestID;
     private double requestTime;
-    private String bookName;
+    private String bookCourse;
 
     Request(){}
 
-    Request(User user, Book book) throws IllegalAccessException{
-        // Todo: Check if IDS are valid ???
+    Request(User user, Book book) {
         this.requestID = UUID.randomUUID().toString();
-        this.uid = WebServiceHandler.getUID();
+        this.uid = FirebaseHandler.getUID();
         this.bookID = book.getBookID();
         this.requesteeID = book.getUid();
         this.requesterName = user.getName();
         this.requesterEmail = user.getEmail();
-        this.bookName = book.getTitle();
+        this.bookCourse = book.getCourseTotal();
         this.requestTime = Calendar.getInstance().getTimeInMillis();
     }
 
-    String getUid() {
+    public String getUid() {
         return uid;
     }
-    String getBookID() {
+    public String getBookID() {
         return bookID;
     }
-    String getRequestID() {
+    public String getRequestID() {
         return requestID;
     }
-    String getRequesteeID() {
+    public String getRequesteeID() {
         return requesteeID;
     }
-    String getRequesterName() {
+    public String getRequesterName() {
         return requesterName;
     }
-    String getRequesterEmail() {return requesterEmail;}
-    String getBookName() {
-        return bookName;
+    public String getRequesterEmail() {return requesterEmail;}
+    public String getBookCourse() {
+        return bookCourse;
     }
-    double getRequestTime() {return requestTime;}
+    public double getRequestTime() {return requestTime;}
 }

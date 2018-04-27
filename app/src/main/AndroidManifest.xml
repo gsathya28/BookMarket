@@ -27,38 +27,22 @@
         </activity>
         <activity android:name=".ActMainActivity" />
         <activity
-            android:name=".ActSellMainActivity"
+            android:name=".ActAddBook"
             android:parentActivityName=".ActMainActivity">
+
+            <!-- Parent activity meta-data to support 4.0 and lower -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.clairvoyance.bookmarket.ActMainActivity" />
         </activity>
         <activity
-            android:name=".ActSellAddBook"
-            android:parentActivityName=".ActSellMainActivity">
-
-            <!-- Parent activity meta-data to support 4.0 and lower -->
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.clairvoyance.bookmarket.ActSellMainActivity" />
-        </activity>
-        <activity
-            android:name=".ActSellViewBooks"
-            android:parentActivityName=".ActSellMainActivity">
-
-            <!-- Parent activity meta-data to support 4.0 and lower -->
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.clairvoyance.bookmarket.ActSellMainActivity" />
-        </activity>
-        <activity
             android:name=".ActSellSearchScan"
-            android:parentActivityName=".ActSellMainActivity">
+            android:parentActivityName=".ActMainActivity">
 
             <!-- Parent activity meta-data to support 4.0 and lower -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.clairvoyance.bookmarket.ActSellMainActivity" />
+                android:value="com.clairvoyance.bookmarket.ActMainActivity" />
         </activity>
         <activity
             android:name=".ActSellSearchResults"
@@ -68,15 +52,6 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.clairvoyance.bookmarket.ActSellSearchResults" />
-        </activity>
-        <activity
-            android:name=".ActSellViewRequests"
-            android:parentActivityName=".ActSellMainActivity">
-
-            <!-- Parent activity meta-data to support 4.0 and lower -->
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.clairvoyance.bookmarket.ActSellMainActivity" />
         </activity>
 
         <service android:name=".MyFirebaseMessagingService">
@@ -90,7 +65,7 @@
             </intent-filter>
         </service>
 
-        <activity android:name=".ActViewMessages"></activity>
+        <activity android:name=".ActViewMessages"/>
     </application>
 
 </manifest>

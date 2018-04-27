@@ -65,7 +65,7 @@ public class BookListFragment extends Fragment {
             Iterator iterator = books.iterator();
             while (iterator.hasNext()){
                 Book book = (Book) iterator.next();
-                if(book.getUid().equals(WebServiceHandler.getUID())){
+                if(book.getUid().equals(FirebaseHandler.getUID())){
                     iterator.remove();
                 }
             }
@@ -143,10 +143,16 @@ public class BookListFragment extends Fragment {
 
     private void loadPrivateData(){
         if(mType.equals(Book.MY_BOOK_SELL)) {
-            query = WebServiceHandler.mySellBooks;
+            query = FirebaseHandler.mySellBooks;
             query.addListenerForSingleValueEvent(mBookData);
         }else if(mType.equals(Book.ALL_BOOK_SELL)){
-            query = WebServiceHandler.allSellBooks;
+            query = FirebaseHandler.allSellBooks;
+            query.addListenerForSingleValueEvent(allBookData);
+        }else if(mType.equals(Book.MY_BOOK_BUY)){
+            query = FirebaseHandler.myBuyBooks;
+            query.addListenerForSingleValueEvent(mBookData);
+        }else if(mType.equals(Book.ALL_BOOK_BUY)){
+            query = FirebaseHandler.allBuyBooks;
             query.addListenerForSingleValueEvent(allBookData);
         }
     }

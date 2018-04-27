@@ -25,8 +25,9 @@ class Book implements Serializable, Parcelable {
     public static final String MY_BOOK_BUY = "mBookBuy";
     public static final String ALL_BOOK_BUY = "allBookBuy";
     public static final String ALL_BOOK_SELL = "allBookSell";
-    public static final String SELL_BOOK = "sellBook";
-    public static final String BUY_BOOK = "buyBook";
+
+    public static final String SELL_BOOK = "sellBooks";
+    public static final String BUY_BOOK = "buyBooks";
 
     private String title;
     private String price;
@@ -36,7 +37,6 @@ class Book implements Serializable, Parcelable {
     private String courseNumber;
     private String courseTotal;
     private String versionNumber;
-    private String instructor;
     private String bookID;
     private String uid;
     private String type;
@@ -52,20 +52,26 @@ class Book implements Serializable, Parcelable {
     static final int COURSE_SUBJECT = 4;
     static final int COURSE_NUMBER = 5;
     static final int VERSION_NUMBER = 6;
-    static final int INSTRUCTOR = 7;
 
+    @Deprecated // Must not use this constructor! All books require courseSubj and courseNumber
     public Book(){
         // Firebase Constructor (required)
     }
 
     // Only courseSubj and courseNumber are required
-    public Book(String courseSubj, String courseNumber){
+    public Book(String courseSubj, String courseNumber, String type){
         this.courseSubj = courseSubj;
         this.courseNumber = courseNumber;
         this.courseTotal = courseSubj + courseNumber;
         bookID = UUID.randomUUID().toString();
         postDateInSecs = Calendar.getInstance().getTimeInMillis();
-        this.uid = WebServiceHandler.getUID();
+        this.uid = FirebaseHandler.getUID();
+
+        if(!(type.equals(SELL_BOOK) || type.equals(BUY_BOOK))){
+            throw new IllegalArgumentException("Illegal Type - Type should be set using Book.SELL_BOOK or Book.BUY_BOOK");
+        }else{
+            this.type = type;
+        }
     }
 
     void set(int field, String value){
@@ -94,9 +100,6 @@ class Book implements Serializable, Parcelable {
             case VERSION_NUMBER:
                 this.versionNumber = value;
                 return;
-            case INSTRUCTOR:
-                this.instructor = value;
-                return;
             default:
                 throw new IllegalArgumentException("Invalid Parameter");
         }
@@ -112,10 +115,6 @@ class Book implements Serializable, Parcelable {
 
     void removeRequestID(String requestID){
         requestIDs.remove(requestID);
-    }
-
-    void addRequestList(ArrayList<Request> requests){
-        this.requests = requests;
     }
 
     HashMap<String, Boolean> getRequestIDs(){
@@ -138,52 +137,50 @@ class Book implements Serializable, Parcelable {
                 return this.courseNumber;
             case VERSION_NUMBER:
                 return this.versionNumber;
-            case INSTRUCTOR:
-                return this.instructor;
             default:
                 throw new IllegalArgumentException("Invalid Parameter");
         }
     }
 
     // Firebase-Required Getters
-    String getTitle() {
+    public String getTitle() {
         return title;
     }
-    String getAuthor() {
+    public String getAuthor() {
         return author;
     }
-    String getCourseSubj() {
+    public String getCourseSubj() {
         return courseSubj;
     }
-    String getCourseNumber() {
+    public String getCourseNumber() {
         return courseNumber;
     }
-    String getCourseTotal() {
+    public String getCourseTotal() {
         return courseTotal;
     }
-    String getPrice() {
+    public String getPrice() {
         return price;
     }
-    String getVersionNumber() {
+    public String getVersionNumber() {
         return versionNumber;
-    }
-    String getInstructor() {
-        return instructor;
     }
     public String getNotes() {
         return notes;
     }
-    long getPostDateInSecs() {
+    public long getPostDateInSecs() {
         return postDateInSecs;
     }
-    String getBookID() {
+    public String getBookID() {
         return bookID;
     }
-    String getUid() {
+    public String getUid() {
         return uid;
     }
-    boolean isSpam() {
+    public boolean isSpam() {
         return isSpam;
+    }
+    public String getType() {
+        return type;
     }
 
     @Exclude
@@ -214,7 +211,6 @@ class Book implements Serializable, Parcelable {
         courseNumber = in.readString();
         courseTotal = in.readString();
         versionNumber = in.readString();
-        instructor = in.readString();
         bookID = in.readString();
         uid = in.readString();
         postDateInSecs = in.readLong();
@@ -245,7 +241,6 @@ class Book implements Serializable, Parcelable {
         parcel.writeString(courseNumber);
         parcel.writeString(courseTotal);
         parcel.writeString(versionNumber);
-        parcel.writeString(instructor);
         parcel.writeString(bookID);
         parcel.writeString(uid);
         parcel.writeLong(postDateInSecs);

@@ -14,6 +14,8 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -229,6 +231,12 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
 
                 final AlertDialog editBookDialog = editBookDialog(context);
 
+                if(book.getType().equals(Book.SELL_BOOK)){
+                    ((RadioButton) dialogLayout.findViewById(R.id.radioSell)).setChecked(true);
+                }else if(book.getType().equals(Book.BUY_BOOK)){
+                    ((RadioButton) dialogLayout.findViewById(R.id.radioBuy)).setChecked(true);
+                }
+
                 ((EditText) dialogLayout.findViewById(R.id.sell_course_type_text)).setText(book.get(Book.COURSE_SUBJECT));
                 ((EditText) dialogLayout.findViewById(R.id.sell_course_number_text)).setText(book.get(Book.COURSE_NUMBER));
                 ((EditText) dialogLayout.findViewById(R.id.sell_book_title_text)).setText(book.get(Book.TITLE));
@@ -270,9 +278,14 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
                                 book.set(Book.NOTES, notes);
 
                                 // Save Data -
-                                DatabaseReference bookRef = FirebaseDatabase.getInstance().getReference().child("books").child(book.getBookID());
-                                bookRef.setValue(book);
+                                try {
+                                    FirebaseHandler.addPublicBook(book);
+                                }catch (IllegalAccessException iae){
+                                    illegalAccess();
+                                }
 
+                                int index = mValues.indexOf(book);
+                                notifyItemChanged(index);
                                 editBookDialog.dismiss();
                                 viewMyBookDialog(book, context).show();
                             }
@@ -317,11 +330,13 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 // In Books!
-                String id = book.getBookID();
-                DatabaseReference bookRef = FirebaseDatabase.getInstance().getReference().child("books").child(id);
-                bookRef.removeValue();
-
+                try {
+                    FirebaseHandler.removePublicBook(book);
+                }catch (IllegalAccessException iae){
+                    illegalAccess();
+                }
                 // In User Book Ids
+                String id = book.getBookID();
                 HashMap<String, Object> UserBookIds = mainUser.getBookIDs();
                 UserBookIds.remove(id);
 
@@ -332,20 +347,19 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
 
                     for (Object object : keySet) {
                         if (object instanceof String) {
-                            WebServiceHandler.removeRequest((String) object);
+                            FirebaseHandler.removeRequest((String) object);
                         }
                     }
-                    WebServiceHandler.updateMainUserData(mainUser);
+                    FirebaseHandler.updateMainUserData(mainUser);
 
                 } catch (IllegalAccessException ie){
                     illegalAccess();
                 }
 
-                // Todo: Update UI
+
                 int index = mValues.indexOf(book);
                 mValues.remove(index);
                 notifyItemRemoved(index);
-
             }
         });
         builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -364,6 +378,18 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
 
         LayoutInflater inflater = LayoutInflater.from(context);
         dialogLayout = inflater.inflate(R.layout.add_book_dialog_layout, null);
+
+        RadioGroup radioGroup = dialogLayout.findViewById(R.id.sell_buy_radio);
+        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup radioGroup, int i) {
+                if(i == R.id.radioSell){
+                    dialogLayout.setBackgroundColor(Color.parseColor("#c2efc2"));
+                }else if(i == R.id.radioBuy){
+                    dialogLayout.setBackgroundColor(Color.parseColor("#cce0ff"));
+                }
+            }
+        });
 
         builder.setView(dialogLayout);
         builder.setPositiveButton("Save", null);
@@ -411,12 +437,6 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
         stringBuilder.append(System.getProperty("line.separator"));
         stringBuilder.append(System.getProperty("line.separator"));
 
-        stringBuilder.append("Instructor: ");
-        stringBuilder.append(System.getProperty("line.separator"));
-        stringBuilder.append(book.getInstructor());
-        stringBuilder.append(System.getProperty("line.separator"));
-        stringBuilder.append(System.getProperty("line.separator"));
-
         stringBuilder.append("Notes: ");
         stringBuilder.append(System.getProperty("line.separator"));
         stringBuilder.append(book.getNotes());
@@ -444,8 +464,8 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
                 public void onClick(View view) {
                     book.setSpam(true);
                     try {
-                        WebServiceHandler.addSpam(book);
-                        WebServiceHandler.addPublicBook(book);
+                        FirebaseHandler.addSpam(book);
+                        FirebaseHandler.addPublicBook(book);
                     }catch (IllegalAccessException i){
                         illegalAccess();
                     }
@@ -492,13 +512,13 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
         // NO need to add to bookRequests, since bookRequests is a pointer AND it will update the Firebase Database
         try {
             Request request = new Request(mainUser, bookRequested);
-            WebServiceHandler.addRequest(request);
+            FirebaseHandler.addRequest(request);
 
             bookRequested.addRequestID(request);
-            WebServiceHandler.addPublicBook(bookRequested);
+            FirebaseHandler.addPublicBook(bookRequested);
 
             mainUser.addMyRequest(request);
-            WebServiceHandler.updateMainUserData(mainUser);
+            FirebaseHandler.updateMainUserData(mainUser);
         }catch (IllegalAccessException i){
             illegalAccess();
         }
@@ -506,14 +526,14 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
 
     private void deleteRequest(Book book, String requestID){
         // NO need to delete to bookRequests, since bookRequests is a pointer (mainUser.getMyRequestIDs) AND it will update the Firebase Database
-        WebServiceHandler.getRootRef().child("requests").child(requestID).removeValue();
+        FirebaseHandler.getRootRef().child("requests").child(requestID).removeValue();
 
         try {
             book.removeRequestID(requestID);
-            WebServiceHandler.addPublicBook(book);
+            FirebaseHandler.addPublicBook(book);
 
             mainUser.getMyRequestIDs().remove(book.getBookID());
-            WebServiceHandler.updateMainUserData(mainUser);
+            FirebaseHandler.updateMainUserData(mainUser);
         }catch (IllegalAccessException i){
             illegalAccess();
         }

@@ -23,7 +23,7 @@ public class MyFirebaseInstanceIDService extends FirebaseInstanceIdService {
 
         // Update UserData - to store the registration token
         try {
-            WebServiceHandler.updateToken();
+            FirebaseHandler.updateToken();
         }
         catch (IllegalAccessException i){
             Log.d("AccessTokenDenied", i.getMessage());
