@@ -411,12 +411,6 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
         stringBuilder.append(System.getProperty("line.separator"));
         stringBuilder.append(System.getProperty("line.separator"));
 
-        stringBuilder.append("Instructor: ");
-        stringBuilder.append(System.getProperty("line.separator"));
-        stringBuilder.append(book.getInstructor());
-        stringBuilder.append(System.getProperty("line.separator"));
-        stringBuilder.append(System.getProperty("line.separator"));
-
         stringBuilder.append("Notes: ");
         stringBuilder.append(System.getProperty("line.separator"));
         stringBuilder.append(book.getNotes());

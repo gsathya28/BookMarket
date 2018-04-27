@@ -136,7 +136,7 @@ class FirebaseHandler {
     // This also updates books!
     static void addPublicBook(Book book) throws IllegalAccessException{
         if (isMainUserAuthenticated()) { // Add function to only allow certain people to post
-            DatabaseReference postRef = FirebaseHandler.rootRef.child(SELL_BOOK_REF).child(book.getBookID());
+            DatabaseReference postRef = FirebaseHandler.rootRef.child(book.getType()).child(book.getBookID());
             postRef.setValue(book);
         }
         else {
