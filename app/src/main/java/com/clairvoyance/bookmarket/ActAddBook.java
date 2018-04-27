@@ -61,8 +61,11 @@ public class ActAddBook extends AppCompatActivity {
     }
 
     private void setMainUser() {
-        String uid = FirebaseHandler.getUID();
-        if (uid == null) {
+
+        String uid;
+        try{
+            uid = FirebaseHandler.getUID();
+        }catch (IllegalAccessException iae){
             illegalAccess();
             return;
         }

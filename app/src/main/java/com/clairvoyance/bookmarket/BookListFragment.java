@@ -1,6 +1,7 @@
 package com.clairvoyance.bookmarket;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -65,7 +66,7 @@ public class BookListFragment extends Fragment {
             Iterator iterator = books.iterator();
             while (iterator.hasNext()){
                 Book book = (Book) iterator.next();
-                if(book.getUid().equals(FirebaseHandler.getUID())){
+                if(book.getUid().equals(mainUser.getUid())){
                     iterator.remove();
                 }
             }
@@ -121,7 +122,6 @@ public class BookListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        // Layout selection
         View view = inflater.inflate(R.layout.fragment_book_list, container, false);
 
         // Color Scheme
@@ -131,30 +131,42 @@ public class BookListFragment extends Fragment {
         else if(mType.equals(Book.ALL_BOOK_BUY) || mType.equals(Book.MY_BOOK_BUY)){
             view.setBackgroundColor(Color.parseColor("#cce0ff"));
         }
-        // Set the adapter
+
+        // Set the query which sets the adapter
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
             recyclerView = (RecyclerView) view;
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            loadPrivateData();
+            try {
+                loadPrivateData();
+            }catch (IllegalAccessException iae){
+                illegalAccess(context);
+            }
         }
         return view;
     }
 
-    private void loadPrivateData(){
-        if(mType.equals(Book.MY_BOOK_SELL)) {
-            query = FirebaseHandler.mySellBooks;
+    private void loadPrivateData() throws IllegalAccessException{
+
+        query = FirebaseHandler.getBookListQuery(mType);
+
+        if(mType.equals(Book.MY_BOOK_SELL) || mType.equals(Book.MY_BOOK_BUY)) {
             query.addListenerForSingleValueEvent(mBookData);
-        }else if(mType.equals(Book.ALL_BOOK_SELL)){
-            query = FirebaseHandler.allSellBooks;
-            query.addListenerForSingleValueEvent(allBookData);
-        }else if(mType.equals(Book.MY_BOOK_BUY)){
-            query = FirebaseHandler.myBuyBooks;
-            query.addListenerForSingleValueEvent(mBookData);
-        }else if(mType.equals(Book.ALL_BOOK_BUY)){
-            query = FirebaseHandler.allBuyBooks;
-            query.addListenerForSingleValueEvent(allBookData);
+            return;
         }
+
+        if(mType.equals(Book.ALL_BOOK_SELL) || mType.equals(Book.ALL_BOOK_BUY)) {
+            query.addListenerForSingleValueEvent(allBookData);
+            return;
+        }
+
+        throw new IllegalStateException("Invalid Type, Mate!");
+
+    }
+
+    private void illegalAccess(Context context){
+        Intent intent = new Intent(context, ActLoginActivity.class);
+        startActivity(intent);
     }
 
     @Override

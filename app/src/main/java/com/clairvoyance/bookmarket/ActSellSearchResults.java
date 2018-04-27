@@ -110,7 +110,7 @@ public class ActSellSearchResults extends AppCompatActivity {
 
         for (final Book book : resultBooks) {
 
-            if (book.getUid().equals(FirebaseHandler.getUID())) {
+            if (book.getUid().equals(mainUser.getUid())) {
                 continue;
             }
 

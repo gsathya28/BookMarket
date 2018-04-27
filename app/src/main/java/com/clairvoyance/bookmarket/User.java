@@ -11,6 +11,7 @@ import java.util.HashMap;
 // Todo: Implement Parcelable (for argument passing in bundles in fragments)
 @IgnoreExtraProperties
 class User implements Serializable {
+    private String uid;
     private String name;
     private String email;
     private HashMap<String, Object> bookIDs = new HashMap<>();
@@ -22,7 +23,8 @@ class User implements Serializable {
 
     public User(){ }
 
-    User(String email){
+    User(String uid, String email){
+        this.uid = uid;
         this.email = email;
     }
 
@@ -57,5 +59,9 @@ class User implements Serializable {
     }
     public String setRegistrationToken() {
         return registrationToken;
+    }
+
+    public String getUid() {
+        return uid;
     }
 }

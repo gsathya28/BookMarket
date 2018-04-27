@@ -17,15 +17,15 @@ import com.google.firebase.database.ValueEventListener;
 public class ActMainActivity extends AppCompatActivity implements BookListFragment.OnListFragmentInteractionListener {
 
     User mainUser;
-    ViewPager actViewPager;
+    ViewPager mainActViewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setToolbar();
-        actViewPager = findViewById(R.id.main_pager);
-        setMainUser();
+        initMainActViewPager();
+        setMainActViewPagerGUIAdapter();
     }
 
     private void setToolbar() {
@@ -36,13 +36,24 @@ public class ActMainActivity extends AppCompatActivity implements BookListFragme
         // Get a support ActionBar corresponding to this toolbar
     }
 
-    private void setMainUser() {
-        String uid = FirebaseHandler.getUID();
-        if (uid == null) {
+    private void initMainActViewPager(){
+        mainActViewPager = findViewById(R.id.main_pager);
+    }
+
+    private void setMainActViewPagerGUIAdapter() {
+
+        String uid;
+        try{
+            uid = FirebaseHandler.getUID();
+        }catch (IllegalAccessException iae){
             illegalAccess();
             return;
         }
+        setViewPagerAfterUserDataCollection(uid);
 
+    }
+
+    void setViewPagerAfterUserDataCollection(String uid){
         DatabaseReference userRef = FirebaseHandler.getRootRef().child("users").child(uid);
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -54,9 +65,9 @@ public class ActMainActivity extends AppCompatActivity implements BookListFragme
                     Log.d("MainActivityCycle", "mainUserSet");
                     mainUser = dataSnapshot.getValue(User.class);
                     if (mainUser != null) {
-                        // Set up the GUI now that the mainUser is set (we'll need its data)
-                        actViewPager.setAdapter(new MainPagerAdapter(getSupportFragmentManager(), mainUser));
-                        actViewPager.setCurrentItem(1);
+                        setViewPagerWithUserData(mainUser);
+                    }else{
+                        Log.d("UserDataCollect", "No User Data on Store - GUI not loaded");
                     }
                 }
             }
@@ -68,12 +79,17 @@ public class ActMainActivity extends AppCompatActivity implements BookListFragme
         });
     }
 
+    void setViewPagerWithUserData(User mainUser){
+        mainActViewPager.setAdapter(new MainPagerAdapter(getSupportFragmentManager(), mainUser));
+        mainActViewPager.setCurrentItem(1);
+    }
+
     @Override
     public void onListFragmentInteraction(Book item) {
         // List Fragment stuff
     }
 
-    private void illegalAccess() {
+    public void illegalAccess() {
         Intent intent = new Intent(ActMainActivity.this, ActLoginActivity.class);
         startActivity(intent);
     }
