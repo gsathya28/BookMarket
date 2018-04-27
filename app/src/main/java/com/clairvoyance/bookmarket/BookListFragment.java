@@ -12,14 +12,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
-
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
+
 
 
 /**
@@ -33,53 +27,7 @@ public class BookListFragment extends Fragment {
     RecyclerView recyclerView;
     private ArrayList<Book> books = new ArrayList<>();
 
-    Query query;
-    private ValueEventListener mBookData = new ValueEventListener() {
-        @Override
-        public void onDataChange(DataSnapshot dataSnapshot) {
-            books.clear();
-            for(DataSnapshot d: dataSnapshot.getChildren()){
-                Book book = d.getValue(Book.class);
-                if (book != null){
-                    books.add(book);
-                }
-            }
-            recyclerView.setAdapter(new BookRecyclerAdapter(books, mType, mListener, mainUser));
-        }
 
-        @Override
-        public void onCancelled(DatabaseError databaseError) {
-
-        }
-    };
-    private ValueEventListener allBookData = new ValueEventListener() {
-        @Override
-        public void onDataChange(DataSnapshot dataSnapshot) {
-            books.clear();
-            for(DataSnapshot d: dataSnapshot.getChildren()){
-                Book book = d.getValue(Book.class);
-                if (book != null){
-                    books.add(book);
-                }
-            }
-            // Get rid of own books - may move this somewhere else...
-            Iterator iterator = books.iterator();
-            while (iterator.hasNext()){
-                Book book = (Book) iterator.next();
-                if(book.getUid().equals(mainUser.getUid())){
-                    iterator.remove();
-                }
-            }
-
-            Collections.reverse(books);
-            recyclerView.setAdapter(new BookRecyclerAdapter(books, mType, mListener, mainUser));
-        }
-
-        @Override
-        public void onCancelled(DatabaseError databaseError) {
-
-        }
-    };
     private OnListFragmentInteractionListener mListener;
 
     private static final String ARG_TYPE = "type";
@@ -138,7 +86,7 @@ public class BookListFragment extends Fragment {
             recyclerView = (RecyclerView) view;
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
             try {
-                loadPrivateData();
+                recyclerView.setAdapter(new BookRecyclerAdapter(books, mType, mainUser));
             }catch (IllegalAccessException iae){
                 illegalAccess(context);
             }
@@ -146,23 +94,6 @@ public class BookListFragment extends Fragment {
         return view;
     }
 
-    private void loadPrivateData() throws IllegalAccessException{
-
-        query = FirebaseHandler.getBookListQuery(mType);
-
-        if(mType.equals(Book.MY_BOOK_SELL) || mType.equals(Book.MY_BOOK_BUY)) {
-            query.addListenerForSingleValueEvent(mBookData);
-            return;
-        }
-
-        if(mType.equals(Book.ALL_BOOK_SELL) || mType.equals(Book.ALL_BOOK_BUY)) {
-            query.addListenerForSingleValueEvent(allBookData);
-            return;
-        }
-
-        throw new IllegalStateException("Invalid Type, Mate!");
-
-    }
 
     private void illegalAccess(Context context){
         Intent intent = new Intent(context, ActLoginActivity.class);

@@ -21,10 +21,16 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.clairvoyance.bookmarket.BookListFragment.OnListFragmentInteractionListener;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -35,24 +41,81 @@ import java.util.Set;
  */
 public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapter.ViewHolder> {
 
+    private ValueEventListener mBooksRecyclerListener = new ValueEventListener() {
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+            mValues.clear();
+            for(DataSnapshot d: dataSnapshot.getChildren()){
+                Book book = d.getValue(Book.class);
+                if (book != null){
+                    mValues.add(book);
+                }
+            }
+            notifyDataSetChanged();
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+
+        }
+    };
+
+    private ValueEventListener publicBooksRecyclerListener = new ValueEventListener() {
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+            mValues.clear();
+            for(DataSnapshot d: dataSnapshot.getChildren()){
+                Book book = d.getValue(Book.class);
+                if (book != null){
+                    mValues.add(book);
+                }
+            }
+
+            // Don't display user's own books on the public list
+            Iterator iterator = mValues.iterator();
+            while (iterator.hasNext()){
+                Book book = (Book) iterator.next();
+                if(book.getUid().equals(mainUser.getUid())){
+                    iterator.remove();
+                }
+            }
+
+            Collections.reverse(mValues);
+            notifyDataSetChanged();
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+
+        }
+    };
+
     private final List<Book> mValues;
-    private final OnListFragmentInteractionListener mListener;
     private final String mType;
     private final User mainUser;
     private View dialogLayout;
 
     private final HashMap<String, String> bookRequests;
 
-    BookRecyclerAdapter(List<Book> items, String type, OnListFragmentInteractionListener listener, User user) {
+    BookRecyclerAdapter(List<Book> items, String type, User user) throws IllegalAccessException {
         mValues = items;
-        mListener = listener;
-        mType = type;
+        mType = type; // Todo: Check for type validity (precautionary)
         mainUser = user;
         bookRequests = mainUser.getMyRequestIDs();
+
+        Query query = FirebaseHandler.getBookListQuery(mType);
+        if(mType.equals(Book.MY_BOOK_SELL) || mType.equals(Book.MY_BOOK_BUY)) {
+            query.addListenerForSingleValueEvent(mBooksRecyclerListener);
+        }
+        else if(mType.equals(Book.ALL_BOOK_SELL) || mType.equals(Book.ALL_BOOK_BUY)) {
+            query.addListenerForSingleValueEvent(publicBooksRecyclerListener);
+        }
+
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    @NotNull
+    public ViewHolder onCreateViewHolder(@NotNull ViewGroup parent, int viewType) {
         View view = parent;
         if(mType.equals(Book.MY_BOOK_SELL) || mType.equals(Book.MY_BOOK_BUY)) {
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.my_fragment_book, parent, false);
@@ -123,7 +186,7 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
+    public void onBindViewHolder(@NotNull final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
 
         String buttonText = holder.mItem.getCourseSubj() + " " + holder.mItem.getCourseNumber() + " - " + holder.mItem.getTitle();
@@ -143,6 +206,7 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
         else if(holder.mView instanceof LinearLayout){ // Public Book
 
             LinearLayout bookLayout = (LinearLayout) holder.mView;
+            bookLayout.removeAllViews();
             setBookLayout(bookLayout);
 
             Context context = bookLayout.getContext();
