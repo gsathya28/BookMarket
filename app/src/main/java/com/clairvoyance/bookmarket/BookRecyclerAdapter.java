@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +22,7 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.clairvoyance.bookmarket.BookListFragment.OnListFragmentInteractionListener;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.Query;
@@ -28,9 +30,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -41,59 +41,62 @@ import java.util.Set;
  */
 public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapter.ViewHolder> {
 
-    private ValueEventListener mBooksRecyclerListener = new ValueEventListener() {
-        @Override
-        public void onDataChange(DataSnapshot dataSnapshot) {
-            mValues.clear();
-            for(DataSnapshot d: dataSnapshot.getChildren()){
-                Book book = d.getValue(Book.class);
-                if (book != null){
-                    mValues.add(book);
-                }
-            }
-            notifyDataSetChanged();
-        }
-
-        @Override
-        public void onCancelled(DatabaseError databaseError) {
-
-        }
-    };
-
-    private ValueEventListener publicBooksRecyclerListener = new ValueEventListener() {
-        @Override
-        public void onDataChange(DataSnapshot dataSnapshot) {
-            mValues.clear();
-            for(DataSnapshot d: dataSnapshot.getChildren()){
-                Book book = d.getValue(Book.class);
-                if (book != null){
-                    mValues.add(book);
-                }
-            }
-
-            // Don't display user's own books on the public list
-            Iterator iterator = mValues.iterator();
-            while (iterator.hasNext()){
-                Book book = (Book) iterator.next();
-                if(book.getUid().equals(mainUser.getUid())){
-                    iterator.remove();
-                }
-            }
-
-            Collections.reverse(mValues);
-            notifyDataSetChanged();
-        }
-
-        @Override
-        public void onCancelled(DatabaseError databaseError) {
-
-        }
-    };
-
     private final List<Book> mValues;
     private final String mType;
     private final User mainUser;
     private View dialogLayout;
+    private final Query query;
+
+    private ChildEventListener childTracker = new ChildEventListener() {
+        @Override
+        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+            Book book = dataSnapshot.getValue(Book.class);
+            if(book != null){
+                if(!(book.getUid().equals(mainUser.getUid()))){
+                    mValues.add(0, book);
+                    notifyItemInserted(0);
+                }
+            }
+        }
+
+        @Override
+        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+            Book changedBook = dataSnapshot.getValue(Book.class);
+            if(changedBook != null) {
+                for (Book book : mValues) {
+                    if (changedBook.getBookID().equals(book.getBookID())) {
+                        book = changedBook;
+                        int index = mValues.indexOf(book);
+                        notifyItemChanged(index);
+                    }
+                }
+            }
+        }
+
+        @Override
+        public void onChildRemoved(DataSnapshot dataSnapshot) {
+            Book removedBook = dataSnapshot.getValue(Book.class);
+            if(removedBook != null){
+                for (Book book : mValues){
+                    if (removedBook.getBookID().equals(book.getBookID())) {
+                        int index = mValues.indexOf(book);
+                        mValues.remove(index);
+                        notifyItemRemoved(index);
+                    }
+                }
+            }
+        }
+
+        @Override
+        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+
+        }
+    };
 
     private final HashMap<String, String> bookRequests;
 
@@ -103,14 +106,33 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
         mainUser = user;
         bookRequests = mainUser.getMyRequestIDs();
 
-        Query query = FirebaseHandler.getBookListQuery(mType);
+        query = FirebaseHandler.getBookListQuery(mType);
         if(mType.equals(Book.MY_BOOK_SELL) || mType.equals(Book.MY_BOOK_BUY)) {
-            query.addListenerForSingleValueEvent(mBooksRecyclerListener);
+            query.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    mValues.clear();
+                    for(DataSnapshot d: dataSnapshot.getChildren()){
+                        Book book = d.getValue(Book.class);
+                        if (book != null){
+                            mValues.add(book);
+                        }
+                    }
+                    notifyDataSetChanged();
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
         }
         else if(mType.equals(Book.ALL_BOOK_SELL) || mType.equals(Book.ALL_BOOK_BUY)) {
-            query.addListenerForSingleValueEvent(publicBooksRecyclerListener);
+            mValues.clear();
+            notifyDataSetChanged();
+            query.addChildEventListener(childTracker);
         }
-
+        Log.d("QueryDetacher", "Query Attached!" + " " + mType);
     }
 
     @Override
@@ -670,6 +692,15 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
 
     private void illegalAccess(){
 
+    }
+
+    public void removeListener(){
+        if(mType.equals(Book.ALL_BOOK_SELL) || mType.equals(Book.ALL_BOOK_BUY)) {
+            if (query != null) {
+                query.removeEventListener(childTracker);
+                Log.d("QueryDetacher", "Query Detached!" + " " + mType);
+            }
+        }
     }
 
     @Override

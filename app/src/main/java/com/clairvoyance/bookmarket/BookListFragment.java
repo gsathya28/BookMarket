@@ -71,7 +71,6 @@ public class BookListFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_book_list, container, false);
-
         // Color Scheme
         if(mType.equals(Book.ALL_BOOK_SELL) || mType.equals(Book.MY_BOOK_SELL)) {
             view.setBackgroundColor(Color.parseColor("#c2efc2"));
@@ -101,9 +100,17 @@ public class BookListFragment extends Fragment {
     }
 
     @Override
+    public void onStop(){
+        super.onStop();
+        BookRecyclerAdapter recyclerAdapter = (BookRecyclerAdapter) recyclerView.getAdapter();
+        recyclerAdapter.removeListener();
+    }
+
+    @Override
     public void onDestroyView() {
         super.onDestroyView();
         // Detach any continuous listeners??
+
     }
 
     @Override
