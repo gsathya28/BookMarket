@@ -144,6 +144,14 @@ class FirebaseHandler {
         }
     }
 
+    static void removePublicBook(Book book) throws IllegalAccessException{
+        if(isMainUserAuthenticated()){
+            String id = book.getBookID();
+            DatabaseReference bookRef = rootRef.child(book.getType()).child(id);
+            bookRef.removeValue();
+        }
+    }
+
     static void addRequest(Request request) throws IllegalAccessException{
         if (isMainUserAuthenticated()) { // Add function to only allow certain people to post
             DatabaseReference myRequestRef = rootRef.child(REQUEST_REF).child(request.getRequestID());

@@ -148,6 +148,12 @@ public class BookListFragment extends Fragment {
         }else if(mType.equals(Book.ALL_BOOK_SELL)){
             query = FirebaseHandler.allSellBooks;
             query.addListenerForSingleValueEvent(allBookData);
+        }else if(mType.equals(Book.MY_BOOK_BUY)){
+            query = FirebaseHandler.myBuyBooks;
+            query.addListenerForSingleValueEvent(mBookData);
+        }else if(mType.equals(Book.ALL_BOOK_BUY)){
+            query = FirebaseHandler.allBuyBooks;
+            query.addListenerForSingleValueEvent(allBookData);
         }
     }
 
