@@ -365,7 +365,7 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
 
                                 // Save Data -
                                 try {
-                                    FirebaseHandler.addPublicBook(book);
+                                    FirebaseHandler.updatePublicBook(book);
                                 }catch (IllegalAccessException iae){
                                     illegalAccess();
                                 }
@@ -430,7 +430,6 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
                 HashMap<String, Boolean> requestIDs = book.getRequestIDs();
                 Set keySet = requestIDs.keySet();
                 try {
-
                     for (Object object : keySet) {
                         if (object instanceof String) {
                             FirebaseHandler.removeRequest((String) object);
@@ -551,7 +550,7 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
                     book.setSpam(true);
                     try {
                         FirebaseHandler.addSpam(book);
-                        FirebaseHandler.addPublicBook(book);
+                        FirebaseHandler.updatePublicBook(book);
                     }catch (IllegalAccessException i){
                         illegalAccess();
                     }
@@ -601,7 +600,7 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
             FirebaseHandler.addRequest(request);
 
             bookRequested.addRequestID(request);
-            FirebaseHandler.addPublicBook(bookRequested);
+            FirebaseHandler.updatePublicBook(bookRequested);
 
             mainUser.addMyRequest(request);
             FirebaseHandler.updateMainUserData(mainUser);
@@ -616,7 +615,7 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
 
         try {
             book.removeRequestID(requestID);
-            FirebaseHandler.addPublicBook(book);
+            FirebaseHandler.updatePublicBook(book);
 
             mainUser.getMyRequestIDs().remove(book.getBookID());
             FirebaseHandler.updateMainUserData(mainUser);

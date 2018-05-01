@@ -1,5 +1,7 @@
 package com.clairvoyance.bookmarket;
 
+import android.os.Parcelable;
+
 import com.google.firebase.database.IgnoreExtraProperties;
 import java.io.Serializable;
 import java.util.HashMap;
@@ -21,6 +23,7 @@ class User implements Serializable {
     private boolean isEmailVerified = false;
     private String registrationToken;
 
+    @Deprecated
     public User(){ }
 
     User(String uid, String email){
@@ -64,4 +67,6 @@ class User implements Serializable {
     public String getUid() {
         return uid;
     }
+
+
 }

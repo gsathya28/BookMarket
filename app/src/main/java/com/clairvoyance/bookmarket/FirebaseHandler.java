@@ -128,9 +128,18 @@ class FirebaseHandler {
         }
     }
 
-    // This also updates books!
+    static void updatePublicBook(Book book) throws IllegalAccessException{
+        if(isMainUserAuthenticated(getFirebaseUser())){
+            DatabaseReference postRef = FirebaseHandler.rootRef.child(book.getType()).child(book.getBookID());
+            postRef.setValue(book);
+        }
+        else {
+            throw new IllegalAccessException("User not authorized");
+        }
+    }
+
     static void addPublicBook(Book book) throws IllegalAccessException{
-        if (isMainUserAuthenticated(getFirebaseUser())) { // Add function to only allow certain people to post
+        if (isMainUserAuthenticated(getFirebaseUser())) {
             book.setUid(getFirebaseUser().getUid());
             DatabaseReference postRef = FirebaseHandler.rootRef.child(book.getType()).child(book.getBookID());
             postRef.setValue(book);

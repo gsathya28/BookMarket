@@ -80,10 +80,6 @@ public class ActAddBook extends AppCompatActivity {
                     // This works even after the initial data read since loadedUser's pointer is returned at the end of the method.
                     Log.d("MainActivityCycle", "mainUserSet");
                     mainUser = dataSnapshot.getValue(User.class);
-                    if (mainUser != null) {
-                        // Set up the GUI now that the mainUser is set (we'll need its data)
-                        setButtons();
-                    }
                 }
             }
 
