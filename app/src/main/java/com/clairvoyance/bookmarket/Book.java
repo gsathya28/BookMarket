@@ -59,13 +59,13 @@ class Book implements Serializable, Parcelable {
     }
 
     // Only courseSubj and courseNumber are required
+    // Todo: Set UID of Book in FirebaseHandler AddBookMethod (or elsewhere) - for offline optimization
     public Book(String courseSubj, String courseNumber, String type){
         this.courseSubj = courseSubj;
         this.courseNumber = courseNumber;
         this.courseTotal = courseSubj + courseNumber;
         bookID = UUID.randomUUID().toString();
         postDateInSecs = Calendar.getInstance().getTimeInMillis();
-        this.uid = FirebaseHandler.getUID();
 
         if(!(type.equals(SELL_BOOK) || type.equals(BUY_BOOK))){
             throw new IllegalArgumentException("Illegal Type - Type should be set using Book.SELL_BOOK or Book.BUY_BOOK");
@@ -103,6 +103,10 @@ class Book implements Serializable, Parcelable {
             default:
                 throw new IllegalArgumentException("Invalid Parameter");
         }
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 
     void setSpam(boolean spam) {

@@ -23,7 +23,7 @@ class Request {
 
     Request(User user, Book book) {
         this.requestID = UUID.randomUUID().toString();
-        this.uid = FirebaseHandler.getUID();
+        this.uid = user.getUid();
         this.bookID = book.getBookID();
         this.requesteeID = book.getUid();
         this.requesterName = user.getName();

@@ -1,5 +1,7 @@
 package com.clairvoyance.bookmarket;
 
+import android.os.Parcelable;
+
 import com.google.firebase.database.IgnoreExtraProperties;
 import java.io.Serializable;
 import java.util.HashMap;
@@ -11,6 +13,7 @@ import java.util.HashMap;
 // Todo: Implement Parcelable (for argument passing in bundles in fragments)
 @IgnoreExtraProperties
 class User implements Serializable {
+    private String uid;
     private String name;
     private String email;
     private HashMap<String, Object> bookIDs = new HashMap<>();
@@ -20,9 +23,11 @@ class User implements Serializable {
     private boolean isEmailVerified = false;
     private String registrationToken;
 
+    @Deprecated
     public User(){ }
 
-    User(String email){
+    User(String uid, String email){
+        this.uid = uid;
         this.email = email;
     }
 
@@ -55,7 +60,14 @@ class User implements Serializable {
     public HashMap<String, String> getMyRequestIDs() {
         return myRequestIDs;
     }
-    public String setRegistrationToken() {
+
+    public String getRegistrationToken() {
         return registrationToken;
     }
+
+    public String getUid() {
+        return uid;
+    }
+
+
 }

@@ -61,8 +61,11 @@ public class ActAddBook extends AppCompatActivity {
     }
 
     private void setMainUser() {
-        String uid = FirebaseHandler.getUID();
-        if (uid == null) {
+
+        String uid;
+        try{
+            uid = FirebaseHandler.getUID();
+        }catch (IllegalAccessException iae){
             illegalAccess();
             return;
         }
@@ -77,10 +80,6 @@ public class ActAddBook extends AppCompatActivity {
                     // This works even after the initial data read since loadedUser's pointer is returned at the end of the method.
                     Log.d("MainActivityCycle", "mainUserSet");
                     mainUser = dataSnapshot.getValue(User.class);
-                    if (mainUser != null) {
-                        // Set up the GUI now that the mainUser is set (we'll need its data)
-                        setButtons();
-                    }
                 }
             }
 
@@ -106,10 +105,10 @@ public class ActAddBook extends AppCompatActivity {
                 newBookDialog.setOnShowListener(new DialogInterface.OnShowListener() {
                     @Override
                     public void onShow(DialogInterface dialogInterface) {
-                        Button button = newBookDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                        Button addBookButton = newBookDialog.getButton(AlertDialog.BUTTON_POSITIVE);
 
                         // Listener for Dialog Positive Button to create Book Object and stored temporarily in Activity (postBooks)
-                        button.setOnClickListener(new View.OnClickListener() {
+                        addBookButton.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
 
@@ -165,7 +164,7 @@ public class ActAddBook extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                // Add books to database that are in temporary store (postBooks)
+                // Add books to database that are in local Activity store (postBooks)
                 for(Book book: postBooks){
                     mainUser.addBook(book);
                     try{

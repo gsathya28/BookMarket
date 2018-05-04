@@ -13,17 +13,17 @@ import android.view.View;
 import android.view.ViewGroup;
 
 
-public class MainFragment extends Fragment {
+public class HomeFragment extends Fragment {
 
     private static final String ARG_USER = "user";
     private User mainUser;
 
-    public MainFragment(){
+    public HomeFragment(){
 
     }
 
-    public static MainFragment newInstance(User user){
-        MainFragment fragment = new MainFragment();
+    public static HomeFragment newInstance(User user){
+        HomeFragment fragment = new HomeFragment();
         Bundle args = new Bundle();
         args.putSerializable(ARG_USER, user);
         fragment.setArguments(args);
@@ -41,15 +41,14 @@ public class MainFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_main, container, false);
 
-        // Set the View Pagers
-        ViewPager tabViewPager = view.findViewById(R.id.sell_buy_pager);
-        tabViewPager.setAdapter(new TabPagerAdapter(getFragmentManager(), mainUser));
+        View view = inflater.inflate(R.layout.fragment_home, container, false);
+
+        ViewPager myBooksViewPager = view.findViewById(R.id.sell_buy_pager);
+        myBooksViewPager.setAdapter(new MyBooksPagerAdapter(getFragmentManager(), mainUser));
+
         TabLayout tabLayout = view.findViewById(R.id.tabLayout);
-        tabLayout.setupWithViewPager(tabViewPager);
-
-        // Set the button
+        tabLayout.setupWithViewPager(myBooksViewPager);
         FloatingActionButton button = view.findViewById(R.id.addBookButton);
         button.setOnClickListener(new View.OnClickListener() {
             @Override

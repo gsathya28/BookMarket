@@ -20,8 +20,6 @@ import com.google.firebase.iid.FirebaseInstanceId;
 
 class FirebaseHandler {
 
-    private static final String SELL_BOOK_REF = "sellBooks";
-    private static final String BUY_BOOK_REF = "buyBooks";
     private static final String REQUEST_REF = "requests";
     private static final String USER_REF = "users";
     private static final String UID_REF = "uid";
@@ -29,149 +27,147 @@ class FirebaseHandler {
 
     final static int RC_SIGN_IN = 2899;
     final static String WEB_CLIENT_ID = "483082602147-bmhfbbj3k1proa5r2ll3hr694d9s5mrr.apps.googleusercontent.com";
-    private static FirebaseUser mUser;
-    private static User loadedUser;
 
     private static DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
-    static Query allSellBooks = rootRef.child(SELL_BOOK_REF).orderByChild(DATE_REF).limitToFirst(100);
-    static Query mySellBooks = rootRef.child(SELL_BOOK_REF).orderByChild(UID_REF).equalTo(getUID());
-    static Query allBuyBooks = rootRef.child(BUY_BOOK_REF).orderByChild(DATE_REF).limitToFirst(100);
-    static Query myBuyBooks = rootRef.child(BUY_BOOK_REF).orderByChild(UID_REF).equalTo(getUID());
 
     static DatabaseReference getRootRef() {
         return rootRef;
     }
 
-    private static boolean isMainUserAuthenticated() throws IllegalAccessException{
-        FirebaseAuth mAuth = FirebaseAuth.getInstance();
-        mUser = mAuth.getCurrentUser();
-        if (mUser == null){
-            throw new IllegalAccessException("User not authorized");
-        }
-        else{
-            return true;
-        }
+    private static FirebaseUser getFirebaseUser(){
+        return FirebaseAuth.getInstance().getCurrentUser();
     }
 
-    static User generateMainUser() throws IllegalAccessException{
-        if (isMainUserAuthenticated()){
-            User user = new User(mUser.getEmail());
-            user.setEmailVerified(mUser.isEmailVerified());
-            user.setName(mUser.getDisplayName());
-            // Key-line
-            user = loadMainUserData(user);
-            return user;
-        }
-        else {
-            throw new IllegalStateException("Main User not Authenticated");
-        }
+    private static boolean isMainUserAuthenticated(FirebaseUser user) {
+        return user != null;
     }
 
-    private static User loadMainUserData(final User user){
-        // Load main data (and set listener) from database - if not already loaded
-        if (loadedUser == null) {
-            DatabaseReference userRef = rootRef.child(USER_REF).child(mUser.getUid());
-
-            // Read Data
-            userRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    if (!dataSnapshot.exists()) {
-                        // Create new user in database
-                        createNewUserData(user);
-                        // Loaded User is whatever it is now since there is no previous data to load
-                        loadedUser = user;
-                    }
-                    else {
-                        // This works even after the initial data read since loadedUser's pointer is returned at the end of the method.
-                        Log.d("MainActivityCycle", "mainUserSet");
-                        loadedUser = dataSnapshot.getValue(User.class);
-                    }
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-            });
-
-        }
-        return loadedUser; // This will be null at first since the ValueEventListener only puts the data in this pointer after all the code (onCreate) has run
-    }
-
-    private static void createNewUserData(User user) {
-
+    static User createNewUserData() {
+        FirebaseUser mUser = getFirebaseUser();
+        User user = new User(mUser.getUid(), mUser.getEmail());
         DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child(USER_REF);
         userRef.child(mUser.getUid()).setValue(user);
-
+        return user;
     }
 
     static void updateMainUserData(User user) throws IllegalAccessException{
-        if (isMainUserAuthenticated()){
+        FirebaseUser mUser = getFirebaseUser();
+        if (isMainUserAuthenticated(mUser)){
             user.setRegistrationToken(FirebaseInstanceId.getInstance().getToken());
             DatabaseReference userRef = rootRef.child("users").child(mUser.getUid());
             userRef.setValue(user);
         }
         else {
-            throw new IllegalStateException("User not authorized");
+            throw new IllegalAccessException("User not authorized");
         }
     }
 
-    static String getUID(){
-        FirebaseAuth mAuth = FirebaseAuth.getInstance();
-        mUser = mAuth.getCurrentUser();
-        if(mUser != null){
+    static String getUID() throws IllegalAccessException{
+        FirebaseUser mUser = getFirebaseUser();
+        if(isMainUserAuthenticated(mUser)){
             return mUser.getUid();
         }
-        return null;
-    }
-
-    static void updateToken() throws IllegalAccessException{
-        if(isMainUserAuthenticated()){
-            User user = generateMainUser();
-            updateMainUserData(user);
+        else{
+            throw new IllegalAccessException("User not authorized");
         }
     }
 
-    // This also updates books!
-    static void addPublicBook(Book book) throws IllegalAccessException{
-        if (isMainUserAuthenticated()) { // Add function to only allow certain people to post
+    static void setToken(final String token) throws IllegalAccessException{
+
+        String uid = getUID();
+        DatabaseReference userRef = getRootRef().child(USER_REF).child(uid);
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                User mainUser = dataSnapshot.getValue(User.class);
+                if(mainUser != null){
+                    mainUser.setRegistrationToken(token);
+                    dataSnapshot.getRef().setValue(mainUser);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
+    static void updatePublicBook(Book book) throws IllegalAccessException{
+        if(isMainUserAuthenticated(getFirebaseUser())){
             DatabaseReference postRef = FirebaseHandler.rootRef.child(book.getType()).child(book.getBookID());
             postRef.setValue(book);
         }
         else {
-            throw new IllegalStateException("User not authorized");
+            throw new IllegalAccessException("User not authorized");
+        }
+    }
+
+    static void addPublicBook(Book book) throws IllegalAccessException{
+        if (isMainUserAuthenticated(getFirebaseUser())) {
+            book.setUid(getFirebaseUser().getUid());
+            DatabaseReference postRef = FirebaseHandler.rootRef.child(book.getType()).child(book.getBookID());
+            postRef.setValue(book);
+        }
+        else {
+            throw new IllegalAccessException("User not authorized");
         }
     }
 
     static void removePublicBook(Book book) throws IllegalAccessException{
-        if(isMainUserAuthenticated()){
+        if(isMainUserAuthenticated(getFirebaseUser())){
             String id = book.getBookID();
             DatabaseReference bookRef = rootRef.child(book.getType()).child(id);
             bookRef.removeValue();
+        }else{
+            throw new IllegalAccessException("User not authorized");
         }
     }
 
     static void addRequest(Request request) throws IllegalAccessException{
-        if (isMainUserAuthenticated()) { // Add function to only allow certain people to post
+        if (isMainUserAuthenticated(getFirebaseUser())) { // Add function to only allow certain people to post
             DatabaseReference myRequestRef = rootRef.child(REQUEST_REF).child(request.getRequestID());
             myRequestRef.setValue(request);
 
-        }
-        else {
-            throw new IllegalStateException("User not authorized");
+        }else{
+            throw new IllegalAccessException("User not authorized");
         }
     }
 
     static void removeRequest(String requestID) throws IllegalAccessException{
-        if (isMainUserAuthenticated()){
+        if (isMainUserAuthenticated(getFirebaseUser())){
             rootRef.child(REQUEST_REF).child(requestID).removeValue();
+        }else{
+            throw new IllegalAccessException("User not authorized");
         }
     }
 
     static void addSpam(Book book) throws IllegalAccessException{
-        if (isMainUserAuthenticated()){
+        if (isMainUserAuthenticated(getFirebaseUser())){
             rootRef.child("spam").child(book.getBookID()).setValue(getUID());
+        }else{
+            throw new IllegalAccessException("User not authorized");
+        }
+    }
+
+    static Query getBookListQuery(String type) throws IllegalAccessException{
+        FirebaseUser mUser = getFirebaseUser();
+        if(isMainUserAuthenticated(mUser)){
+            switch (type){
+                case Book.ALL_BOOK_SELL:
+                    return rootRef.child(Book.SELL_BOOK).orderByChild(DATE_REF).limitToFirst(100);
+                case Book.ALL_BOOK_BUY:
+                    return rootRef.child(Book.BUY_BOOK).orderByChild(DATE_REF).limitToFirst(100);
+                case Book.MY_BOOK_SELL:
+                    return rootRef.child(Book.SELL_BOOK).orderByChild(UID_REF).equalTo(mUser.getUid());
+                case Book.MY_BOOK_BUY:
+                    return rootRef.child(Book.BUY_BOOK).orderByChild(UID_REF).equalTo(mUser.getUid());
+                default:
+                    throw new IllegalArgumentException("Wrong Query Type Parameter - Use Book Class Query Strings");
+            }
+        }else{
+            throw new IllegalAccessException("User not authorized");
         }
     }
 
