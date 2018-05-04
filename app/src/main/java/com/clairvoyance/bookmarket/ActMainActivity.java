@@ -59,15 +59,15 @@ public class ActMainActivity extends AppCompatActivity implements BookListFragme
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (!dataSnapshot.exists()) {
+                    mainUser = FirebaseHandler.createNewUserData();
                     illegalAccess();
                 } else {
                     // This works even after the initial data read since loadedUser's pointer is returned at the end of the method.
                     Log.d("MainActivityCycle", "mainUserSet");
                     mainUser = dataSnapshot.getValue(User.class);
-                    if (mainUser == null) {
-                        mainUser = FirebaseHandler.createNewUserData();
+                    if(mainUser != null) {
+                        setViewPagerWithUserData(mainUser);
                     }
-                    setViewPagerWithUserData(mainUser);
                 }
             }
 

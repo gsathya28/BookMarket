@@ -1,7 +1,5 @@
 package com.clairvoyance.bookmarket;
 
-import android.util.Log;
-
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -45,6 +43,7 @@ class FirebaseHandler {
     static User createNewUserData() {
         FirebaseUser mUser = getFirebaseUser();
         User user = new User(mUser.getUid(), mUser.getEmail());
+        user.setRegistrationToken(FirebaseInstanceId.getInstance().getToken());
         DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child(USER_REF);
         userRef.child(mUser.getUid()).setValue(user);
         return user;

@@ -11,10 +11,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-
-
 
 /**
  * A fragment representing a list of Items.
@@ -25,8 +26,6 @@ import java.util.ArrayList;
 public class BookListFragment extends Fragment {
 
     RecyclerView recyclerView;
-    private ArrayList<Book> books = new ArrayList<>();
-
 
     private OnListFragmentInteractionListener mListener;
 
@@ -67,7 +66,7 @@ public class BookListFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_book_list, container, false);
@@ -85,7 +84,7 @@ public class BookListFragment extends Fragment {
             recyclerView = (RecyclerView) view;
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
             try {
-                recyclerView.setAdapter(new BookRecyclerAdapter(books, mType, mainUser));
+                recyclerView.setAdapter(new BookRecyclerAdapter(mType, mainUser));
             }catch (IllegalAccessException iae){
                 illegalAccess(context);
             }

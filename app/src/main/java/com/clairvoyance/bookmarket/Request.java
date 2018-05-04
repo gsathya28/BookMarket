@@ -18,6 +18,7 @@ class Request {
     private String requestID;
     private double requestTime;
     private String bookCourse;
+    private String bookType;
 
     Request(){}
 
@@ -30,6 +31,7 @@ class Request {
         this.requesterEmail = user.getEmail();
         this.bookCourse = book.getCourseTotal();
         this.requestTime = Calendar.getInstance().getTimeInMillis();
+        this.bookType = book.getType();
     }
 
     public String getUid() {
@@ -52,4 +54,7 @@ class Request {
         return bookCourse;
     }
     public double getRequestTime() {return requestTime;}
+    public String getBookType() {
+        return bookType;
+    }
 }

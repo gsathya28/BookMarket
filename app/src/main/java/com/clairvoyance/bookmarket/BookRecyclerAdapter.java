@@ -30,6 +30,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -44,7 +45,7 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
     private final List<Book> mValues;
     private final String mType;
     private final User mainUser;
-    private View dialogLayout;
+    private View editDialogLayout;
     private final Query query;
 
     private ChildEventListener childTracker = new ChildEventListener() {
@@ -97,11 +98,10 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
 
         }
     };
-
     private final HashMap<String, String> bookRequests;
 
-    BookRecyclerAdapter(List<Book> items, String type, User user) throws IllegalAccessException {
-        mValues = items;
+    BookRecyclerAdapter(String type, User user) throws IllegalAccessException {
+        mValues = new ArrayList<>();
         mType = type; // Todo: Check for type validity (precautionary)
         mainUser = user;
         bookRequests = mainUser.getMyRequestIDs();
@@ -118,6 +118,7 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
                             mValues.add(book);
                         }
                     }
+
                     notifyDataSetChanged();
                 }
 
@@ -268,49 +269,32 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
     private AlertDialog viewMyBookDialog(final Book book, final Context context){
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle(book.getTitle());
 
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("Book Title");
-        stringBuilder.append(System.getProperty("line.separator"));
-        stringBuilder.append(book.getTitle());
-        stringBuilder.append(System.getProperty("line.separator"));
-        stringBuilder.append(System.getProperty("line.separator"));
+        LayoutInflater inflater = LayoutInflater.from(context);
+        View view = inflater.inflate(R.layout.view_book_layout, null, false);
 
-        stringBuilder.append("Course: ");
-        stringBuilder.append(System.getProperty("line.separator"));
-        stringBuilder.append(book.getCourseSubj());
-        stringBuilder.append(" ");
-        stringBuilder.append(book.getCourseNumber());
-        stringBuilder.append(System.getProperty("line.separator"));
-        stringBuilder.append(System.getProperty("line.separator"));
+        String courseString = book.getCourseSubj() + " " + book.getCourseNumber();
+        ((TextView) view.findViewById(R.id.view_course)).setText(courseString);
 
-        stringBuilder.append("Price: ");
-        stringBuilder.append(System.getProperty("line.separator"));
-        stringBuilder.append("$");
-        stringBuilder.append(book.getPrice());
-        stringBuilder.append(System.getProperty("line.separator"));
-        stringBuilder.append(System.getProperty("line.separator"));
+        ((TextView) view.findViewById(R.id.view_title)).setText(book.getTitle());
 
-        stringBuilder.append("Author: ");
-        stringBuilder.append(System.getProperty("line.separator"));
-        stringBuilder.append(book.getAuthor());
-        stringBuilder.append(System.getProperty("line.separator"));
-        stringBuilder.append(System.getProperty("line.separator"));
+        String authorString = "Author: " + book.getAuthor();
+        ((TextView) view.findViewById(R.id.view_author)).setText(authorString);
 
-        stringBuilder.append("Version Number: ");
-        stringBuilder.append(System.getProperty("line.separator"));
-        stringBuilder.append(book.getVersionNumber());
-        stringBuilder.append(System.getProperty("line.separator"));
-        stringBuilder.append(System.getProperty("line.separator"));
+        String priceString = "$" + book.getPrice();
+        ((TextView) view.findViewById(R.id.view_price)).setText(priceString);
 
-        stringBuilder.append("Notes: ");
-        stringBuilder.append(System.getProperty("line.separator"));
-        stringBuilder.append(book.getNotes());
-        stringBuilder.append(System.getProperty("line.separator"));
-        stringBuilder.append(System.getProperty("line.separator"));
+        String editionString = "Edition: " + book.getVersionNumber();
+        ((TextView) view.findViewById(R.id.view_edition)).setText(editionString);
 
-        builder.setMessage(stringBuilder.toString());
+        String notesString = "Notes:\n" + book.getNotes();
+        ((TextView) view.findViewById(R.id.view_notes)).setText(notesString);
+
+        Button spamButton = view.findViewById(R.id.flag_button);
+        spamButton.setVisibility(View.GONE);
+
+        builder.setView(view);
+
         builder.setPositiveButton("Edit", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
@@ -318,18 +302,18 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
                 final AlertDialog editBookDialog = editBookDialog(context);
 
                 if(book.getType().equals(Book.SELL_BOOK)){
-                    ((RadioButton) dialogLayout.findViewById(R.id.radioSell)).setChecked(true);
+                    ((RadioButton) editDialogLayout.findViewById(R.id.radioSell)).setChecked(true);
                 }else if(book.getType().equals(Book.BUY_BOOK)){
-                    ((RadioButton) dialogLayout.findViewById(R.id.radioBuy)).setChecked(true);
+                    ((RadioButton) editDialogLayout.findViewById(R.id.radioBuy)).setChecked(true);
                 }
 
-                ((EditText) dialogLayout.findViewById(R.id.sell_course_type_text)).setText(book.get(Book.COURSE_SUBJECT));
-                ((EditText) dialogLayout.findViewById(R.id.sell_course_number_text)).setText(book.get(Book.COURSE_NUMBER));
-                ((EditText) dialogLayout.findViewById(R.id.sell_book_title_text)).setText(book.get(Book.TITLE));
-                ((EditText) dialogLayout.findViewById(R.id.sell_author_text)).setText(book.get(Book.AUTHOR));
-                ((EditText) dialogLayout.findViewById(R.id.sell_price_text)).setText(book.get(Book.PRICE));
-                ((EditText) dialogLayout.findViewById(R.id.sell_vnum_text)).setText(book.get(Book.VERSION_NUMBER));
-                ((EditText) dialogLayout.findViewById(R.id.sell_book_notes_text)).setText(book.get(Book.NOTES));
+                ((EditText) editDialogLayout.findViewById(R.id.sell_course_type_text)).setText(book.get(Book.COURSE_SUBJECT));
+                ((EditText) editDialogLayout.findViewById(R.id.sell_course_number_text)).setText(book.get(Book.COURSE_NUMBER));
+                ((EditText) editDialogLayout.findViewById(R.id.sell_book_title_text)).setText(book.get(Book.TITLE));
+                ((EditText) editDialogLayout.findViewById(R.id.sell_author_text)).setText(book.get(Book.AUTHOR));
+                ((EditText) editDialogLayout.findViewById(R.id.sell_price_text)).setText(book.get(Book.PRICE));
+                ((EditText) editDialogLayout.findViewById(R.id.sell_vnum_text)).setText(book.get(Book.VERSION_NUMBER));
+                ((EditText) editDialogLayout.findViewById(R.id.sell_book_notes_text)).setText(book.get(Book.NOTES));
 
                 editBookDialog.setOnShowListener(new DialogInterface.OnShowListener() {
                     @Override
@@ -340,8 +324,8 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
                             @Override
                             public void onClick(View view) {
 
-                                String courseType = ((EditText) dialogLayout.findViewById(R.id.sell_course_type_text)).getText().toString();
-                                String courseNumber = ((EditText) dialogLayout.findViewById(R.id.sell_course_number_text)).getText().toString();
+                                String courseType = ((EditText) editDialogLayout.findViewById(R.id.sell_course_type_text)).getText().toString();
+                                String courseNumber = ((EditText) editDialogLayout.findViewById(R.id.sell_course_number_text)).getText().toString();
 
                                 if (courseType.equals("") && courseNumber.equals("")){
                                     Toast.makeText(context, "Both Course Subject and Number required", Toast.LENGTH_LONG).show();
@@ -351,11 +335,11 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
                                 book.set(Book.COURSE_SUBJECT, courseType);
                                 book.set(Book.COURSE_NUMBER, courseNumber);
 
-                                String bookTitle = ((EditText) dialogLayout.findViewById(R.id.sell_book_title_text)).getText().toString();
-                                String author = ((EditText) dialogLayout.findViewById(R.id.sell_author_text)).getText().toString();
-                                String price = ((EditText) dialogLayout.findViewById(R.id.sell_price_text)).getText().toString();
-                                String vnum = ((EditText) dialogLayout.findViewById(R.id.sell_vnum_text)).getText().toString();
-                                String notes = ((EditText) dialogLayout.findViewById(R.id.sell_book_notes_text)).getText().toString();
+                                String bookTitle = ((EditText) editDialogLayout.findViewById(R.id.sell_book_title_text)).getText().toString();
+                                String author = ((EditText) editDialogLayout.findViewById(R.id.sell_author_text)).getText().toString();
+                                String price = ((EditText) editDialogLayout.findViewById(R.id.sell_price_text)).getText().toString();
+                                String vnum = ((EditText) editDialogLayout.findViewById(R.id.sell_vnum_text)).getText().toString();
+                                String notes = ((EditText) editDialogLayout.findViewById(R.id.sell_book_notes_text)).getText().toString();
 
                                 book.set(Book.TITLE, bookTitle);
                                 book.set(Book.AUTHOR, author);
@@ -462,21 +446,21 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
 
         LayoutInflater inflater = LayoutInflater.from(context);
-        dialogLayout = inflater.inflate(R.layout.add_book_dialog_layout, null);
+        editDialogLayout = inflater.inflate(R.layout.add_book_dialog_layout, null);
 
-        RadioGroup radioGroup = dialogLayout.findViewById(R.id.sell_buy_radio);
+        RadioGroup radioGroup = editDialogLayout.findViewById(R.id.sell_buy_radio);
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup radioGroup, int i) {
                 if(i == R.id.radioSell){
-                    dialogLayout.setBackgroundColor(Color.parseColor("#c2efc2"));
+                    editDialogLayout.setBackgroundColor(Color.parseColor("#c2efc2"));
                 }else if(i == R.id.radioBuy){
-                    dialogLayout.setBackgroundColor(Color.parseColor("#cce0ff"));
+                    editDialogLayout.setBackgroundColor(Color.parseColor("#cce0ff"));
                 }
             }
         });
 
-        builder.setView(dialogLayout);
+        builder.setView(editDialogLayout);
         builder.setPositiveButton("Save", null);
         builder.setNegativeButton("Cancel", null);
         return builder.create();
@@ -486,7 +470,6 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
     private AlertDialog viewPublicBookDialog(final Book book, final ToggleButton reqButton){
 
         AlertDialog.Builder builder = new AlertDialog.Builder(reqButton.getContext());
-        builder.setTitle(book.getTitle());
 
         LayoutInflater inflater = LayoutInflater.from(reqButton.getContext());
         View view = inflater.inflate(R.layout.view_book_layout, null, false);
@@ -687,4 +670,5 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
             return super.toString();
         }
     }
+
 }
