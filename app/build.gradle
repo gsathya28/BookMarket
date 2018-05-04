@@ -30,10 +30,9 @@ dependencies {
 
     // Firebase (+ Google Services) Dependencies
     implementation 'com.google.firebase:firebase-database:15.0.0'
-    implementation 'com.google.firebase:firebase-auth:15.0.0'
+    implementation 'com.google.firebase:firebase-auth:15.1.0'
     implementation 'com.google.android.gms:play-services-auth:15.0.0'
-    implementation 'com.google.firebase:firebase-messaging:15.0.0'
-    implementation 'com.firebaseui:firebase-ui-database:3.3.0'
+    implementation 'com.google.firebase:firebase-messaging:15.0.2'
     implementation 'com.android.support:design:27.1.1'
 
     // Twilio Dependency

@@ -488,62 +488,28 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
         AlertDialog.Builder builder = new AlertDialog.Builder(reqButton.getContext());
         builder.setTitle(book.getTitle());
 
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("Book Title");
-        stringBuilder.append(System.getProperty("line.separator"));
-        stringBuilder.append(book.getTitle());
-        stringBuilder.append(System.getProperty("line.separator"));
-        stringBuilder.append(System.getProperty("line.separator"));
+        LayoutInflater inflater = LayoutInflater.from(reqButton.getContext());
+        View view = inflater.inflate(R.layout.view_book_layout, null, false);
 
-        stringBuilder.append("Course: ");
-        stringBuilder.append(System.getProperty("line.separator"));
-        stringBuilder.append(book.getCourseSubj());
-        stringBuilder.append(" ");
-        stringBuilder.append(book.getCourseNumber());
-        stringBuilder.append(System.getProperty("line.separator"));
-        stringBuilder.append(System.getProperty("line.separator"));
+        String courseString = book.getCourseSubj() + " " + book.getCourseNumber();
+        ((TextView) view.findViewById(R.id.view_course)).setText(courseString);
 
-        stringBuilder.append("Price: ");
-        stringBuilder.append(System.getProperty("line.separator"));
-        stringBuilder.append("$");
-        stringBuilder.append(book.getPrice());
-        stringBuilder.append(System.getProperty("line.separator"));
-        stringBuilder.append(System.getProperty("line.separator"));
+        ((TextView) view.findViewById(R.id.view_title)).setText(book.getTitle());
 
-        stringBuilder.append("Author: ");
-        stringBuilder.append(System.getProperty("line.separator"));
-        stringBuilder.append(book.getAuthor());
-        stringBuilder.append(System.getProperty("line.separator"));
-        stringBuilder.append(System.getProperty("line.separator"));
+        String authorString = "Author: " + book.getAuthor();
+        ((TextView) view.findViewById(R.id.view_author)).setText(authorString);
 
-        stringBuilder.append("Version Number: ");
-        stringBuilder.append(System.getProperty("line.separator"));
-        stringBuilder.append(book.getVersionNumber());
-        stringBuilder.append(System.getProperty("line.separator"));
-        stringBuilder.append(System.getProperty("line.separator"));
+        String priceString = "$" + book.getPrice();
+        ((TextView) view.findViewById(R.id.view_price)).setText(priceString);
 
-        stringBuilder.append("Notes: ");
-        stringBuilder.append(System.getProperty("line.separator"));
-        stringBuilder.append(book.getNotes());
-        stringBuilder.append(System.getProperty("line.separator"));
-        stringBuilder.append(System.getProperty("line.separator"));
+        String editionString = "Edition: " + book.getVersionNumber();
+        ((TextView) view.findViewById(R.id.view_edition)).setText(editionString);
 
-        String infoText = stringBuilder.toString();
-        TextView infoTextView = new TextView(reqButton.getContext());
-        infoTextView.setText(infoText);
-
-        LinearLayout linearLayout = new LinearLayout(reqButton.getContext());
-        linearLayout.setOrientation(LinearLayout.VERTICAL);
-        linearLayout.addView(infoTextView);
+        String notesString = "Notes:\n" + book.getNotes();
+        ((TextView) view.findViewById(R.id.view_notes)).setText(notesString);
 
         if(!book.isSpam()){
-            final Button button = new Button(reqButton.getContext());
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-            );
-            button.setText("Flag");
-            button.setLayoutParams(params);
+            final Button button = view.findViewById(R.id.flag_button);
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -555,12 +521,12 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
                         illegalAccess();
                     }
                     button.setVisibility(View.GONE);
+                    Toast.makeText(reqButton.getContext(), "Book Flagged", Toast.LENGTH_LONG).show();
                 }
             });
-            linearLayout.addView(button);
         }
 
-        builder.setView(linearLayout);
+        builder.setView(view);
 
         // If a request is not made for this book - button will prompt to make request
         // and the listener will set the toggleButton to isChecked which will run code to add request to database
