@@ -64,11 +64,10 @@ public class ActMainActivity extends AppCompatActivity implements BookListFragme
                     // This works even after the initial data read since loadedUser's pointer is returned at the end of the method.
                     Log.d("MainActivityCycle", "mainUserSet");
                     mainUser = dataSnapshot.getValue(User.class);
-                    if (mainUser != null) {
-                        setViewPagerWithUserData(mainUser);
-                    }else{
-                        Log.d("UserDataCollect", "No User Data on Store - GUI not loaded");
+                    if (mainUser == null) {
+                        mainUser = FirebaseHandler.createNewUserData();
                     }
+                    setViewPagerWithUserData(mainUser);
                 }
             }
 

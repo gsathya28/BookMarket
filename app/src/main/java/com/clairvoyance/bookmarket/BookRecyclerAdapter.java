@@ -143,38 +143,38 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.my_fragment_book, parent, false);
         }
         else if(mType.equals(Book.ALL_BOOK_SELL) || mType.equals(Book.ALL_BOOK_BUY)){
-            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.all_fragment_book, parent, false);
+            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.public_fragment_book, parent, false);
         }
         return new ViewHolder(view);
     }
 
-    private void setButtonLayout(Button button){
+    private void setInfoButtonLayout(Button infoButton){
 
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
         );
 
-        int bottomValueInPx = (int) button.getContext().getResources().getDimension(R.dimen.activity_vertical_margin);
+        int bottomValueInPx = (int) infoButton.getContext().getResources().getDimension(R.dimen.activity_vertical_margin);
         bottomValueInPx = bottomValueInPx / 2;
-        int valueInPx = (int) button.getContext().getResources().getDimension(R.dimen.activity_horizontal_margin);
+        int valueInPx = (int) infoButton.getContext().getResources().getDimension(R.dimen.activity_horizontal_margin);
 
         if(mType.equals(Book.MY_BOOK_SELL) || mType.equals(Book.MY_BOOK_BUY)){
             params.setMargins(params.leftMargin, params.topMargin, params.rightMargin, bottomValueInPx*2);
         }
 
-        button.setGravity(Gravity.START);
-        button.setGravity(Gravity.CENTER_VERTICAL);
-        button.setTextColor(Color.WHITE);
+        infoButton.setGravity(Gravity.START);
+        infoButton.setGravity(Gravity.CENTER_VERTICAL);
+        infoButton.setTextColor(Color.WHITE);
         if(mType.equals(Book.ALL_BOOK_SELL) || mType.equals(Book.MY_BOOK_SELL)) {
-            button.setBackgroundColor(Color.parseColor("#2aa22a"));
+            infoButton.setBackgroundColor(Color.parseColor("#2aa22a"));
         }else if(mType.equals(Book.ALL_BOOK_BUY) || mType.equals(Book.MY_BOOK_BUY)){
-            button.setBackgroundColor(Color.parseColor("#3385ff"));
+            infoButton.setBackgroundColor(Color.parseColor("#3385ff"));
         }
-        button.setSingleLine();
-        button.setEllipsize(TextUtils.TruncateAt.END);
-        button.setPadding(valueInPx, button.getPaddingTop(), valueInPx, button.getPaddingBottom());
-        button.setLayoutParams(params);
+        infoButton.setSingleLine();
+        infoButton.setEllipsize(TextUtils.TruncateAt.END);
+        infoButton.setPadding(valueInPx, infoButton.getPaddingTop(), valueInPx, infoButton.getPaddingBottom());
+        infoButton.setLayoutParams(params);
     }
 
     private void setReqButtonLayout(ToggleButton reqButton){
@@ -189,7 +189,7 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
         reqButton.setTextOn("Unrequest");
     }
 
-    private void setBookLayout(LinearLayout bookLayout){
+    private void setBookListLayout(LinearLayout bookLayout){
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
@@ -215,7 +215,7 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
         if(holder.mView instanceof Button){ // Personal Book
             Button button = (Button) holder.mView;
             button.setText(buttonText);
-            setButtonLayout(button);
+            setInfoButtonLayout(button);
             final Book book = holder.mItem;
             final Context context = holder.mView.getContext();
             button.setOnClickListener(new View.OnClickListener() {
@@ -229,7 +229,7 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
 
             LinearLayout bookLayout = (LinearLayout) holder.mView;
             bookLayout.removeAllViews();
-            setBookLayout(bookLayout);
+            setBookListLayout(bookLayout);
 
             Context context = bookLayout.getContext();
 
@@ -240,7 +240,7 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
             Button infoButton = new Button(context);
             infoButton.setText(buttonText);
             bookLayout.addView(infoButton);
-            setButtonLayout(infoButton);
+            setInfoButtonLayout(infoButton);
 
             // Check if the book is already requested by the User
             final Book book = holder.mItem;
@@ -264,7 +264,7 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
         }
     }
 
-    // User Book Functions
+    // Private Book Functions
     private AlertDialog viewMyBookDialog(final Book book, final Context context){
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -593,37 +593,6 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
         return builder.create();
     }
 
-    private void addRequest(Book bookRequested){
-        // NO need to add to bookRequests, since bookRequests is a pointer AND it will update the Firebase Database
-        try {
-            Request request = new Request(mainUser, bookRequested);
-            FirebaseHandler.addRequest(request);
-
-            bookRequested.addRequestID(request);
-            FirebaseHandler.updatePublicBook(bookRequested);
-
-            mainUser.addMyRequest(request);
-            FirebaseHandler.updateMainUserData(mainUser);
-        }catch (IllegalAccessException i){
-            illegalAccess();
-        }
-    }
-
-    private void deleteRequest(Book book, String requestID){
-        // NO need to delete to bookRequests, since bookRequests is a pointer (mainUser.getMyRequestIDs) AND it will update the Firebase Database
-        FirebaseHandler.getRootRef().child("requests").child(requestID).removeValue();
-
-        try {
-            book.removeRequestID(requestID);
-            FirebaseHandler.updatePublicBook(book);
-
-            mainUser.getMyRequestIDs().remove(book.getBookID());
-            FirebaseHandler.updateMainUserData(mainUser);
-        }catch (IllegalAccessException i){
-            illegalAccess();
-        }
-    }
-
     private void checkedConditional(ToggleButton reqButton, boolean isChecked, Book book){
         if (isChecked){
             addRequest(book);
@@ -639,6 +608,22 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
             // Add Delete? Dialog - to prevent accidental request removal -
             AlertDialog dialog = removeRequestDialog(book, requestID, reqButton);
             dialog.show();
+        }
+    }
+
+    private void addRequest(Book bookRequested){
+        // NO need to add to bookRequests, since bookRequests is a pointer AND it will update the Firebase Database
+        try {
+            Request request = new Request(mainUser, bookRequested);
+            FirebaseHandler.addRequest(request);
+
+            bookRequested.addRequestID(request);
+            FirebaseHandler.updatePublicBook(bookRequested);
+
+            mainUser.addMyRequest(request);
+            FirebaseHandler.updateMainUserData(mainUser);
+        }catch (IllegalAccessException i){
+            illegalAccess();
         }
     }
 
@@ -687,6 +672,21 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
             }
         });
         return builder.create();
+    }
+
+    private void deleteRequest(Book book, String requestID){
+        // NO need to delete to bookRequests, since bookRequests is a pointer (mainUser.getMyRequestIDs) AND it will update the Firebase Database
+        FirebaseHandler.getRootRef().child("requests").child(requestID).removeValue();
+
+        try {
+            book.removeRequestID(requestID);
+            FirebaseHandler.updatePublicBook(book);
+
+            mainUser.getMyRequestIDs().remove(book.getBookID());
+            FirebaseHandler.updateMainUserData(mainUser);
+        }catch (IllegalAccessException i){
+            illegalAccess();
+        }
     }
 
     private void illegalAccess(){

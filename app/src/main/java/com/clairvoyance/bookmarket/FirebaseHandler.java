@@ -27,7 +27,6 @@ class FirebaseHandler {
 
     final static int RC_SIGN_IN = 2899;
     final static String WEB_CLIENT_ID = "483082602147-bmhfbbj3k1proa5r2ll3hr694d9s5mrr.apps.googleusercontent.com";
-    private static User loadedUser;
 
     private static DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
 
@@ -43,60 +42,12 @@ class FirebaseHandler {
         return user != null;
     }
 
-    static User generateMainUser() throws IllegalAccessException{
+    static User createNewUserData() {
         FirebaseUser mUser = getFirebaseUser();
-        if (isMainUserAuthenticated(mUser)){
-            User user = new User(mUser.getUid(), mUser.getEmail());
-            user.setEmailVerified(mUser.isEmailVerified());
-            user.setName(mUser.getDisplayName());
-            // Key-line
-            user = loadMainUserData(user);
-            return user;
-        }
-        else{
-            throw new IllegalAccessException("User not authorized");
-        }
-    }
-
-    private static User loadMainUserData(final User user){
-        // Load main data (and set listener) from database - if not already loaded
-        if (loadedUser == null) {
-            FirebaseUser mUser = getFirebaseUser();
-            DatabaseReference userRef = rootRef.child(USER_REF).child(mUser.getUid());
-
-            // Read Data
-            userRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    if (!dataSnapshot.exists()) {
-                        // Create new user in database
-                        createNewUserData(user);
-                        // Loaded User is whatever it is now since there is no previous data to load
-                        loadedUser = user;
-                    }
-                    else {
-                        // This works even after the initial data read since loadedUser's pointer is returned at the end of the method.
-                        Log.d("MainActivityCycle", "mainUserSet");
-                        loadedUser = dataSnapshot.getValue(User.class);
-                    }
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-            });
-
-        }
-        return loadedUser; // This will be null at first since the ValueEventListener only puts the data in this pointer after all the code (onCreate) has run
-    }
-
-    private static void createNewUserData(User user) {
-
-        FirebaseUser mUser = getFirebaseUser();
+        User user = new User(mUser.getUid(), mUser.getEmail());
         DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child(USER_REF);
         userRef.child(mUser.getUid()).setValue(user);
-
+        return user;
     }
 
     static void updateMainUserData(User user) throws IllegalAccessException{
@@ -121,11 +72,26 @@ class FirebaseHandler {
         }
     }
 
-    static void updateToken() throws IllegalAccessException{
-        if(isMainUserAuthenticated(getFirebaseUser())){
-            User user = generateMainUser();
-            updateMainUserData(user);
-        }
+    static void setToken(final String token) throws IllegalAccessException{
+
+        String uid = getUID();
+        DatabaseReference userRef = getRootRef().child(USER_REF).child(uid);
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                User mainUser = dataSnapshot.getValue(User.class);
+                if(mainUser != null){
+                    mainUser.setRegistrationToken(token);
+                    dataSnapshot.getRef().setValue(mainUser);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
     }
 
     static void updatePublicBook(Book book) throws IllegalAccessException{

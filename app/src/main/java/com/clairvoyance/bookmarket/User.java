@@ -60,7 +60,8 @@ class User implements Serializable {
     public HashMap<String, String> getMyRequestIDs() {
         return myRequestIDs;
     }
-    public String setRegistrationToken() {
+
+    public String getRegistrationToken() {
         return registrationToken;
     }
 

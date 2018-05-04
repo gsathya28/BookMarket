@@ -105,10 +105,10 @@ public class ActAddBook extends AppCompatActivity {
                 newBookDialog.setOnShowListener(new DialogInterface.OnShowListener() {
                     @Override
                     public void onShow(DialogInterface dialogInterface) {
-                        Button button = newBookDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                        Button addBookButton = newBookDialog.getButton(AlertDialog.BUTTON_POSITIVE);
 
                         // Listener for Dialog Positive Button to create Book Object and stored temporarily in Activity (postBooks)
-                        button.setOnClickListener(new View.OnClickListener() {
+                        addBookButton.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
 
@@ -164,7 +164,7 @@ public class ActAddBook extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                // Add books to database that are in temporary store (postBooks)
+                // Add books to database that are in local Activity store (postBooks)
                 for(Book book: postBooks){
                     mainUser.addBook(book);
                     try{

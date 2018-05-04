@@ -23,10 +23,9 @@ public class MyFirebaseInstanceIDService extends FirebaseInstanceIdService {
 
         // Update UserData - to store the registration token
         try {
-            FirebaseHandler.updateToken();
-        }
-        catch (IllegalAccessException i){
-            Log.d("AccessTokenDenied", i.getMessage());
+            FirebaseHandler.setToken(refreshedToken);
+        }catch (IllegalAccessException iae){
+            // Todo: Local Storage of Registration Key
         }
     }
 
