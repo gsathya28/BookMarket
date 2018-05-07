@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "483082602147",
+    "firebase_url": "https://bookmarket-66efd.firebaseio.com",
+    "project_id": "bookmarket-66efd",
+    "storage_bucket": "bookmarket-66efd.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:483082602147:android:e28706bb66e94e71",
+        "android_client_info": {
+          "package_name": "com.clairvoyance.bookmarket"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "483082602147-pbqd624alltlni4aic1nbqq7mo02hpe1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.clairvoyance.bookmarket",
+            "certificate_hash": "0d542c8c48b65b0a3dd25c58206fe1c9fa19a3fd"
+          }
+        },
+        {
+          "client_id": "483082602147-bmhfbbj3k1proa5r2ll3hr694d9s5mrr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDUNYqxer4YRji2RhehzRBL8Ym2xROlGnk"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "483082602147-bmhfbbj3k1proa5r2ll3hr694d9s5mrr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
