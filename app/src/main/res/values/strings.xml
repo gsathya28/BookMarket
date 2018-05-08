@@ -54,5 +54,8 @@
     <string name="exampleCourse">E.g. PHYS 1302W, SOC 1001, etc.</string>
     <string name="new_book">New Book</string>
     <string name="flag">flag</string>
+    <string name="no_requests">No Requests for your book!</string>
+    <string name="accept">Accept</string>
+    <string name="decline">decline</string>
 
 </resources>

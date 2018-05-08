@@ -64,7 +64,9 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 .setContentText(notification.getBody())
                 .setAutoCancel( true )
                 .setSound(notificationSoundURI)
-                .setContentIntent(resultIntent);
+                .setContentIntent(resultIntent)
+                .setVibrate(new long[]{4000, 4000, 4000, 4000, 4000, 4000, 4000});
+
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             // Create the NotificationChannel, but only on API 26+ because
@@ -74,6 +76,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             int importance = NotificationManager.IMPORTANCE_DEFAULT;
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
             channel.setDescription(description);
+            channel.setVibrationPattern(new long[]{4000, 4000, 4000, 4000, 4000, 4000, 4000});
             // Register the channel with the system
             if (notificationManager != null) {
                 notificationManager.createNotificationChannel(channel);

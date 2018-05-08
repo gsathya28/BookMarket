@@ -18,7 +18,7 @@ import com.google.firebase.iid.FirebaseInstanceId;
 
 class FirebaseHandler {
 
-    private static final String REQUEST_REF = "requests";
+    static final String REQUEST_REF = "requests";
     private static final String USER_REF = "users";
     private static final String UID_REF = "uid";
     private static final String DATE_REF = "postDateInSecs";

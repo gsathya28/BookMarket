@@ -25,6 +25,7 @@ import com.clairvoyance.bookmarket.BookListFragment.OnListFragmentInteractionLis
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
@@ -291,7 +292,13 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
         ((TextView) view.findViewById(R.id.view_notes)).setText(notesString);
 
         Button spamButton = view.findViewById(R.id.flag_button);
-        spamButton.setVisibility(View.GONE);
+        spamButton.setText("View Requests");
+        spamButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                viewRequestsDialog(book, context).show();
+            }
+        });
 
         builder.setView(view);
 
@@ -463,6 +470,49 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
         builder.setView(editDialogLayout);
         builder.setPositiveButton("Save", null);
         builder.setNegativeButton("Cancel", null);
+        return builder.create();
+    }
+
+    private AlertDialog viewRequestsDialog(final Book book, final Context context){
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("Requests for " + book.getTitle());
+
+        final LayoutInflater inflater = LayoutInflater.from(context);
+        final View view = inflater.inflate(R.layout.view_requests_layout, null, false);
+
+        final LinearLayout linearLayout = view.findViewById(R.id.view_request_linear_layout);
+        linearLayout.setOrientation(LinearLayout.VERTICAL);
+        builder.setView(view);
+
+        HashMap<String, Boolean> requestIDMap = book.getRequestIDs();
+        Set<String> requestIDMapKeys = requestIDMap.keySet();
+
+        if(!requestIDMapKeys.isEmpty()){
+            linearLayout.removeAllViews();
+        }
+
+        for(String id: requestIDMapKeys){
+            DatabaseReference requestRef = FirebaseHandler.getRootRef().child(FirebaseHandler.REQUEST_REF).child(id);
+            requestRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    Request request = dataSnapshot.getValue(Request.class);
+                    if(request != null) {
+                        View requestView = inflater.inflate(R.layout.view_request_fragment, null, false);
+
+                        ((TextView) requestView.findViewById(R.id.view_request_email)).setText(request.getRequesterEmail());
+                        ((TextView) requestView.findViewById(R.id.view_request_name)).setText(request.getRequesterName());
+                        linearLayout.addView(requestView);
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+        }
+
         return builder.create();
     }
 

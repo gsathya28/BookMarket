@@ -121,7 +121,7 @@ class Book implements Serializable, Parcelable {
         requestIDs.remove(requestID);
     }
 
-    HashMap<String, Boolean> getRequestIDs(){
+    public HashMap<String, Boolean> getRequestIDs() {
         return requestIDs;
     }
 
