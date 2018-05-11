@@ -28,25 +28,32 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/view_request_name" />
 
-    <Button
-        android:id="@+id/request_message_button"
-        style="@style/Widget.AppCompat.Button.Borderless.Colored"
-        android:layout_width="wrap_content"
+    <TextView
+        android:id="@+id/view_request_accepted_text"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginTop="60dp"
-        android:text="@string/message"
-        app:layout_constraintEnd_toStartOf="@+id/request_decline_button"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:gravity="center"
+        android:text="@string/accepted"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@+id/view_request_name"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
-        android:id="@+id/request_decline_button"
-        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+    <TextView
+        android:id="@+id/view_request_messages_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:layout_marginTop="60dp"
-        android:text="@string/decline"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/view_messages"
+        android:textColor="@color/colorAccent"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="@+id/view_request_email"
+        app:layout_constraintStart_toEndOf="@+id/view_request_name"
+        app:layout_constraintTop_toBottomOf="@+id/view_request_accepted_text" />
+
+
 </android.support.constraint.ConstraintLayout>

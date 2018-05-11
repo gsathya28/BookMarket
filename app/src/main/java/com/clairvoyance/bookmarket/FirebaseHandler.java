@@ -19,7 +19,7 @@ import com.google.firebase.iid.FirebaseInstanceId;
 class FirebaseHandler {
 
     static final String REQUEST_REF = "requests";
-    private static final String USER_REF = "users";
+    static final String USER_REF = "users";
     private static final String UID_REF = "uid";
     private static final String DATE_REF = "postDateInSecs";
 
@@ -125,6 +125,16 @@ class FirebaseHandler {
     }
 
     static void addRequest(Request request) throws IllegalAccessException{
+        if (isMainUserAuthenticated(getFirebaseUser())) { // Add function to only allow certain people to post
+            DatabaseReference myRequestRef = rootRef.child(REQUEST_REF).child(request.getRequestID());
+            myRequestRef.setValue(request);
+
+        }else{
+            throw new IllegalAccessException("User not authorized");
+        }
+    }
+
+    static void updateRequest(Request request) throws IllegalAccessException{
         if (isMainUserAuthenticated(getFirebaseUser())) { // Add function to only allow certain people to post
             DatabaseReference myRequestRef = rootRef.child(REQUEST_REF).child(request.getRequestID());
             myRequestRef.setValue(request);

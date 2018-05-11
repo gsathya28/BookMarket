@@ -2,6 +2,7 @@ package com.clairvoyance.bookmarket;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
@@ -39,7 +40,6 @@ import java.util.Set;
 /**
  * {@link RecyclerView.Adapter} that can display a {@link Book} and makes a call to the
  * specified {@link OnListFragmentInteractionListener}.
- * TODO: Replace the implementation with code for your data type.
  */
 public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapter.ViewHolder> {
 
@@ -484,25 +484,75 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
         linearLayout.setOrientation(LinearLayout.VERTICAL);
         builder.setView(view);
 
-        HashMap<String, Boolean> requestIDMap = book.getRequestIDs();
+        // Todo: Send to a recycler instead of a linearLayout
+
+        final HashMap<String, Boolean> requestIDMap = book.getRequestIDs();
         Set<String> requestIDMapKeys = requestIDMap.keySet();
 
-        if(!requestIDMapKeys.isEmpty()){
-            linearLayout.removeAllViews();
-        }
+        TextView noRequestTextView = view.findViewById(R.id.no_requests_text);
 
         for(String id: requestIDMapKeys){
             DatabaseReference requestRef = FirebaseHandler.getRootRef().child(FirebaseHandler.REQUEST_REF).child(id);
             requestRef.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
-                    Request request = dataSnapshot.getValue(Request.class);
+                    final Request request = dataSnapshot.getValue(Request.class);
                     if(request != null) {
-                        View requestView = inflater.inflate(R.layout.view_request_fragment, null, false);
+                        if(!request.isAccepted() || request.isNew()) {
+                            final View requestView = inflater.inflate(R.layout.view_request_fragment, null, false);
+                            linearLayout.addView(requestView);
+                            ((TextView) requestView.findViewById(R.id.view_request_email)).setText(request.getRequesterEmail());
+                            ((TextView) requestView.findViewById(R.id.view_request_name)).setText(request.getRequesterName());
+                            (requestView.findViewById(R.id.request_message_button)).setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    request.setAccepted(true);
+                                    try {
+                                        FirebaseHandler.updateRequest(request);
+                                        Toast.makeText(context, "Accepted!", Toast.LENGTH_SHORT).show();
+                                        Intent intent = new Intent(context, ActViewMessages.class);
+                                        context.startActivity(intent);
+                                    } catch (IllegalAccessException iae) {
+                                        illegalAccess();
+                                    }
+                                }
+                            });
+                            (requestView.findViewById(R.id.request_decline_button)).setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
 
-                        ((TextView) requestView.findViewById(R.id.view_request_email)).setText(request.getRequesterEmail());
-                        ((TextView) requestView.findViewById(R.id.view_request_name)).setText(request.getRequesterName());
-                        linearLayout.addView(requestView);
+                                    try {
+                                        FirebaseHandler.removeRequest(request.getRequestID());
+                                        Toast.makeText(context, "Declined!", Toast.LENGTH_SHORT).show();
+                                        linearLayout.removeView(requestView);
+                                        requestIDMap.remove(request.getRequestID());
+                                        FirebaseHandler.updatePublicBook(book);
+                                        FirebaseHandler.getRootRef().child(FirebaseHandler.USER_REF).child(request.getUid()).child("myRequestIDs").child(request.getBookID()).removeValue();
+
+                                    } catch (IllegalAccessException iae) {
+                                        illegalAccess();
+                                    }
+                                }
+                            });
+                            request.setNew(false);
+                            try {
+                                FirebaseHandler.updateRequest(request);
+                            } catch (IllegalAccessException iae) {
+                                illegalAccess();
+                            }
+                        }else{
+                            View requestView = inflater.inflate(R.layout.view_request_accepted, null, false);
+                            ((TextView) requestView.findViewById(R.id.view_request_email)).setText(request.getRequesterEmail());
+                            ((TextView) requestView.findViewById(R.id.view_request_name)).setText(request.getRequesterName());
+                            linearLayout.addView(requestView);
+                            requestView.findViewById(R.id.view_request_messages_text).setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    Intent intent = new Intent(context, ActViewMessages.class);
+                                    context.startActivity(intent);
+                                }
+                            });
+                        }
                     }
                 }
 
@@ -512,6 +562,8 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
                 }
             });
         }
+
+        builder.setPositiveButton("OK", null);
 
         return builder.create();
     }

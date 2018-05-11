@@ -19,6 +19,8 @@ class Request {
     private double requestTime;
     private String bookCourse;
     private String bookType;
+    private boolean isNew;
+    private boolean isAccepted;
 
     Request(){}
 
@@ -32,6 +34,8 @@ class Request {
         this.bookCourse = book.getCourseTotal();
         this.requestTime = Calendar.getInstance().getTimeInMillis();
         this.bookType = book.getType();
+        this.isNew = true;
+        this.isAccepted = false;
     }
 
     public String getUid() {
@@ -56,5 +60,17 @@ class Request {
     public double getRequestTime() {return requestTime;}
     public String getBookType() {
         return bookType;
+    }
+    public boolean isNew() {
+        return isNew;
+    }
+    public void setNew(boolean aNew) {
+        isNew = aNew;
+    }
+    public boolean isAccepted() {
+        return isAccepted;
+    }
+    public void setAccepted(boolean accepted) {
+        isAccepted = accepted;
     }
 }
