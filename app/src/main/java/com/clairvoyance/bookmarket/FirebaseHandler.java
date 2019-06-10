@@ -1,5 +1,10 @@
 package com.clairvoyance.bookmarket;
 
+import android.support.annotation.NonNull;
+import android.widget.Toast;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -9,6 +14,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 
 
 /**
@@ -42,17 +48,48 @@ class FirebaseHandler {
 
     static User createNewUserData() {
         FirebaseUser mUser = getFirebaseUser();
-        User user = new User(mUser.getUid(), mUser.getEmail());
-        user.setRegistrationToken(FirebaseInstanceId.getInstance().getToken());
+        final User user = new User(mUser.getUid(), mUser.getEmail());
+        FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(
+            new OnCompleteListener<InstanceIdResult>() {
+                @Override
+                public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                    if (!task.isSuccessful()) {
+                        return;
+                    }
+
+                    // Get new Instance ID token
+                    if(task.getResult() != null) {
+                        user.setRegistrationToken(task.getResult().getToken());
+                    }
+
+                }
+            }
+        );
+
         DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child(USER_REF);
         userRef.child(mUser.getUid()).setValue(user);
         return user;
     }
 
-    static void updateMainUserData(User user) throws IllegalAccessException{
+    static void updateMainUserData(final User user) throws IllegalAccessException{
         FirebaseUser mUser = getFirebaseUser();
         if (isMainUserAuthenticated(mUser)){
-            user.setRegistrationToken(FirebaseInstanceId.getInstance().getToken());
+            FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(
+                    new OnCompleteListener<InstanceIdResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                            if (!task.isSuccessful()) {
+                                return;
+                            }
+
+                            // Get new Instance ID token
+                            if(task.getResult() != null) {
+                                user.setRegistrationToken(task.getResult().getToken());
+                            }
+
+                        }
+                    }
+            );
             DatabaseReference userRef = rootRef.child("users").child(mUser.getUid());
             userRef.setValue(user);
         }

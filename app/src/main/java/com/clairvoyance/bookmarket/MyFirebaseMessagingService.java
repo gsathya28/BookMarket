@@ -87,4 +87,18 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             notificationManager.notify(0, mNotificationBuilder.build());
         }
     }
+
+    @Override
+    public void onNewToken(String token) {
+        //Get hold of the registration token
+        //Log the token
+        Log.d(TAG, "Refreshed token: " + token);
+
+        // Update UserData - to store the registration token
+        try {
+            FirebaseHandler.setToken(token);
+        }catch (IllegalAccessException iae){
+            // Todo: Local Storage of Registration Key
+        }
+    }
 }
